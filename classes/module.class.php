@@ -14,4 +14,9 @@ class Module extends \RAAS\Module
         }
     }
 
+
+    public function dev_fields()
+    {
+        return User_Field::getSet();
+    }
 }
