@@ -5,7 +5,7 @@ class ViewSub_Users extends \RAAS\Abstract_Sub_View
 {
     protected static $instance;
     
-    public function users(array $IN = array())
+    public function showlist(array $IN = array())
     {
         $view = $this;
         $IN['Table'] = new UsersTable(array_merge($IN, array('view' => $this, 'editAction' => 'edit', 'ctxMenu' => 'getUserContextMenu')));

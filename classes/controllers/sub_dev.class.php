@@ -1,9 +1,10 @@
 <?php
 namespace RAAS\CMS\Users;
 use \RAAS\Redirector;
-use \RAAS\EditFieldForm;
+use \RAAS\CMS\EditFieldForm;
 use \RAAS\CMS\Form as CMSForm;
 use \RAAS\StdSub;
+use \RAAS\CMS\User;
 
 class Sub_Dev extends \RAAS\Abstract_Sub_Controller
 {
@@ -24,6 +25,13 @@ class Sub_Dev extends \RAAS\Abstract_Sub_Controller
                 $f = str_replace('_field', '', $this->action);
                 $url2 .= '&action=fields';
                 StdSub::$f($Item, $this->url . $url2);
+                break;
+            case 'webmaster':
+                if (isset($_GET['confirm']) && $_GET['confirm']) {
+                    $w = new Webmaster();
+                    $w->createCab();
+                }
+                new Redirector($this->url);
                 break;
             default:
                 new Redirector(\RAAS\CMS\ViewSub_Dev::i()->url);

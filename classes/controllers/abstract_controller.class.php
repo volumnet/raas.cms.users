@@ -1,5 +1,5 @@
 <?php
-namespace RAAS\Cms\Users;
+namespace RAAS\CMS\Users;
 
 abstract class Abstract_Controller extends \RAAS\Abstract_Module_Controller
 {
@@ -7,7 +7,6 @@ abstract class Abstract_Controller extends \RAAS\Abstract_Module_Controller
     
     protected function execute()
     {
-        $this->view->submenu = $this->view->usersMenu();
         switch ($this->sub) {
             case 'dev':
                 parent::execute();

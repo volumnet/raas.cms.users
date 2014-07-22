@@ -3,6 +3,7 @@ namespace RAAS\CMS\Users;
 use \RAAS\Table as Table;
 use \RAAS\Column as Column;
 use \RAAS\Row as Row;
+use \RAAS\CMS\FieldsTable;
 
 class ViewSub_Dev extends \RAAS\Abstract_Sub_View
 {
@@ -21,7 +22,7 @@ class ViewSub_Dev extends \RAAS\Abstract_Sub_View
     
     public function edit_field(array $IN = array())
     {
-        $this->js[] = Package::i()->publicURL . '/dev_edit_field.js';
+        $this->js[] = Module::i()->parent->view->publicURL . '/dev_edit_field.js';
         $this->path[] = array('name' => $this->_('DEVELOPMENT'), 'href' => $this->url);
         $this->path[] = array('name' => $this->_('USERS_FIELDS'), 'href' => $this->url . '&action=fields');
         $this->stdView->stdEdit($IN, 'getFieldContextMenu');
@@ -40,7 +41,7 @@ class ViewSub_Dev extends \RAAS\Abstract_Sub_View
     }
     
     
-    public function getFieldContextMenu(Page_Field $Item, $i = 0, $c = 0) 
+    public function getFieldContextMenu(User_Field $Item, $i = 0, $c = 0) 
     {
         $arr = array();
         if ($Item->id) {
