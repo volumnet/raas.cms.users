@@ -1,5 +1,5 @@
 <?php
-namespace RAAS\CMS\User;
+namespace RAAS\CMS\Users;
 use \RAAS\Application;
 use \RAAS\FormTab;
 use \RAAS\Field as RAASField;
@@ -12,6 +12,7 @@ class EditUserForm extends \RAAS\Form
     public function __construct(array $params = array())
     {
         $this->_view = isset($params['view']) ? $params['view'] : null;
+        $t = $this;
         unset($params['view']);
         $Item = isset($params['Item']) ? $params['Item'] : null;
         $defaultParams = array(
@@ -22,33 +23,28 @@ class EditUserForm extends \RAAS\Form
         );
         
         // Логин
-        $Field = new Field(array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'required' => 'required'));
-        if ($Item->id == $this->model->user->id) {
-            $Field->readonly = 'readonly';
-            $Field->export = 'is_null';
-        } else {
-            $Field->required = 'required';
-            $Field->check = function($Field) use ($t) {
-                $localError = $Field->getErrors();
-                if (!$localError) {
-                    if ($t->model->checkLoginExists($_POST[$Field->name], $Field->Form->Item->id)) {
-                        $localError[] = array('name' => 'INVALID', 'value' => $Field->name, 'description' => $t->view->_('ERR_LOGIN_EXISTS'));
-                    }
+        $Field = new RAASField(array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'required' => 'required'));
+        $Field->required = 'required';
+        $Field->check = function($Field) use ($t) {
+            $localError = $Field->getErrors();
+            if (!$localError) {
+                if ($Field->Form->Item->checkLoginExists($_POST[$Field->name])) {
+                    $localError[] = array('name' => 'INVALID', 'value' => $Field->name, 'description' => $t->view->_('ERR_LOGIN_EXISTS'));
                 }
-                return $localError;
-           };
-        }
+            }
+            return $localError;
+        };
         $defaultParams['children']['login'] = $Field;
 
         // Пароль
-        $Field = new Field(array(
+        $Field = new RAASField(array(
             'type' => 'password', 
             'name' => 'password', 
             'caption' => $this->view->_('PASSWORD'),
             'confirm' => true, 
             'export' => function($Field) use ($t) { 
                 if ($_POST[$Field->name]) {
-                    $Field->Form->Item->password_md5 = $t->application->md5It(trim($_POST[$Field->name])); 
+                    $Field->Form->Item->password_md5 = \RAAS\Application::i()->md5It(trim($_POST[$Field->name])); 
                 }
             }
         ));
@@ -58,7 +54,37 @@ class EditUserForm extends \RAAS\Form
         $defaultParams['children']['password'] = $Field;
         
         // E-mail
-        $defaultParams['children']['email'] = new Field(array('type' => 'email', 'name' => 'email', 'caption' => $this->view->_('EMAIL')));
+        $Field = new RAASField(array('type' => 'email', 'name' => 'email', 'caption' => $this->view->_('EMAIL'), 'required' => true));
+        $Field->check = function($Field) use ($t) {
+            $localError = $Field->getErrors();
+            if (!$localError) {
+                if ($Field->Form->Item->checkEmailExists($_POST[$Field->name])) {
+                    $localError[] = array('name' => 'INVALID', 'value' => $Field->name, 'description' => $t->view->_('ERR_EMAIL_EXISTS'));
+                }
+            }
+            return $localError;
+        };
+        $defaultParams['children']['email'] = $Field;
+
+        // Активирован
+        $Field = new RAASField(array('type' => 'checkbox', 'name' => 'vis', 'caption' => $this->view->_('ACTIVATED')));
+        $defaultParams['children']['vis'] = $Field;
+
+        // Кастомные поля
+        foreach ($Item->fields as $row) {
+            $defaultParams['children'][$row->urn] = $row->Field;
+        }
+
+        // Социальные сети
+        $defaultParams['children']['social'] = new RAASField(array(
+            'type' => 'text', 
+            'name' => 'social', 
+            'multiple' => true, 
+            'caption' => $this->view->_('SOCIAL_NETWORKS'),
+            'export' => function($Field) use ($t) {
+                $Field->Form->Item->meta_social = isset($_POST[$Field->name]) ? (array)$_POST[$Field->name] : array();
+            }
+        ));
 
         $arr = array_merge($defaultParams, $params);
         parent::__construct($arr);

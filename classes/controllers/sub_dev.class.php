@@ -5,6 +5,7 @@ use \RAAS\CMS\EditFieldForm;
 use \RAAS\CMS\Form as CMSForm;
 use \RAAS\StdSub;
 use \RAAS\CMS\User;
+use \RAAS\CMS\User_Field;
 
 class Sub_Dev extends \RAAS\Abstract_Sub_Controller
 {
@@ -44,10 +45,8 @@ class Sub_Dev extends \RAAS\Abstract_Sub_Controller
     {
         $Item = new User_Field((int)$this->id);
         $parentUrl = $this->url . '&action=fields';
-        $Parent = $Item->pid ? $Item->parent : new User(isset($_GET['pid']) ? (int)$_GET['pid'] : 0);
-        $Form = new EditFieldForm(array('Item' => $Item, 'view' => $this->view, 'Parent' => $Parent, 'parentUrl' => $parentUrl));
+        $Form = new EditFieldForm(array('Item' => $Item, 'view' => $this->view, 'parentUrl' => $parentUrl));
         $OUT = $Form->process();
-        $OUT['Parent'] = $Parent;
         $this->view->edit_field($OUT);
     }
 }

@@ -1,4 +1,4 @@
-<form class="form-search" action="<?php echo \SOME\HTTP::queryString()?>#users" method="get">
+<form class="form-search" action="<?php echo \SOME\HTTP::queryString()?>" method="get">
   <?php foreach ($VIEW->nav as $key => $val) { ?>
       <?php if (!in_array($key, array('page', 'search_string', 'group_only'))) { ?>
           <input type="hidden" name="<?php echo htmlspecialchars($key)?>" value="<?php echo htmlspecialchars($val)?>" />
@@ -10,8 +10,5 @@
   </div> &nbsp; 
 </form>
 <?php 
-if ($UsersTable->Set) { 
-    $Table = $UsersTable;
-    include \RAAS\Application::i()->view->context->tmp('/table.tmp.php');
- }
- ?>
+include \RAAS\Application::i()->view->context->tmp('/table.tmp.php');
+?>

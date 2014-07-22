@@ -1,6 +1,7 @@
 <?php
 namespace RAAS\CMS\Users;
 use \RAAS\CMS\User;
+use \RAAS\CMS\User_Field;
 
 class Module extends \RAAS\Module
 {
@@ -48,12 +49,13 @@ class Module extends \RAAS\Module
         } elseif (in_array($sort, array('post_date', 'login', 'email'))) {
             $SQL_query .= $sort;
         } else {
-            $SQL_query .= 'login';
+            $sort = 'login';
+            $SQL_query .= $sort;
         }
         $SQL_query .= " " . $order;
         $Pages = new \SOME\Pages((int)$page ?: 1, $this->registryGet('rowsPerPage'));
         $Set = User::getSQLSet($SQL_query, $Pages);
-        return array('Set' => $Set, 'Pages' => $Pages, 'columns' => $columns);
+        return array('Set' => $Set, 'Pages' => $Pages, 'columns' => $columns, 'sort' => $sort, 'order' => $order);
     }
 
 }

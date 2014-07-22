@@ -1,7 +1,8 @@
 <?php
 namespace RAAS\CMS\Users;
-use \RAAS\User;
+use \RAAS\CMS\User;
 use \RAAS\StdSub;
+use \RAAS\Application;
 
 class Sub_Users extends \RAAS\Abstract_Sub_Controller
 {
@@ -32,17 +33,12 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
                 setcookie($var, $_COOKIE[$var], time() + Application::i()->registryGet('cookieLifetime') * 86400, '/');
             }
         }
-        $IN = $this->model->showlist(
+        $OUT = $this->model->showlist(
             isset($_GET['search_string']) ? $_GET['search_string'] : '', 
             isset($_COOKIE['sort']) ? $_COOKIE['sort'] : 'login',
             isset($_COOKIE['order']) ? $_COOKIE['order'] : 'asc',
             isset($_GET['page']) ? (int)$_GET['page'] : 1
         );
-        $Set = $IN['Set'];
-        $Pages = $IN['Pages'];
-        $OUT['columns'] = $IN['columns'];
-        $OUT['Set'] = $Set;
-        $OUT['Pages'] = $Pages;
         $OUT['search_string'] = isset($_GET['search_string']) ? (string)$_GET['search_string'] : '';
         $this->view->showlist($OUT);
     }

@@ -4,6 +4,7 @@ use \RAAS\Table as Table;
 use \RAAS\Column as Column;
 use \RAAS\Row as Row;
 use \RAAS\CMS\FieldsTable;
+use \RAAS\CMS\User_Field;
 
 class ViewSub_Dev extends \RAAS\Abstract_Sub_View
 {
@@ -11,7 +12,7 @@ class ViewSub_Dev extends \RAAS\Abstract_Sub_View
     
     public function fields(array $IN = array())
     {
-        $IN['Table'] = new FieldsTable(array_merge($IN, array('view' => $this, 'editAction' => 'edit', 'ctxMenu' => 'getFieldContextMenu')));
+        $IN['Table'] = new FieldsTable(array_merge($IN, array('view' => $this, 'editAction' => 'edit_field', 'ctxMenu' => 'getFieldContextMenu')));
         $this->assignVars($IN);
         $this->title = $this->_('USERS_FIELDS');
         $this->path[] = array('name' => $this->_('DEVELOPMENT'), 'href' => $this->url);
