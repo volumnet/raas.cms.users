@@ -25,6 +25,7 @@ class Controller_Ajax extends Abstract_Controller
         $notifications['block_subject'] = sprintf($this->view->_('BLOCK_NOTIFICATION'), $_SERVER['HTTP_HOST']);
         $Item = new User((int)$this->id);
         $lang = $Item->lang ? $Item->lang : $this->view->language;
+        Controller_Frontend::i()->exportLang(Application::i(), $lang);
         Controller_Frontend::i()->exportLang($this->model->parent, $lang);
         foreach ($this->model->parent->modules as $row) {
             Controller_Frontend::i()->exportLang($row, $lang);

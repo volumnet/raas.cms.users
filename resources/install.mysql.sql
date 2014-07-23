@@ -1,16 +1,15 @@
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_register (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
-  register_form_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Register form ID#',
-  edit_form_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Edit form ID#',
+  form_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Register form ID#',
   email_as_login TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Use e-mail as login',
-  allow_edit_login TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Allow to edit login',
-  allow_edit_email TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Allow to edit email',
+  notify_about_edit TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Notify admin about profile edit',
   allow_edit_social TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Allow to edit social networks',
   activation_type TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Activation type: 0 - by admin, 1 - by user, 2 - already active',
+  allow_to TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Allow block to: -1 - unregistered, 0 - all, 1 - registered',
+  redirect_url VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Redirect unallowable users to',
 
   PRIMARY KEY (id),
-  KEY (register_form_id),
-  KEY (edit_form_id)
+  KEY (form_id)
 ) COMMENT='Register blocks';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_login (

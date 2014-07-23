@@ -30,21 +30,13 @@ class EditBlockRegisterForm extends EditBlockForm
         $tab = parent::getCommonTab();
         $tab->children[] = new RAASField(array(
             'type' => 'select', 
-            'name' => 'register_form_id', 
+            'name' => 'form_id', 
             'caption' => $this->_view->_('REGISTRATION_FORM'), 
             'children' => array('Set' => CMSForm::getSet()), 
             'required' => true,
         ));
-        $tab->children[] = new RAASField(array(
-            'type' => 'select', 
-            'name' => 'edit_form_id', 
-            'caption' => $this->_view->_('PROFILE_DATA_FORM'), 
-            'children' => array('Set' => CMSForm::getSet()), 
-            'placeholder' => '--'
-        ));
         $tab->children[] = new RAASField(array('type' => 'checkbox', 'name' => 'email_as_login', 'caption' => $this->_view->_('USE_EMAIL_AS_LOGIN')));
-        $tab->children[] = new RAASField(array('type' => 'checkbox', 'name' => 'allow_edit_login', 'caption' => $this->_view->_('ALLOW_EDIT_LOGIN')));
-        $tab->children[] = new RAASField(array('type' => 'checkbox', 'name' => 'allow_edit_email', 'caption' => $this->_view->_('ALLOW_EDIT_EMAIL')));
+        $tab->children[] = new RAASField(array('type' => 'checkbox', 'name' => 'notify_about_edit', 'caption' => $this->_view->_('NOTIFY_ADMIN_ABOUT_EDIT')));
         $tab->children[] = new RAASField(array('type' => 'checkbox', 'name' => 'allow_edit_social', 'caption' => $this->_view->_('ALLOW_EDIT_SOCIAL')));
         $tab->children[] = new RAASField(array(
             'type' => 'select', 
@@ -56,6 +48,17 @@ class EditBlockRegisterForm extends EditBlockForm
                 array('value' => Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED, 'caption' => $this->_view->_('ALREADY_ACTIVATED')),
             ),
         ));
+        $tab->children[] = new RAASField(array(
+            'type' => 'select', 
+            'name' => 'allow_to', 
+            'caption' => $this->_view->_('ALLOW_TO'),
+            'children' => array(
+                array('value' => Block_Register::ALLOW_TO_UNREGISTERED, 'caption' => $this->_view->_('ALLOW_TO_UNREGISTERED')),
+                array('value' => Block_Register::ALLOW_TO_ALL, 'caption' => $this->_view->_('ALLOW_TO_ALL')),
+                array('value' => Block_Register::ALLOW_TO_REGISTERED, 'caption' => $this->_view->_('ALLOW_TO_REGISTERED')),
+            ),
+        ));
+        $tab->children[] = new RAASField(array('name' => 'redirect_url', 'caption' => $this->_view->_('REDIRECT_URL')));
         $tab->children[] = $this->getWidgetField();
         return $tab;
     }

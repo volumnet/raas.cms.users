@@ -126,12 +126,13 @@ class EditUserForm extends \RAAS\Form
     public function sendNotification(User $User)
     {
         $lang = $User->lang ? $User->lang : $this->_view->language;
+        Controller_Frontend::i()->exportLang(Application::i(), $lang);
         Controller_Frontend::i()->exportLang(Package::i(), $lang);
         foreach (Package::i()->modules as $row) {
             Controller_Frontend::i()->exportLang($row, $lang);
         }
         $text = Module::i()->getActivationNotification($User);
         $subject = sprintf($this->_view->_($User->vis ? 'ACTIVATION_NOTIFICATION' : 'BLOCK_NOTIFICATION'), $_SERVER['HTTP_HOST']);
-        Application::i()->sendmail(trim($User->email), trim($subject), trim($text), $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'mailer@' . $_SERVER['HTTP_HOST']);
+        Application::i()->sendmail(trim($User->email), trim($subject), trim($text), $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
     }
 }

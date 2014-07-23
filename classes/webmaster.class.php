@@ -98,6 +98,32 @@ class Webmaster extends \RAAS\CMS\Webmaster
 
         $F = new Form_Field();
         $F->pid = $FRM->id;
+        $F->name = $this->view->_('LOGIN');
+        $F->urn = 'login';
+        $F->datatype = 'text';
+        $F->required = 1;
+        $F->show_in_table = 1;
+        $F->commit();
+
+        $F = new Form_Field();
+        $F->pid = $FRM->id;
+        $F->name = $this->view->_('PASSWORD');
+        $F->urn = 'password';
+        $F->datatype = 'password';
+        $F->required = 1;
+        $F->show_in_table = 1;
+        $F->commit();
+
+        $F = new Form_Field();
+        $F->pid = $FRM->id;
+        $F->name = $this->view->_('EMAIL');
+        $F->urn = 'email';
+        $F->datatype = 'text';
+        $F->show_in_table = 1;
+        $F->commit();
+
+        $F = new Form_Field();
+        $F->pid = $FRM->id;
         $F->name = $this->view->_('YOUR_NAME');
         $F->urn = 'full_name';
         $F->required = 1;
@@ -128,13 +154,12 @@ class Webmaster extends \RAAS\CMS\Webmaster
         $B->vis = 1;
         $B->author_id = $B->editor_id = Application::i()->user->id;
         $B->cats = array($register->id);
-        $B->register_form_id = $FRM ? $FRM[0]->id : 0;
-        $B->edit_form_id = $FRM ? $FRM[0]->id : 0;
-        $B->email_as_login = 1;
-        $B->allow_edit_login = 0;
-        $B->allow_edit_email = 1;
+        $B->form_id = $FRM ? $FRM[0]->id : 0;
+        $B->email_as_login = 0;
+        $B->notify_about_edit = 0;
         $B->allow_edit_social = 0;
         $B->activation_type = Block_Register::ACTIVATION_TYPE_USER;
+        $B->allowed_to = Block_Register::ALLOW_TO_ALL;
         $B->widget_id = $S->id;
         $B->interface_id = $I->id;
         $B->commit();
