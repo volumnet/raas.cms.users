@@ -1,0 +1,42 @@
+<?php
+namespace RAAS\CMS\Users;
+use \RAAS\CMS\Block;
+
+class Block_Register extends Block
+{
+    const ACTIVATION_TYPE_ADMINISTRATOR = 0;
+    const ACTIVATION_TYPE_USER = 1;
+    const ACTIVATION_TYPE_ALREADY_ACTIVATED = 2;
+
+    protected static $tablename2 = 'cms_users_blocks_register';
+
+    protected static $references = array(
+        'Register_Form' => array('FK' => 'register_form_id', 'classname' => 'RAAS\\CMS\\Form', 'cascade' => false),
+        'Edit_Form' => array('FK' => 'edit_form_id', 'classname' => 'RAAS\\CMS\\Form', 'cascade' => false),
+        'author' => array('FK' => 'author_id', 'classname' => 'RAAS\\User', 'cascade' => false),
+        'editor' => array('FK' => 'editor_id', 'classname' => 'RAAS\\User', 'cascade' => false),
+    );
+    
+    public function commit()
+    {
+        if (!$this->name) {
+            $this->name = Module::i()->view->_('REGISTRATION');
+        }
+        parent::commit();
+    }
+
+
+    protected function getAddData()
+    {
+        return array(
+            'id' => (int)$this->id, 
+            'register_form_id' => (int)$this->register_form_id,
+            'edit_form_id' => (int)$this->edit_form_id,
+            'email_as_login' => (int)$this->email_as_login,
+            'allow_edit_login' => (int)$this->allow_edit_login,
+            'allow_edit_email' => (int)$this->allow_edit_email,
+            'allow_edit_social' => (int)$this->allow_edit_social,
+            'activation_type' => (int)$this->activation_type,
+        );
+    }
+}

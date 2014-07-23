@@ -2,9 +2,17 @@
 namespace RAAS\CMS\Users;
 use \RAAS\CMS\User;
 use \RAAS\CMS\User_Field;
+use \RAAS\CMS\Block_Type;
+use \RAAS\Controller_Frontend;
+use \RAAS\IContext;
+use \RAAS\CMS\Page;
 
 class Module extends \RAAS\Module
 {
+    const AUTOMATIC_NOTIFICATION_NONE = 0;
+    const AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION = 1;
+    const AUTOMATIC_NOTIFICATION_BOTH = 2;
+
     protected static $instance;
 
     public function __get($var)
@@ -58,4 +66,48 @@ class Module extends \RAAS\Module
         return array('Set' => $Set, 'Pages' => $Pages, 'columns' => $columns, 'sort' => $sort, 'order' => $order);
     }
 
+
+    public function newUsers()
+    {
+        $SQL_query = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE NOT vis";
+        $c = (int)$this->SQL->getvalue($SQL_query);
+        return $c;
+    }
+
+
+    public function getActivationNotification(User $User, $active = null)
+    {
+        $snippet = $this->registryGet('activation_notify');
+        if ($active === null) {
+            $active = (bool)$User->vis;
+        }
+        ob_start();
+        eval('?' . '>' . $snippet);
+        $text = ob_get_contents();
+        ob_end_clean();
+        return $text;
+    }
+
+
+    public function registerBlockTypes()
+    {
+        Block_Type::registerType('RAAS\\CMS\\Users\\Block_Register', 'RAAS\\CMS\\Users\\ViewBlockRegister', 'RAAS\\CMS\\Users\\EditBlockRegisterForm');
+        Block_Type::registerType('RAAS\\CMS\\Users\\Block_LogIn', 'RAAS\\CMS\\Users\\ViewBlockLogIn', 'RAAS\\CMS\\Users\\EditBlockLogInForm');
+        Block_Type::registerType('RAAS\\CMS\\Users\\Block_Activation', 'RAAS\\CMS\\Users\\ViewBlockActivation', 'RAAS\\CMS\\Users\\EditBlockActivationForm');
+        Block_Type::registerType('RAAS\\CMS\\Users\\Block_Recovery', 'RAAS\\CMS\\Users\\ViewBlockRecovery', 'RAAS\\CMS\\Users\\EditBlockRecoveryForm');
+    }
+
+
+    public function install()
+    {
+        if (!$this->registryGet('installDate')) {
+            if (!trim($this->registryGet('activation_notify'))) {
+                $this->registrySet('activation_notify', file_get_contents($this->resourcesDir . '/activation_notify.php'));
+            }
+            if ($this->registryGet('automatic_notification') === null) {
+                $this->registrySet('automatic_notification', self::AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION);
+            }
+        }
+        parent::install();
+    }
 }

@@ -7,7 +7,8 @@ class View_Web extends \RAAS\Module_View_Web
 
     public function header()
     {
-        //$c = Order::unreadFeedbacks();
+        $this->css[] = $this->publicURL . '/style.css';
+        $c = Module::i()->newUsers();
         $menuItem = array(array(
             'href' => '?p=' . $this->package->alias . '&m=' . $this->module->alias, 
             'name' => $this->_('__NAME') . ($c ? ' (' . $c . ')' : ''),
