@@ -31,21 +31,22 @@ class EditUserForm extends \RAAS\Form
             'caption' => $Item->id ? $this->view->_('EDITING_USER') : $this->view->_('CREATING_USER'),
             'children' => array(),
             'template' => 'edit',
-        );
-        if (($an = Module::i()->registryGet('automatic_notification')) && $Item->email) {
-            $defaultParams['export'] = function($Form) use ($t, $an) {
+            'export' => function($Form) use ($t) {
                 $oldVis = (int)$Form->Item->vis;
                 $Form->exportDefault();
+                $Form->Item->new = 0;
                 $newVis = (int)$Form->Item->vis;
-                if (!$oldVis && $newVis && in_array($an, array(Module::AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION, Module::AUTOMATIC_NOTIFICATION_BOTH))) {
-                    // Уведомление об активации
-                    $t->sendNotification($Form->Item);
-                } elseif ($oldVis && !$newVis && ($an == Module::AUTOMATIC_NOTIFICATION_BOTH)) {
-                    // Уведомление о блокировке
-                    $t->sendNotification($Form->Item);
+                if (($an = Module::i()->registryGet('automatic_notification')) && $Form->Item->email) {
+                    if (!$oldVis && $newVis && in_array($an, array(Module::AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION, Module::AUTOMATIC_NOTIFICATION_BOTH))) {
+                        // Уведомление об активации
+                        $t->sendNotification($Form->Item);
+                    } elseif ($oldVis && !$newVis && ($an == Module::AUTOMATIC_NOTIFICATION_BOTH)) {
+                        // Уведомление о блокировке
+                        $t->sendNotification($Form->Item);
+                    }
                 }
-            };
-        }
+            }
+        );
         
         // Логин
         $Field = new RAASField(array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'required' => 'required'));

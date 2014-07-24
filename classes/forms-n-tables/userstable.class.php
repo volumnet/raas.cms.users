@@ -44,7 +44,7 @@ class UsersTable extends \RAAS\Table
             'columns' => $columns, 
             'Set' => $params['Set'], 
             'Pages' => $params['Pages'],
-            'callback' => function($Row) { if (!$Row->source->vis) { $Row->class = 'info'; } },
+            'callback' => function($Row) { if ($Row->source->new) { $Row->class = 'info'; } },
             'emptyString' => $this->_view->_('NO_USERS_FOUND'),
             'template' => 'showlist',
             'order' => ((strtolower($params['order']) == 'desc') ? Column::SORT_DESC : Column::SORT_ASC)

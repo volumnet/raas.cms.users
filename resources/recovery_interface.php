@@ -4,6 +4,7 @@ use \RAAS\Application;
 use \RAAS\Controller_Frontend;
 use \RAAS\CMS\User;
 use \RAAS\CMS\Snippet;
+use \RAAS\CMS\Auth;
 
 $notify = function(User $User, array $config = array())
 {
@@ -28,10 +29,14 @@ $notify = function(User $User, array $config = array())
 $OUT = array();
 $Item = $User = Controller_Frontend::i()->user;
 $localError = array();
-if ($_GET['key']) {
+if ($_GET['key'] || $User->id) {
     $OUT['proceed'] = true;
-    if ($tmp_user = User::importByRecoveryKey($_GET['key'])) {
+    if (!$User->id && ($tmp_user = User::importByRecoveryKey($_GET['key']))) {
         $User = $tmp_user;
+        $a = new Auth($User);
+        $a->setSession();
+    }
+    if ($User->id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!isset($_POST['password']) || !trim($_POST['password'])) {
                 $localError['password'] = 'PASSWORD_REQUIRED';
@@ -62,3 +67,5 @@ if ($_GET['key']) {
 }
 $OUT['localError'] = $localError;
 $OUT['User'] = $User;
+
+return $OUT;

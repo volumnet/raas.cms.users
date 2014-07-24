@@ -69,7 +69,7 @@ class Module extends \RAAS\Module
 
     public function newUsers()
     {
-        $SQL_query = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE NOT vis";
+        $SQL_query = "SELECT COUNT(*) FROM " . User::_tablename() . " WHERE new";
         $c = (int)$this->SQL->getvalue($SQL_query);
         return $c;
     }

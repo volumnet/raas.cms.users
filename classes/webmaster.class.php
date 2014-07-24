@@ -10,7 +10,7 @@ use \RAAS\CMS\Form;
 
 class Webmaster extends \RAAS\CMS\Webmaster
 {
-    protected static $snippets = array('register' => 'REGISTRATION', 'activation' => 'ACTIVATION', 'login' => 'LOG_IN', 'recovery' => 'PASSWORD_RECOVERY');
+    protected static $snippets = array('register' => 'REGISTRATION', 'activation' => 'ACTIVATION', 'login' => 'LOG_IN_INTO_THE_SYSTEM', 'recovery' => 'PASSWORD_RECOVERY');
     protected static $notifications = array('register' => 'REGISTRATION', 'recovery' => 'PASSWORD_RECOVERY');
     protected static $instance;
 
@@ -143,7 +143,7 @@ class Webmaster extends \RAAS\CMS\Webmaster
         
         $register = $this->createPage(array('name' => $this->view->_('REGISTRATION'), 'urn' => 'register', 'cache' => 0, 'response_code' => 200), $Site);
         $activation = $this->createPage(array('name' => $this->view->_('ACTIVATION'), 'urn' => 'activate', 'cache' => 0, 'response_code' => 200), $Site);
-        $login = $this->createPage(array('name' => $this->view->_('LOG_IN'), 'urn' => 'login', 'cache' => 0, 'response_code' => 200), $Site);
+        $login = $this->createPage(array('name' => $this->view->_('LOG_IN_INTO_THE_SYSTEM'), 'urn' => 'login', 'cache' => 0, 'response_code' => 200), $Site);
         $recovery = $this->createPage(array('name' => $this->view->_('PASSWORD_RECOVERY'), 'urn' => 'recovery', 'cache' => 0, 'response_code' => 200), $Site);
 
         $FRM = Form::getSet(array('where' => "name = '" . $this->SQL->real_escape_string($this->view->_('REGISTRATION_FORM')) . "'"));

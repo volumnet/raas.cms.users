@@ -1,6 +1,5 @@
 <?php 
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\Feedback;
 
 if ($_POST['AJAX']) { 
     $result = array();

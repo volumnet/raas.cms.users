@@ -17,7 +17,7 @@ class Block_LogIn extends Block
     public function commit()
     {
         if (!$this->name) {
-            $this->name = Module::i()->view->_('LOG_IN');
+            $this->name = Module::i()->view->_('LOG_IN_INTO_THE_SYSTEM');
         }
         parent::commit();
     }

@@ -118,6 +118,7 @@ if ($Form->id) {
             $User->ip = (string)$_SERVER['REMOTE_ADDR'];
             $User->user_agent = (string)$_SERVER['HTTP_USER_AGENT'];
             $User->vis = (int)($config['activation_type'] == Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED);
+            $User->new = 1;
             
             if (isset($Form->fields['email'])) {
                 $val = $User->email = trim($_POST['email']);

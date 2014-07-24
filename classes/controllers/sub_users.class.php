@@ -47,6 +47,7 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
     protected function edit()
     {
         $Item = new User((int)$this->id);
+        $Item->visit();
         $Form = new EditUserForm(array('Item' => $Item, 'view' => $this->view));
         $OUT = $Form->process();
         $this->view->stdView->stdEdit($OUT, 'getUserContextMenu');
