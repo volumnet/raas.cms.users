@@ -1,6 +1,7 @@
 <?php 
 namespace RAAS\CMS\Users;
 use \RAAS\CMS\Feedback;
+use \RAAS\CMS\SocialProfile;
 
 if ($_POST['AJAX']) { 
     $result = array();
@@ -9,6 +10,12 @@ if ($_POST['AJAX']) {
     }
     if ($localError) {
         $result['localError'] = $localError;
+    }
+    if ($social) {
+        $result['social'] = trim($social);
+    }
+    if ($social) {
+        $result['socialNetwork'] = trim($socialNetwork);
     }
     ob_clean();
     echo json_encode($result);
@@ -56,6 +63,62 @@ if ($_POST['AJAX']) {
                 <label for="<?php echo htmlspecialchars($row->urn)?>" class="control-label col-sm-2"><?php echo htmlspecialchars($row->name . ($row->required ? '*' : ''))?></label>
                 <div class="col-sm-4"><?php $getField($row, $DATA)?></div>
               </div>
+          <?php } ?>
+          <?php if ($config['allow_edit_social']) { ?>
+              <h3><?php echo SOCIAL_NETWORKS?></h3>
+              <div data-role="raas-social-network-container">
+                <?php foreach ((array)$DATA['social'] as $i => $temp) { ?>
+                    <div data-role="raas-repo-element" class="clearfix">
+                      <input type="hidden" name="social[]" value="<?php echo htmlspecialchars($temp)?>" />
+                      <a href="<?php echo htmlspecialchars($temp)?>" target="_blank">
+                        <span class="raas-social raas-social<?php echo (int)SocialProfile::getSocialNetwork($temp)?>"><span>
+                        <?php echo htmlspecialchars($temp)?>
+                      </a>
+                      <a href="#" class="close" style="float: right;" data-role="raas-repo-del">&times;</a>
+                    </div>
+                <?php } ?>
+              </div>
+              <style type="text/css">
+              .raas-social { display: inline-block; width: 16px; height: 16px; background-image: url('http://ulogin.ru/img/small.png?version=1.3.00'); }
+              .raas-social<?php echo SocialProfile::SN_VK?> { background-position: 0 -19px; }
+              .raas-social<?php echo SocialProfile::SN_FB?> { background-position: 0 -88px; }
+              .raas-social<?php echo SocialProfile::SN_OK?> { background-position: 0 -42px; }
+              .raas-social<?php echo SocialProfile::SN_MR?> { background-position: 0 -65px; }
+              .raas-social<?php echo SocialProfile::SN_TW?> { background-position: 0 -111px; }
+              .raas-social<?php echo SocialProfile::SN_LJ?> { background-position: 0 -180px; }
+              .raas-social<?php echo SocialProfile::SN_GO?> { background-position: 0 -134px; }
+              .raas-social<?php echo SocialProfile::SN_YA?> { background-position: 0 -157px; }
+              .raas-social<?php echo SocialProfile::SN_WM?> { background-position: 0 -410px; }
+              .raas-social<?php echo SocialProfile::SN_YT?> { background-position: 0 -433px; }
+              </style>
+              <script src="//ulogin.ru/js/ulogin.js"></script>
+              <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=twitter,google,yandex,livejournal,youtube,webmoney;redirect_uri=&callback=RAAS_CMS_social_login"></div>
+              <script>
+              jQuery(document).ready(function($) {
+                  $('[data-role="raas-social-network-container"]').on('click', '[data-role="raas-repo-del"]', function() {
+                      $(this).closest('[data-role="raas-repo-element"]').remove();
+                  });
+                  RAAS_CMS_social_login = function(token)
+                  {
+                      $.post(location.toString(), {'token': token}), function(data) {
+                          var isFound = false;
+                          $('[data-role="raas-social-network-container"] input:hidden').each(function() {
+                              if ($.trim($(this).val()) == $.trim(data.social)) {
+                                  isFound = true;
+                              }
+                          });
+                          if (!isFound) {
+                              var text = '<div data-role="raas-repo-element" class="clearfix">'
+                                       + '  <input type="hidden" name="social[]" value="' + data.social + '" />'
+                                       + '  <a href="' + data.social + '" target="_blank"><span class="raas-social raas-social' + data.socialNetwork + '"><span> ' + data.social + '</a>'
+                                       + '  <a href="#" class="close" style="float: right;" data-role="raas-repo-del">&times;</a>'
+                                       + '</div>';
+                              $('[data-role="raas-social-network-container"]').append(text);
+                          }
+                      }, 'json');
+                  }
+              });
+              </script>
           <?php } ?>
           <?php if ($Form->antispam == 'captcha' && $Form->antispam_field_name && !$User->id) { ?>
               <div class="form-group">

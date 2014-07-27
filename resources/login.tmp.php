@@ -21,7 +21,7 @@ namespace RAAS\CMS\Users;
         <label for="password" class="control-label col-sm-2"><?php echo PASSWORD?>:</label>
         <div class="col-sm-4"><input type="password" name="password" /></div>
       </div>
-      <?php if ($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_SAVE_PASSWORD) || ($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_FOREIGN_COMPUTER) { ?>
+      <?php if (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_SAVE_PASSWORD) || ($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_FOREIGN_COMPUTER)) { ?>
           <div class="form-group">
             <div class="col-sm-4 col-sm-offset-2">
               <label class="checkbox">
@@ -37,4 +37,8 @@ namespace RAAS\CMS\Users;
       <div class="form-group"><div class="col-sm-4 col-sm-offset-2"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div></div>
     </div>
   </form>
+  <?php if ($config['social_login_type']) { ?>
+      <script src="//ulogin.ru/js/ulogin.js"></script>
+      <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=twitter,google,yandex,livejournal,youtube,webmoney;redirect_uri=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])?>"></div>
+  <?php } ?>
 </div>

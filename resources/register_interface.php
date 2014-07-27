@@ -5,6 +5,24 @@ use \RAAS\CMS\Form;
 use \RAAS\Application;
 use \RAAS\CMS\User;
 
+$generatePass = function($length = 5)
+{
+    $text = '';
+    for ($i = 0; $i < $length; $i++) {
+        $x = rand(0, 61);
+        if ($x < 10) {
+            $c = (string)(int)$x;
+        } elseif ($x < 36) {
+            $c = chr((int)$x - 10 + 65);
+        } else {
+            $c = chr((int)$x - 36 + 97);
+        }
+        $text .= $c;
+    }
+    return $text;
+};
+
+
 $notify = function(User $User, Form $Form, array $config = array(), $ADMIN = false)
 {
     $emails = $sms = array();
@@ -50,7 +68,22 @@ $Form = new Form(isset($config['form_id']) ? (int)$config['form_id'] : 0);
 
 if ($Form->id) {
     $localError = array();
-    if (($Form->signature && isset($_POST['form_signature']) && $_POST['form_signature'] == md5('form' . (int)$Form->id . (int)$Block->id)) || (!$Form->signature && ($_SERVER['REQUEST_METHOD'] == 'POST'))) {
+    if ($config['allow_edit_social'] && isset($_POST['token'])) {
+        if (!isset($_SESSION['confirmedSocial'])) {
+            $_SESSION['confirmedSocial'] = array();
+        }
+        if ($Profile = ULogin::getProfile($_POST['token'])) {
+            if ($_POST['AJAX']) {
+                $_SESSION['confirmedSocial'][] = $Profile->profile;
+                $OUT['social'] = $Profile->profile;
+                $OUT['socialNetwork'] = $Profile->socialNetwork;
+            } else {
+                $User->addSocial($Profile->profile);
+                header('Location: ' . $_SERVER['REQUEST_URI']);
+                exit;
+            }
+        }
+    } elseif (($Form->signature && isset($_POST['form_signature']) && $_POST['form_signature'] == md5('form' . (int)$Form->id . (int)$Block->id)) || (!$Form->signature && ($_SERVER['REQUEST_METHOD'] == 'POST'))) {
         $Item = $User;
         foreach ($Form->fields as $row) {
             switch ($row->datatype) {
@@ -106,7 +139,7 @@ if ($Form->id) {
         }
         if (isset($_POST['email']) && $_POST['email'] && isset($Form->fields['email'])) {
             if ($User->checkEmailExists(trim($_POST['login']))) {
-                $localError['login'] = 'ERR_LOGIN_EXISTS';
+                $localError['login'] = 'ERR_EMAIL_EXISTS';
             } elseif (!isset($Form->fields['login'])) {
                 if ($User->checkLoginExists(trim($_POST['email']))) {
                     $localError['email'] = 'ERR_LOGIN_EXISTS';
@@ -134,9 +167,21 @@ if ($Form->id) {
             if (isset($Form->fields['password']) && ($val = trim($_POST['password']))) {
                 $User->password = $val;
                 $User->password_md5 = Application::i()->md5It($val);
+            } elseif (!$User->id) {
+                $User->password_md5 = Application::i()->md5It($generatePass);
             }
             if (isset($Form->fields['lang']) && ($val = trim($_POST['lang']))) {
                 $User->lang = $val;
+            }
+            if ($config['allow_edit_social'] && isset($_POST['social']) && isset($_SESSION['confirmedSocial'])) {
+                $arr = array();
+                foreach ((array)$_POST['social'] as $val) {
+                    if (($val = trim($val)) && in_array($val, $_SESSION['confirmedSocial']) || in_array($val, $User->social)) {
+                        $arr[] = $val;
+                    }
+                }
+                unset($_SESSION['confirmedSocial']);
+                $User->meta_social = $arr;
             }
             $User->commit();
 
@@ -257,9 +302,21 @@ if ($Form->id) {
             }
             $OUT['success'][(int)$Block->id] = true;
         }
+        $OUT['DATA'] = $_POST;
+    } else {
+        $OUT['DATA'] = $User->getArrayCopy();
+        foreach ($Form->fields as $fname => $temp) {
+            if ($User->id && isset($User->fields[$fname])) {
+                $OUT['DATA'][$fname] = $User->fields[$fname]->getValues();
+            } else {
+                $OUT['DATA'][$fname] = $temp->default;
+            }
+        }
+        if ($config['allow_edit_social']) {
+            $OUT['DATA']['social'] = $User->social;
+        }
     }
     $OUT['localError'] = $localError;
-    $OUT['DATA'] = $_POST;
     $OUT['User'] = $User;
 }
 $OUT['Form'] = $Form;
