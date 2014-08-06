@@ -89,9 +89,9 @@ $emailField = function($field)
       foreach ($Form->fields as $field) {
           if ($field->urn == 'login') {
               echo '<div>' . htmlspecialchars($field->name) . ': ' . htmlspecialchars($User->{$field->urn}) . '</div>';
-          if ($field->urn == 'email') {
+          } elseif ($field->urn == 'email') {
               echo '<div>' . htmlspecialchars($field->name) . ': <a href="mailto:' . htmlspecialchars($User->{$field->urn}) . '">' . htmlspecialchars($User->{$field->urn}) . '</a></div>';
-          } elseif (!$ADMIN && $field->urn == 'password')) {
+          } elseif (!$ADMIN && ($field->urn == 'password')) {
               echo '<div>' . htmlspecialchars($field->name) . ': ' . htmlspecialchars($User->{$field->urn}) . '</div>';
           } elseif (isset($User->fields[$field->urn]) && ($field = $User->fields[$field->urn])) {
               echo $emailField($field);
@@ -102,29 +102,22 @@ $emailField = function($field)
     <?php if ($ADMIN) { ?>
         <?php if ($User && $User->id) { ?>
             <p>
-              <a href="http://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'] . '/admin/?p=cms&sub=users&action=edit&id=' . (int)$User->id)?>">
+              <a href="http://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'] . '/admin/?p=cms&m=users&action=edit&id=' . (int)$User->id)?>">
                 <?php echo VIEW?>
               </a>
             </p>
         <?php } ?>
         <p>
           <small>
-            <?php echo IP_ADDRESS?>: <?php echo htmlspecialchars($Item->ip)?><br />
-            <?php echo USER_AGENT?>: <?php echo htmlspecialchars($Item->user_agent)?><br />
+            <?php echo IP_ADDRESS?>: <?php echo htmlspecialchars($User->ip)?><br />
+            <?php echo USER_AGENT?>: <?php echo htmlspecialchars($User->user_agent)?><br />
             <?php echo PAGE?>: 
-            <?php if ($Item->page->parents) { ?>
-                <?php foreach ($Item->page->parents as $row) { ?>
-                    <a href="<?php echo htmlspecialchars($Item->domain . $row->url)?>"><?php echo htmlspecialchars($row->name)?></a> / 
+            <?php if ($User->page->parents) { ?>
+                <?php foreach ($User->page->parents as $row) { ?>
+                    <a href="<?php echo htmlspecialchars($User->domain . $row->url)?>"><?php echo htmlspecialchars($row->name)?></a> / 
                 <?php } ?>
             <?php } ?>
-            <a href="<?php echo htmlspecialchars($Item->domain . $Item->page->url)?>"><?php echo htmlspecialchars($Item->page->name)?></a>
-            <br />
-            <?php echo FORM?>: 
-            <?php if ($Item->parent->create_feedback) { ?>
-                <a href="<?php echo htmlspecialchars($Item->domain . '/admin/?p=cms&sub=feedback&id=' . $Item->parent->id)?>"><?php echo htmlspecialchars($Item->parent->name)?></a>
-            <?php } else { ?>
-                <?php echo htmlspecialchars($Item->parent->name)?>
-            <?php } ?>
+            <a href="<?php echo htmlspecialchars($User->domain . $User->page->url)?>"><?php echo htmlspecialchars($User->page->name)?></a>
           </small>
         </p>
         <?php 
@@ -149,5 +142,5 @@ $emailField = function($field)
         </p>
         <?php
     } 
-    ?>
-<?php } ?>
+} 
+?>

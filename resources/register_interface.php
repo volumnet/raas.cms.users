@@ -4,6 +4,7 @@ use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\Form;
 use \RAAS\Application;
 use \RAAS\CMS\User;
+use \RAAS\CMS\ULogin;
 
 $generatePass = function($length = 5)
 {
@@ -75,6 +76,7 @@ if ($Form->id) {
         if ($Profile = ULogin::getProfile($_POST['token'])) {
             if ($_POST['AJAX']) {
                 $_SESSION['confirmedSocial'][] = $Profile->profile;
+                $_SESSION['confirmedSocial'] = array_values(array_unique($_SESSION['confirmedSocial']));
                 $OUT['social'] = $Profile->profile;
                 $OUT['socialNetwork'] = $Profile->socialNetwork;
             } else {
@@ -137,21 +139,30 @@ if ($Form->id) {
                     break;
             }
         }
+        if (isset($_POST['login']) && $_POST['login'] && isset($Form->fields['login'])) {
+            if ($User->checkLoginExists(trim($_POST['login']))) {
+                $localError['login'] = ERR_LOGIN_EXISTS;
+            }
+        }
         if (isset($_POST['email']) && $_POST['email'] && isset($Form->fields['email'])) {
-            if ($User->checkEmailExists(trim($_POST['login']))) {
-                $localError['login'] = 'ERR_EMAIL_EXISTS';
-            } elseif (!isset($Form->fields['login'])) {
+            if ($User->checkEmailExists(trim($_POST['email']))) {
+                $localError['email'] = ERR_EMAIL_EXISTS;
+            } elseif (!isset($Form->fields['email'])) {
                 if ($User->checkLoginExists(trim($_POST['email']))) {
-                    $localError['email'] = 'ERR_LOGIN_EXISTS';
+                    $localError['email'] = ERR_LOGIN_EXISTS;
                 }
             }
         }
         if (!$localError) {
             $User->page_id = (int)$Page->id;
+            $User->page = $Page;
             $User->ip = (string)$_SERVER['REMOTE_ADDR'];
             $User->user_agent = (string)$_SERVER['HTTP_USER_AGENT'];
-            $User->vis = (int)($config['activation_type'] == Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED);
-            $User->new = 1;
+            if ($new = !$User->id) {
+                $User->vis = (int)($config['activation_type'] == Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED);
+                $User->new = 1;
+            }
+            
             
             if (isset($Form->fields['email'])) {
                 $val = $User->email = trim($_POST['email']);
@@ -167,7 +178,7 @@ if ($Form->id) {
             if (isset($Form->fields['password']) && ($val = trim($_POST['password']))) {
                 $User->password = $val;
                 $User->password_md5 = Application::i()->md5It($val);
-            } elseif (!$User->id) {
+            } elseif ($new) {
                 $User->password_md5 = Application::i()->md5It($generatePass);
             }
             if (isset($Form->fields['lang']) && ($val = trim($_POST['lang']))) {
@@ -294,10 +305,10 @@ if ($Form->id) {
                 $User->fields['user_agent']->addValue((string)$_SERVER['HTTP_USER_AGENT']);
             }
             
-            if ($Form->email && (!$User->id || $config['notify_about_edit'])) {
+            if ($Form->email && ($new || $config['notify_about_edit'])) {
                 $notify($User, $Form, $config, true);
             }
-            if ($User->email && !$User->id) {
+            if ($User->email && $new) {
                 $notify($User, $Form, $config, false);
             }
             $OUT['success'][(int)$Block->id] = true;

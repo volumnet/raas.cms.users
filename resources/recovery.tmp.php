@@ -31,20 +31,20 @@ if ($_POST['AJAX']) {
         <div data-role="feedback-form" <?php echo $success ? 'style="display: none"' : ''?>>
           <?php if ($proceed) { ?>
               <div class="form-group">
-                <label for="password" class="control-label col-sm-2"><?php echo PASSWORD?></label>
-                <div class="col-sm-4"><input type="password" name="password" /></div>
+                <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD?></label>
+                <div class="col-sm-9 col-md-4"><input type="password" name="password" /></div>
               </div>
               <div class="form-group">
-                <label for="password" class="control-label col-sm-2"><?php echo PASSWORD_CONFIRM?></label>
-                <div class="col-sm-4"><input type="password" name="password@confirm" /></div>
+                <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD_CONFIRM?></label>
+                <div class="col-sm-9 col-md-4"><input type="password" name="password@confirm" /></div>
               </div>
-              <div class="form-group"><div class="col-sm-4 col-sm-offset-2"><button class="btn btn-default" type="submit"><?php echo CHANGE?></button></div></div>
+              <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-default" type="submit"><?php echo CHANGE?></button></div></div>
           <?php } else { ?>
               <div class="form-group">
-                <label for="password" class="control-label col-sm-2"><?php echo ENTER_LOGIN_OR_EMAIL?></label>
-                <div class="col-sm-4"><input type="text" name="login" /></div>
+                <label for="password" class="control-label col-sm-3"><?php echo ENTER_LOGIN_OR_EMAIL?></label>
+                <div class="col-sm-9 col-md-4"><input type="text" name="login" /></div>
               </div>
-              <div class="form-group"><div class="col-sm-4 col-sm-offset-2"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div></div>
+              <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div></div>
           <?php } ?>
         </div>
       </form>

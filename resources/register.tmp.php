@@ -23,7 +23,7 @@ if ($_POST['AJAX']) {
 } else { ?>
     <a name="feedback"></a>
     <div class="feedback">
-      <form class="form-horizontal" data-role="raas-ajaxform" action="#feedback" method="post" enctype="multipart/form-data">
+      <form class="form-horizontal" <?php /*data-role="raas-ajaxform"*/?> action="" method="post" enctype="multipart/form-data">
         <?php include \RAAS\CMS\Package::i()->resourcesDir . '/form.inc.php'?>
         <div data-role="notifications" <?php echo ($success[(int)$Block->id] || $localError) ? '' : 'style="display: none"'?>>
           <div class="alert alert-success" <?php echo ($success[(int)$Block->id]) ? '' : 'style="display: none"'?>>
@@ -60,24 +60,11 @@ if ($_POST['AJAX']) {
           <?php } ?>
           <?php foreach ($Form->fields as $row) { ?>
               <div class="form-group">
-                <label for="<?php echo htmlspecialchars($row->urn)?>" class="control-label col-sm-2"><?php echo htmlspecialchars($row->name . ($row->required ? '*' : ''))?></label>
-                <div class="col-sm-4"><?php $getField($row, $DATA)?></div>
+                <label for="<?php echo htmlspecialchars($row->urn)?>" class="control-label col-sm-3"><?php echo htmlspecialchars($row->name . ($row->required ? '*' : ''))?></label>
+                <div class="col-sm-9 col-md-4"><?php $getField($row, $DATA)?></div>
               </div>
           <?php } ?>
           <?php if ($config['allow_edit_social']) { ?>
-              <h3><?php echo SOCIAL_NETWORKS?></h3>
-              <div data-role="raas-social-network-container">
-                <?php foreach ((array)$DATA['social'] as $i => $temp) { ?>
-                    <div data-role="raas-repo-element" class="clearfix">
-                      <input type="hidden" name="social[]" value="<?php echo htmlspecialchars($temp)?>" />
-                      <a href="<?php echo htmlspecialchars($temp)?>" target="_blank">
-                        <span class="raas-social raas-social<?php echo (int)SocialProfile::getSocialNetwork($temp)?>"><span>
-                        <?php echo htmlspecialchars($temp)?>
-                      </a>
-                      <a href="#" class="close" style="float: right;" data-role="raas-repo-del">&times;</a>
-                    </div>
-                <?php } ?>
-              </div>
               <style type="text/css">
               .raas-social { display: inline-block; width: 16px; height: 16px; background-image: url('http://ulogin.ru/img/small.png?version=1.3.00'); }
               .raas-social<?php echo SocialProfile::SN_VK?> { background-position: 0 -19px; }
@@ -92,15 +79,31 @@ if ($_POST['AJAX']) {
               .raas-social<?php echo SocialProfile::SN_YT?> { background-position: 0 -433px; }
               </style>
               <script src="//ulogin.ru/js/ulogin.js"></script>
-              <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=twitter,google,yandex,livejournal,youtube,webmoney;redirect_uri=&callback=RAAS_CMS_social_login"></div>
+              <div class="col-sm-offset-3 col-sm-9 col-md-6" style="margin-bottom: 25px">
+                <h3><?php echo SOCIAL_NETWORKS?></h3>
+                <div data-role="raas-social-network-container" style="margin: 20px 0">
+                  <?php foreach ((array)$DATA['social'] as $i => $temp) { ?>
+                      <div data-role="raas-repo-element" class="clearfix">
+                        <input type="hidden" name="social[]" value="<?php echo htmlspecialchars($temp)?>" />
+                        <a href="<?php echo htmlspecialchars($temp)?>" target="_blank">
+                          <span class="raas-social raas-social<?php echo (int)SocialProfile::getSocialNetwork($temp)?>"></span>
+                          <?php echo htmlspecialchars($temp)?>
+                        </a>
+                        <a href="#" class="close" style="float: right;" data-role="raas-repo-del">&times;</a>
+                      </div>
+                  <?php } ?>
+                </div>
+                <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=twitter,google,yandex,livejournal,youtube,webmoney;redirect_uri=;callback=RAAS_CMS_social_login"></div>
+              </div>
               <script>
               jQuery(document).ready(function($) {
                   $('[data-role="raas-social-network-container"]').on('click', '[data-role="raas-repo-del"]', function() {
                       $(this).closest('[data-role="raas-repo-element"]').remove();
+                      return false;
                   });
                   RAAS_CMS_social_login = function(token)
                   {
-                      $.post(location.toString(), {'token': token}), function(data) {
+                      $.post(location.toString(), {'token': token, 'AJAX': 1}, function(data) {
                           var isFound = false;
                           $('[data-role="raas-social-network-container"] input:hidden').each(function() {
                               if ($.trim($(this).val()) == $.trim(data.social)) {
@@ -110,7 +113,7 @@ if ($_POST['AJAX']) {
                           if (!isFound) {
                               var text = '<div data-role="raas-repo-element" class="clearfix">'
                                        + '  <input type="hidden" name="social[]" value="' + data.social + '" />'
-                                       + '  <a href="' + data.social + '" target="_blank"><span class="raas-social raas-social' + data.socialNetwork + '"><span> ' + data.social + '</a>'
+                                       + '  <a href="' + data.social + '" target="_blank"><span class="raas-social raas-social' + data.socialNetwork + '"></span> ' + data.social + '</a>'
                                        + '  <a href="#" class="close" style="float: right;" data-role="raas-repo-del">&times;</a>'
                                        + '</div>';
                               $('[data-role="raas-social-network-container"]').append(text);
@@ -122,15 +125,15 @@ if ($_POST['AJAX']) {
           <?php } ?>
           <?php if ($Form->antispam == 'captcha' && $Form->antispam_field_name && !$User->id) { ?>
               <div class="form-group">
-                <label for="name" class="control-label col-sm-2"><?php echo CAPTCHA?></label>
-                <div class="col-sm-4 <?php echo htmlspecialchars($Form->antispam_field_name)?>">
+                <label for="name" class="control-label col-sm-3"><?php echo CAPTCHA?></label>
+                <div class="col-sm-9 col-md-4 <?php echo htmlspecialchars($Form->antispam_field_name)?>">
                   <img src="/assets/kcaptcha/?<?php echo session_name() . '=' . session_id()?>" /><br />
                   <input type="text" name="<?php echo htmlspecialchars($Form->antispam_field_name)?>" />
                 </div>
               </div>
           <?php } ?>
           <div class="form-group">
-            <div class="col-sm-4 col-sm-offset-2"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div>
+            <div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div>
           </div>
         </div>
       </form>
