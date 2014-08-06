@@ -1,7 +1,7 @@
 <?php 
 namespace RAAS\CMS\Users;
 use \RAAS\Application;
-use \RAAS\Controller_Frontend;
+use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\User;
 use \RAAS\CMS\Snippet;
 use \RAAS\CMS\Auth;
@@ -27,7 +27,7 @@ $notify = function(User $User, array $config = array())
 };
 
 $OUT = array();
-$Item = $User = Controller_Frontend::i()->user;
+$Item = $User = RAASController_Frontend::i()->user;
 $localError = array();
 if ($_GET['key'] || $User->id) {
     $OUT['proceed'] = true;

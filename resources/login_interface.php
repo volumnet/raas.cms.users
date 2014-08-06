@@ -1,6 +1,6 @@
 <?php
 namespace \RAAS\CMS\Users;
-use \RAAS\Controller_Frontend;
+use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\Auth;
 use \RAAS\CMS\User as CMSUser;
 use \RAAS\CMS\ULogin;
@@ -19,7 +19,7 @@ $checkRedirect = function($referer)
 };
 
 $OUT = array();
-$Item = $User = Controller_Frontend::i()->user;
+$Item = $User = RAASController_Frontend::i()->user;
 $localError = array();
 $a = new Auth($User);
 if ($_GET['logout']) {
@@ -54,7 +54,7 @@ if ($_GET['logout']) {
         } else {
             if (!isset($_POST['login'])) {
                 $localError['password'] = 'LOGIN_REQUIRED';
-            if (!isset($_POST['password'])) {
+            } elseif (!isset($_POST['password'])) {
                 $localError['password'] = 'PASSWORD_REQUIRED';
             } else {
                 $savePassword = (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_SAVE_PASSWORD) && isset($_POST['save_password'])) 

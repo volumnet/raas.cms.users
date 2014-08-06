@@ -1,8 +1,9 @@
 <?php 
 namespace \RAAS\CMS\Users;
+use \RAAS\Controller_Frontend as RAASController_Frontend;
 
 $OUT = array();
-$Item = $User = Controller_Frontend::i()->user;
+$Item = $User = RAASController_Frontend::i()->user;
 $localError = array();
 if ($User->vis) {
     $localError = 'ERR_ALREADY_ACTIVATED';

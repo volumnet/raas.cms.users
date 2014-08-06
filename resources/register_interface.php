@@ -1,6 +1,6 @@
 <?php
 namespace RAAS\CMS\Users;
-use \RAAS\Controller_Frontend;
+use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\Form;
 use \RAAS\Application;
 use \RAAS\CMS\User;
@@ -63,7 +63,7 @@ $notify = function(User $User, Form $Form, array $config = array(), $ADMIN = fal
 };
 
 $OUT = array();
-$User = Controller_Frontend::i()->user;
+$User = RAASController_Frontend::i()->user;
 $Form = new Form(isset($config['form_id']) ? (int)$config['form_id'] : 0);
 
 if ($Form->id) {
