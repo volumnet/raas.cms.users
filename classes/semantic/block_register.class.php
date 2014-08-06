@@ -1,7 +1,7 @@
 <?php
 namespace RAAS\CMS\Users;
 use \RAAS\CMS\Block;
-use \RAAS\Controller_Frontend;
+use \RAAS\Controller_Frontend AS RAASController_Frontend;
 
 class Block_Register extends Block
 {
@@ -34,7 +34,7 @@ class Block_Register extends Block
     public function process(Page $Page)
     {
         if ($this->allow_to != static::ALLOW_TO_ALL) {
-            $r = (bool)Controller_Frontend::i()->user->id;
+            $r = (bool)RAASController_Frontend::i()->user->id;
             if (($r && ($this->allow_to == static::ALLOW_TO_UNREGISTERED)) || (!$r && ($this->allow_to == static::ALLOW_TO_REGISTERED))) {
                 if (trim($this->redirect_url)) {
                     header('Location: ' . trim($this->redirect_url));
