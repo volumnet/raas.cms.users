@@ -46,23 +46,28 @@ if ($_GET['logout']) {
                     }
                     $a = new Auth($User);
                     $a->setSession();
-                    $OUT['success'] = $checkRedirect;
+                    $OUT['success'] = $checkRedirect();
+                } else {
+                    $localError[] = ERR_USER_WITH_THIS_SOCIAL_NETWORK_IS_NOT_FOUND;
                 }
             } else {
-                $localError[] = 'ERR_CANT_CONNECT_TO_SOCIAL_NETWORK';
+                $localError[] = ERR_CANT_CONNECT_TO_SOCIAL_NETWORK;
             }
         } else {
             if (!isset($_POST['login'])) {
-                $localError['password'] = 'LOGIN_REQUIRED';
+                $localError['password'] = LOGIN_REQUIRED;
             } elseif (!isset($_POST['password'])) {
-                $localError['password'] = 'PASSWORD_REQUIRED';
+                $localError['password'] = PASSWORD_REQUIRED;
             } else {
                 $savePassword = (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_SAVE_PASSWORD) && isset($_POST['save_password'])) 
                              || (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_FOREIGN_COMPUTER) && !isset($_POST['foreign_computer']));
-                if ($a->login(trim($_POST['login']), $_POST['password'], $savePassword)) {
+                $val = $a->login(trim($_POST['login']), $_POST['password'], $savePassword);
+                if ($val === -1) {
+                    $localError[] = YOUR_ACCOUNT_IS_BLOCKED;
+                } elseif ($val) {
                     $checkRedirect($_SERVER['HTTP_REFERER'] ?: ($_POST['HTTP_REFERER'] ?: $_GET['HTTP_REFERER']));
                 } else {
-                    $localError[] = 'INVALID_LOGIN_OR_PASSWORD';
+                    $localError[] = INVALID_LOGIN_OR_PASSWORD;
                 }
             }
         }

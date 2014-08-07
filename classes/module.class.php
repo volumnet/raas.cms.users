@@ -51,7 +51,7 @@ class Module extends \RAAS\Module
             $SQL_query .= " AND (SELECT COUNT(*) FROM " . User_Field::_dbprefix() . User_Field::data_table . " WHERE pid = tU.id AND value LIKE '%" . $this->SQL->escape_like($search_string) . "%') > 0 ";
         }
         
-        $SQL_query .= " GROUP BY tU.id ORDER BY tU.vis ASC, ";
+        $SQL_query .= " GROUP BY tU.id ORDER BY tU.new DESC, ";
         if (isset($columns[$sort])) {
             $SQL_query .= " tSort.value ";
         } elseif (in_array($sort, array('post_date', 'login', 'email'))) {

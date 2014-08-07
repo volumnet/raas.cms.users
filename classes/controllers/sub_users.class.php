@@ -14,9 +14,10 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
             case 'edit':
                 $this->{$this->action}();
                 break;
-            case 'delete':
+            case 'delete': case 'chvis':
+                $action = $this->action;
                 $Item = new User($this->id);
-                StdSub::delete($Item, $this->url);
+                StdSub::$action($Item, $this->url);
                 break;
             default:
                 $this->showlist();

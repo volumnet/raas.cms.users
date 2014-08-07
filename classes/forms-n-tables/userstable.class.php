@@ -15,28 +15,28 @@ class UsersTable extends \RAAS\Table
             'caption' => $this->_view->_('REGISTRATION_DATE'),
             'sortable' => Column::SORTABLE_REVERSABLE,
             'callback' => function($row) use ($view) { 
-                return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '">' . date(DATETIMEFORMAT, strtotime($row->post_date)) . '</a>';
+                return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . date(DATETIMEFORMAT, strtotime($row->post_date)) . '</a>';
             }
         );
         $columns['login'] = array(
             'caption' => $this->_view->_('LOGIN'),
             'sortable' => Column::SORTABLE_REVERSABLE,
             'callback' => function($row) use ($view) { 
-                return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '">' . htmlspecialchars($row->login) . '</a>';
+                return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($row->login) . '</a>';
             }
         );
         $columns['email'] = array(
             'caption' => $this->_view->_('EMAIL'),
             'sortable' => Column::SORTABLE_REVERSABLE,
             'callback' => function($row) use ($view) { 
-                return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '">' . htmlspecialchars($row->email) . '</a>';
+                return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($row->email) . '</a>';
             }
         );
         foreach ($params['columns'] as $key => $col) {
             $columns[$col->urn] = array(
                 'caption' => $col->name,
                 'sortable' => Column::SORTABLE_REVERSABLE,
-                'callback' => function($row) use ($col) { if (isset($row->fields[$col->urn])) { $y = $row->fields[$col->urn]->doRich(); } return $y ? $y : ''; }
+                'callback' => function($row) use ($col) { if (isset($row->fields[$col->urn])) { $y = $row->fields[$col->urn]->doRich(); } return $y ? '<span' . (!$row->vis ? ' class="muted"' : '') . '>' . $y . '</span>' : ''; }
             );
         }
         $columns[' '] = array('callback' => function ($row) use ($view) { return rowContextMenu($view->getUserContextMenu($row)); });

@@ -21,6 +21,14 @@ class ViewSub_Users extends \RAAS\Abstract_Sub_View
 
     public function getUserContextMenu(User $Item, $i = 0, $c = 0) 
     {
-        return $this->stdView->stdContextMenu($Item, 0, 0, 'edit', '', 'delete');
+        $arr = array();
+        $arr[] = array(
+            'name' => $Item->vis ? $this->_('ACTIVE') : '<span class="muted">' . $this->_('INACTIVE') . '</span>', 
+            'href' => $this->url . '&action=chvis&id=' . (int)$Item->id . '&back=1', 
+            'icon' => $Item->vis ? 'ok' : '',
+            'title' => $this->_($Item->vis ? 'BLOCK_USER' : 'ACTIVATE')
+        );
+        $arr = array_merge((array)$arr, (array)$this->stdView->stdContextMenu($Item, 0, 0, 'edit', '', 'delete'));
+        return $arr;
     }
 }
