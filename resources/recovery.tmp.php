@@ -15,7 +15,7 @@ if ($_POST['AJAX']) {
 } else { 
     ?>
     <div class="feedback">
-      <form class="form-horizontal" data-role="raas-ajaxform" method="post" enctype="multipart/form-data">
+      <form class="form-horizontal" method="post" enctype="multipart/form-data">
         <div data-role="notifications" <?php echo ($success || $localError) ? '' : 'style="display: none"'?>>
           <div class="alert alert-success" <?php echo ($success) ? '' : 'style="display: none"'?>>
             <?php echo $proceed ? YOUR_PASSWORD_WAS_SUCCESSFULLY_CHANGED : RECOVERY_KEY_WAS_SENT?>
@@ -30,15 +30,17 @@ if ($_POST['AJAX']) {
         </div>
         <div data-role="feedback-form" <?php echo $success ? 'style="display: none"' : ''?>>
           <?php if ($proceed) { ?>
-              <div class="form-group">
-                <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD?></label>
-                <div class="col-sm-9 col-md-4"><input type="password" name="password" /></div>
-              </div>
-              <div class="form-group">
-                <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD_CONFIRM?></label>
-                <div class="col-sm-9 col-md-4"><input type="password" name="password@confirm" /></div>
-              </div>
-              <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-default" type="submit"><?php echo CHANGE?></button></div></div>
+              <?php if (!$key_is_invalid) { ?>
+                  <div class="form-group">
+                    <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD?></label>
+                    <div class="col-sm-9 col-md-4"><input type="password" name="password" /></div>
+                  </div>
+                  <div class="form-group">
+                    <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD_CONFIRM?></label>
+                    <div class="col-sm-9 col-md-4"><input type="password" name="password@confirm" /></div>
+                  </div>
+                  <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-default" type="submit"><?php echo CHANGE?></button></div></div>
+              <?php } ?>
           <?php } else { ?>
               <div class="form-group">
                 <label for="password" class="control-label col-sm-3"><?php echo ENTER_LOGIN_OR_EMAIL?></label>

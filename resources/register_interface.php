@@ -6,6 +6,19 @@ use \RAAS\Application;
 use \RAAS\CMS\User;
 use \RAAS\CMS\ULogin;
 
+$checkRedirect = function($referer)
+{
+    if ($_POST['AJAX']) {
+        return true;
+    } elseif ($referer) {
+        header('Location: ' . $referer);
+        exit;
+    } else {
+        header('Location: ' . $_SERVER['REQUEST_URI']);
+        exit;
+    }
+};
+
 $generatePass = function($length = 5)
 {
     $text = '';
@@ -66,6 +79,11 @@ $notify = function(User $User, Form $Form, array $config = array(), $ADMIN = fal
 $OUT = array();
 $User = RAASController_Frontend::i()->user;
 $Form = new Form(isset($config['form_id']) ? (int)$config['form_id'] : 0);
+foreach ($Form->fields as $fname => &$temp) {
+    if ($User->id && $temp->datatype == 'password') {
+        $temp->required = false;
+    }
+}
 
 if ($Form->id) {
     $localError = array();
@@ -311,15 +329,20 @@ if ($Form->id) {
             if ($User->email && $new) {
                 $notify($User, $Form, $config, false);
             }
-            $OUT['success'][(int)$Block->id] = true;
+            if ($User->id) {
+                $OUT['success'][(int)$Block->id] = $checkRedirect();
+            } else {
+                $OUT['success'][(int)$Block->id] = true;
+            }
         }
         $OUT['DATA'] = $_POST;
     } else {
         $OUT['DATA'] = $User->getArrayCopy();
+        unset($OUT['DATA']['password_md5']);
         foreach ($Form->fields as $fname => $temp) {
             if ($User->id && isset($User->fields[$fname])) {
                 $OUT['DATA'][$fname] = $User->fields[$fname]->getValues();
-            } else {
+            } elseif (!$User->id) {
                 $OUT['DATA'][$fname] = $temp->default;
             }
         }

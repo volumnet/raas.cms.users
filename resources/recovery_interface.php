@@ -34,14 +34,19 @@ if ($_GET['key'] || $User->id) {
     if (!$User->id && ($tmp_user = User::importByRecoveryKey($_GET['key']))) {
         $User = $tmp_user;
         $a = new Auth($User);
-        $a->setSession();
+        if (!$User->vis) {
+            $localError['password'] = YOUR_ACCOUNT_IS_BLOCKED;
+            $OUT['key_is_invalid'] = true;
+        } else {
+            $a->setSession();
+        }
     }
     if ($User->id) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!isset($_POST['password']) || !trim($_POST['password'])) {
-                $localError['password'] = 'PASSWORD_REQUIRED';
+                $localError['password'] = PASSWORD_REQUIRED;
             } elseif ($_POST['password'] != $_POST['password@confirm']) {
-                $localError['password'] = 'PASSWORD_DOESNT_MATCH_CONFIRM';
+                $localError['password'] = PASSWORD_DOESNT_MATCH_CONFIRM;
             } else {
                 $User->password_md5 = Application::i()->md5It($_POST['password']);
                 $User->commit();
@@ -49,19 +54,24 @@ if ($_GET['key'] || $User->id) {
             }
         }
     } else {
-        $localError[] = 'CONFIRMATION_KEY_IS_INVALID';
+        $localError[] = CONFIRMATION_KEY_IS_INVALID;
+        $OUT['key_is_invalid'] = true;
     }
 } else {
     if (isset($_POST['login']) && trim($_POST['login'])) {
         if ($tmp_user = User::importByLoginOrEmail(trim($_POST['login']))) {
-            if ($tmp_user->email) {
-                $notify($tmp_user, $config);
-                $OUT['sent'] = true;
+            if (!$tmp_user->vis) {
+                $localError['password'] = YOUR_ACCOUNT_IS_BLOCKED;
             } else {
-                $localError['login'] = 'NO_EMAIL_OF_THIS_USER';
+                if ($tmp_user->email) {
+                    $notify($tmp_user, $config);
+                    $OUT['success'] = true;
+                } else {
+                    $localError['login'] = NO_EMAIL_OF_THIS_USER;
+                }
             }
         } else {
-            $localError['login'] = 'USER_WITH_THIS_LOGIN_IS_NOT_FOUND';
+            $localError['login'] = USER_WITH_THIS_LOGIN_IS_NOT_FOUND;
         }
     }
 }
