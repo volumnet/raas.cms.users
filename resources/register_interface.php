@@ -329,10 +329,10 @@ if ($Form->id) {
             if ($User->email && $new) {
                 $notify($User, $Form, $config, false);
             }
-            if ($User->id) {
-                $OUT['success'][(int)$Block->id] = $checkRedirect();
-            } else {
+            if ($User->new) {
                 $OUT['success'][(int)$Block->id] = true;
+            } else {
+                $OUT['success'][(int)$Block->id] = $checkRedirect();
             }
         }
         $OUT['DATA'] = $_POST;
