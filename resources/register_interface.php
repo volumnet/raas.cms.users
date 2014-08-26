@@ -77,7 +77,8 @@ $notify = function(User $User, Form $Form, array $config = array(), $ADMIN = fal
 };
 
 $OUT = array();
-$User = RAASController_Frontend::i()->user;
+$uid = (int)RAASController_Frontend::i()->user->id;
+$User = new User($uid);
 $Form = new Form(isset($config['form_id']) ? (int)$config['form_id'] : 0);
 foreach ($Form->fields as $fname => &$temp) {
     if ($User->id && $temp->datatype == 'password') {
