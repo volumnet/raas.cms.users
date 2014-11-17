@@ -92,7 +92,7 @@ class Webmaster extends \RAAS\CMS\Webmaster
         $FRM->name = $this->view->_('REGISTRATION_FORM');
         $FRM->signature = 0;
         $FRM->antispam = 'hidden';
-        $FRM->antispam_field_name = 'name';
+        $FRM->antispam_field_name = '_name';
         $FRM->interface_id = (int)$S->id;
         $FRM->commit();
 
