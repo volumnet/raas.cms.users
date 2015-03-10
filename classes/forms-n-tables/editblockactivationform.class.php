@@ -7,6 +7,19 @@ use \RAAS\CMS\Snippet;
 
 class EditBlockActivationForm extends EditBlockForm
 {
+    public function __get($var)
+    {
+        switch ($var) {
+            case 'view':
+                return View_Web::i();
+                break;
+            default:
+                return parent::__get($var);
+                break;
+        }
+    }
+
+
     public function __construct(array $params)
     {
         $params['view'] = Module::i()->view;

@@ -9,6 +9,19 @@ use \RAAS\Option;
 
 class EditBlockRecoveryForm extends EditBlockForm
 {
+    public function __get($var)
+    {
+        switch ($var) {
+            case 'view':
+                return View_Web::i();
+                break;
+            default:
+                return parent::__get($var);
+                break;
+        }
+    }
+
+
     public function __construct(array $params)
     {
         $params['view'] = Module::i()->view;
@@ -50,7 +63,7 @@ class EditBlockRecoveryForm extends EditBlockForm
             'class' => 'input-xxlarge',
             'name' => 'notification_id', 
             'required' => true,
-            'caption' => $this->_view->_('PASSWORD_RECOVERY_NOTIFICATION'), 
+            'caption' => $this->view->_('PASSWORD_RECOVERY_NOTIFICATION'), 
             'default' => $snippet->id,
             'children' => $wf(new Snippet_Folder())
         ));

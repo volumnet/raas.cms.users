@@ -6,27 +6,40 @@ class UsersTable extends \RAAS\Table
 {
     protected $_view;
 
+    public function __get($var)
+    {
+        switch ($var) {
+            case 'view':
+                return ViewSub_Users::i();
+                break;
+            default:
+                return parent::__get($var);
+                break;
+        }
+    }
+
+
     public function __construct(array $params = array())
     {
-        $this->_view = $view = isset($params['view']) ? $params['view'] : null;
+        $view = $this->view;
         unset($params['view']);
         $columns = array();
         $columns['post_date'] = array(
-            'caption' => $this->_view->_('REGISTRATION_DATE'),
+            'caption' => $this->view->_('REGISTRATION_DATE'),
             'sortable' => Column::SORTABLE_REVERSABLE,
             'callback' => function($row) use ($view) { 
                 return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . date(DATETIMEFORMAT, strtotime($row->post_date)) . '</a>';
             }
         );
         $columns['login'] = array(
-            'caption' => $this->_view->_('LOGIN'),
+            'caption' => $this->view->_('LOGIN'),
             'sortable' => Column::SORTABLE_REVERSABLE,
             'callback' => function($row) use ($view) { 
                 return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($row->login) . '</a>';
             }
         );
         $columns['email'] = array(
-            'caption' => $this->_view->_('EMAIL'),
+            'caption' => $this->view->_('EMAIL'),
             'sortable' => Column::SORTABLE_REVERSABLE,
             'callback' => function($row) use ($view) { 
                 return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($row->email) . '</a>';
@@ -45,7 +58,7 @@ class UsersTable extends \RAAS\Table
             'Set' => $params['Set'], 
             'Pages' => $params['Pages'],
             'callback' => function($Row) { if ($Row->source->new) { $Row->class = 'info'; } },
-            'emptyString' => $this->_view->_('NO_USERS_FOUND'),
+            'emptyString' => $this->view->_('NO_USERS_FOUND'),
             'template' => 'showlist',
             'order' => ((strtolower($params['order']) == 'desc') ? Column::SORT_DESC : Column::SORT_ASC)
         );
