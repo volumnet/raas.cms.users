@@ -40,11 +40,11 @@ if ($_POST['AJAX']) {
         <div data-role="feedback-form" <?php echo $success ? 'style="display: none"' : ''?>>
           <div class="form-group">
             <label for="login" class="control-label col-sm-3 col-md-2"><?php echo LOGIN?>:</label>
-            <div class="col-sm-9 col-md-4"><input type="text" name="login" /></div>
+            <div class="col-sm-9 col-md-4"><input type="text" class="form-control" name="login" /></div>
           </div>
           <div class="form-group">
             <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD?>:</label>
-            <div class="col-sm-9 col-md-4"><input type="password" name="password" /></div>
+            <div class="col-sm-9 col-md-4"><input type="password" class="form-control" name="password" /></div>
           </div>
           <?php if (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_SAVE_PASSWORD) || ($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_FOREIGN_COMPUTER)) { ?>
               <div class="form-group">

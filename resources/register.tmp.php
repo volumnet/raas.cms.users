@@ -56,7 +56,7 @@ if ($_POST['AJAX']) {
                 <input type="hidden" name="form_signature" value="<?php echo md5('form' . (int)$Form->id . (int)$Block->id)?>" />
           <?php } ?>
           <?php if ($Form->antispam == 'hidden' && $Form->antispam_field_name && !$User->id) { ?>
-                <input type="text" name="<?php echo htmlspecialchars($Form->antispam_field_name)?>" value="<?php echo htmlspecialchars($DATA[$Form->antispam_field_name])?>" style="position: absolute; left: -9999px" />
+                <input type="text" autocomplete="off" name="<?php echo htmlspecialchars($Form->antispam_field_name)?>" value="<?php echo htmlspecialchars($DATA[$Form->antispam_field_name])?>" style="position: absolute; left: -9999px" />
           <?php } ?>
           <?php foreach ($Form->fields as $row) { ?>
               <div class="form-group">
@@ -128,7 +128,7 @@ if ($_POST['AJAX']) {
                 <label for="name" class="control-label col-sm-3"><?php echo CAPTCHA?></label>
                 <div class="col-sm-9 col-md-4 <?php echo htmlspecialchars($Form->antispam_field_name)?>">
                   <img src="/assets/kcaptcha/?<?php echo session_name() . '=' . session_id()?>" /><br />
-                  <input type="text" name="<?php echo htmlspecialchars($Form->antispam_field_name)?>" />
+                  <input type="text" name="<?php echo htmlspecialchars($Form->antispam_field_name)?>" class="form-control" />
                 </div>
               </div>
           <?php } ?>
