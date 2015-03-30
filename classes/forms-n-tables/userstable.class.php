@@ -52,8 +52,9 @@ class UsersTable extends \RAAS\Table
                 'callback' => function($row) use ($col) { if (isset($row->fields[$col->urn])) { $y = $row->fields[$col->urn]->doRich(); } return $y ? '<span' . (!$row->vis ? ' class="muted"' : '') . '>' . $y . '</span>' : ''; }
             );
         }
-        $columns[' '] = array('callback' => function ($row) use ($view) { return rowContextMenu($view->getUserContextMenu($row)); });
+        $columns[' '] = array('callback' => function ($row) use ($view, $params) { return rowContextMenu($view->getUserContextMenu($row, $params['Group'])); });
         $defaultParams = array(
+            'caption' => $this->view->_('USERS'),
             'columns' => $columns, 
             'Set' => $params['Set'], 
             'Pages' => $params['Pages'],
