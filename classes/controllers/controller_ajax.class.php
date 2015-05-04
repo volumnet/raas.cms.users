@@ -11,7 +11,7 @@ class Controller_Ajax extends Abstract_Controller
     protected function execute()
     {
         switch ($this->action) {
-            case 'get_notifications': case 'send_notification':
+            case 'get_notifications': case 'send_notification': case 'get_users':
                 $this->{$this->action}();
                 break;
         }
@@ -45,4 +45,40 @@ class Controller_Ajax extends Abstract_Controller
         }
         $this->view->send_notification($OUT);
     }
+
+
+    protected function get_users()
+    {
+        $Set = $this->model->getUsersBySearch(isset($_GET['search_string']) ? $_GET['search_string'] : '');
+        $OUT['Set'] = array_map(
+            function($x) { 
+                $name = $x->login;
+                if ($x->full_name) {
+                    $name = $x->full_name . ' (' . $x->login . ')';
+                } elseif ($x->name) {
+                    $name = $x->name . ' (' . $x->login . ')';
+                } elseif ($x->last_name || $x->first_name || $x->second_name) {
+                    $name = trim($x->last_name . ' ' . $x->first_name . ' ' . $x->second_name . ' (' . $x->login . ')');
+                }
+                $description = '';
+                if ($x->email) {
+                    $description = $x->email;
+                }
+                $y = array('id' => (int)$x->id, 'name' => $name, 'description' => htmlspecialchars($description));
+                foreach ($x->fields as $row) {
+                    if ($row->datatype == 'image') {
+                        if ($val = $row->getValue()) {
+                            if ($val->id) {
+                                $y['img'] = '/' . $val->fileURL;
+                            }
+                        }
+                    }
+                }
+                return $y;
+            },
+            $Set
+        );
+        $this->view->get_users($OUT);
+    }
+
 }

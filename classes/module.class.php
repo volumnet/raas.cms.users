@@ -102,6 +102,22 @@ class Module extends \RAAS\Module
     }
 
 
+    public function getUsersBySearch($search, $limit = 10)
+    {
+        $SQL_query = "SELECT tU.* FROM " . User::_tablename() . " AS tU 
+                        JOIN " . User_Field::_dbprefix() . User_Field::data_table . " AS tD ON tD.pid = tU.id
+                        JOIN " . User_Field::_tablename() . " AS tF ON tF.classname = 'RAAS\\\\CMS\\\\User' AND tF.id = tD.fid
+                       WHERE (
+                                tU.login LIKE '%" . $this->SQL->escape_like($search) . "%' 
+                             OR tU.email LIKE '%" . $this->SQL->escape_like($search) . "%' 
+                             OR tD.value LIKE '%" . $this->SQL->escape_like($search) . "%'
+                        ) ";
+        $SQL_query .= " GROUP BY tU.id ORDER BY tU.login LIMIT " . (int)$limit;
+        $Set = User::getSQLSet($SQL_query);
+        return $Set;
+    }
+
+
     public function registerBlockTypes()
     {
         Block_Type::registerType('RAAS\\CMS\\Users\\Block_Register', 'RAAS\\CMS\\Users\\ViewBlockRegister', 'RAAS\\CMS\\Users\\EditBlockRegisterForm');
