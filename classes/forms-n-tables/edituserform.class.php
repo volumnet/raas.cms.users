@@ -8,6 +8,7 @@ use \RAAS\CMS\Package;
 use \RAAS\CMS\User;
 use \RAAS\CMS\Group;
 use \RAAS\Controller_Frontend;
+use \RAAS\CMS\CMSAccess;
 
 class EditUserForm extends \RAAS\Form
 {
@@ -53,7 +54,7 @@ class EditUserForm extends \RAAS\Form
                         $t->sendNotification($Form->Item);
                     }
                 }
-            }
+            },
         );
         
         $arr = array_merge($defaultParams, $params);
@@ -176,6 +177,7 @@ class EditUserForm extends \RAAS\Form
                             }
                         }
                         $t->Item->_SQL()->add("cms_users_groups_assoc", $arr);
+                        CMSAccess::refreshMaterialsAccessCache($t->Item);
                     }
                 )
             )
