@@ -3,7 +3,6 @@ namespace RAAS\CMS\Users;
 use \RAAS\Table as Table;
 use \RAAS\Column as Column;
 use \RAAS\Row as Row;
-use \RAAS\CMS\FieldsTable;
 use \RAAS\CMS\User_Field;
 
 class ViewSub_Dev extends \RAAS\Abstract_Sub_View
