@@ -90,7 +90,7 @@ class Webmaster extends \RAAS\CMS\Webmaster
         $S = Snippet::importByURN('__RAAS_users_register_notify');
         $FRM = new \RAAS\CMS\Form();
         $FRM->name = $this->view->_('REGISTRATION_FORM');
-        $FRM->signature = 0;
+        $FRM->signature = 1;
         $FRM->antispam = 'hidden';
         $FRM->antispam_field_name = '_name';
         $FRM->interface_id = (int)$S->id;
