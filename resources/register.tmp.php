@@ -28,7 +28,7 @@ if ($_POST['AJAX']) {
         <div data-role="notifications" <?php echo ($success[(int)$Block->id] || $localError) ? '' : 'style="display: none"'?>>
           <div class="alert alert-success" <?php echo ($success[(int)$Block->id]) ? '' : 'style="display: none"'?>>
             <?php 
-            echo YOU_HAVE_SUCCESSFULLY_REGISTERED;
+            echo YOU_HAVE_SUCCESSFULLY_REGISTERED . ' ';
             switch ($config['activation_type']) {
                 case Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED:
                     echo NOW_YOU_CAN_LOG_IN_INTO_THE_SYSTEM;
