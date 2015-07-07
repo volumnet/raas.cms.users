@@ -59,6 +59,10 @@ if ($_POST['AJAX']) {
                 </div>
               </div>
           <?php } ?>
+          <div class="form-group">
+            <label class="control-label col-sm-3 col-md-2">&nbsp;</label>
+            <div class="col-sm-9 col-md-4"><a href="/recovery/"><?php echo LOST_PASSWORD?></a></div>
+          </div>
           <?php if ($config['social_login_type']) { ?>
               <div class="col-sm-offset-3 col-md-offset-2" style="margin-bottom: 25px">
                 <script src="//ulogin.ru/js/ulogin.js"></script>
