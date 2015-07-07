@@ -65,7 +65,7 @@ if ($_POST['AJAX']) {
                 <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=twitter,google,yandex,livejournal,youtube,webmoney;redirect_uri=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])?>"></div>
               </div>
           <?php } ?>
-          <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div></div>
+          <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-default" type="submit"><?php echo DO_LOGIN?></button></div></div>
         </div>
       </form>
     </div>
