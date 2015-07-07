@@ -133,7 +133,7 @@ if ($_POST['AJAX']) {
               </div>
           <?php } ?>
           <div class="form-group">
-            <div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div>
+            <div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-default" type="submit"><?php echo $User->id ? SAVE : DO_REGISTER?></button></div>
           </div>
         </div>
       </form>
