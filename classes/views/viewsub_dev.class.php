@@ -50,6 +50,11 @@ class ViewSub_Dev extends \RAAS\Abstract_Sub_View
                 'href' => $this->url . '&action=show_in_table_field&id=' . (int)$Item->id . '&back=1', 
                 'icon' => $Item->show_in_table ? 'ok' : '',
             );
+            $arr[] = array(
+                'name' => $this->_('REQUIRED'), 
+                'href' => $this->url . '&action=required_field&id=' . (int)$Item->id . '&back=1', 
+                'icon' => $Item->required ? 'ok' : '',
+            );
         }
         $arr = array_merge(
             $arr, 

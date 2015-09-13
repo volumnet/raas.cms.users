@@ -21,7 +21,7 @@ class Sub_Dev extends \RAAS\Abstract_Sub_Controller
             case 'fields':
                 $this->view->fields(array('Set' => $this->model->dev_fields()));
                 break;
-            case 'move_up_field': case 'move_down_field': case 'delete_field': case 'show_in_table_field':
+            case 'move_up_field': case 'move_down_field': case 'delete_field': case 'show_in_table_field': case 'required_field':
                 $Item = new User_Field((int)$this->id);
                 $f = str_replace('_field', '', $this->action);
                 $url2 .= '&action=fields';
