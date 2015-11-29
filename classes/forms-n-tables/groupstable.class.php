@@ -28,7 +28,12 @@ class GroupsTable extends \RAAS\Table
             'callback' => function ($row) use ($view) { 
                 return '<div class="media">
                           <div class="media-body">
-                            <h4 class="media-heading"><a href="' . $view->url . '&id=' . (int)$row->id . '">' . htmlspecialchars($row->name) . '</a></h4>
+                            <h4 class="media-heading">
+                              <a href="' . $view->url . '&id=' . (int)$row->id . '">
+                                ' . htmlspecialchars($row->name) . ' 
+                                (' . htmlspecialchars($row->urn) . ')
+                              </a>
+                            </h4>
                             ' . htmlspecialchars(\SOME\Text::cuttext($row->description)) . '
                           </div>
                         </div>'; 

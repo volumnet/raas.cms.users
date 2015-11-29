@@ -6,7 +6,7 @@ class Updater extends \RAAS\Updater
 {
     public function preInstall()
     {
-        
+        $this->update20151129();
     }
 
 
@@ -19,4 +19,13 @@ class Updater extends \RAAS\Updater
             $w->createCab();
         }
     }
+
+    public function update20151129()
+    {
+        if (in_array('urn', $this->columns(\SOME\SOME::_dbprefix() . "cms_forms"))) {
+            $SQL_query = "UPDATE " . \SOME\SOME::_dbprefix() . "cms_forms SET urn = 'register' WHERE (urn = '') AND (name = 'Форма для регистрации' OR name = 'Registration form')";
+            $this->SQL->query($SQL_query);
+        }
+    }
+
 }

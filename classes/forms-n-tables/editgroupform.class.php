@@ -32,6 +32,7 @@ class EditGroupForm extends \RAAS\Form
             'parentUrl' => urldecode(\SOME\HTTP::queryString('id=%s&action=')) . '#groups',
             'children' => array(
                 array('name' => 'name', 'caption' => $this->view->_('NAME'), 'required' => 'required'),
+                array('name' => 'urn', 'caption' => $this->view->_('URN')),
                 array('type' => 'textarea', 'name' => 'description', 'caption' => $this->view->_('DESCRIPTION')),
             )
         );
