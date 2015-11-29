@@ -58,7 +58,7 @@ class ViewSub_Dev extends \RAAS\Abstract_Sub_View
         }
         $arr = array_merge(
             $arr, 
-            $this->stdView->stdContextMenu($Item, $i, $c, 'edit_field', 'fields', 'delete_field', 'move_up_field', 'move_down_field')
+            $this->stdView->stdContextMenu($Item, $i, $c, 'edit_field', 'fields', 'delete_field')
         );
         return $arr;
     }

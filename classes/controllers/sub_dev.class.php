@@ -1,11 +1,13 @@
 <?php
 namespace RAAS\CMS\Users;
+
 use \RAAS\Redirector;
 use \RAAS\CMS\EditFieldForm;
 use \RAAS\CMS\Form as CMSForm;
 use \RAAS\StdSub;
 use \RAAS\CMS\User;
 use \RAAS\CMS\User_Field;
+use \RAAS\CMS\Package;
 
 class Sub_Dev extends \RAAS\Abstract_Sub_Controller
 {
@@ -15,13 +17,10 @@ class Sub_Dev extends \RAAS\Abstract_Sub_Controller
     {
         $this->view->submenu = \RAAS\CMS\ViewSub_Dev::i()->devMenu();
         switch ($this->action) {
-            case 'edit_field':
+            case 'edit_field': case 'fields':
                 $this->{$this->action}();
                 break;
-            case 'fields':
-                $this->view->fields(array('Set' => $this->model->dev_fields()));
-                break;
-            case 'move_up_field': case 'move_down_field': case 'delete_field': case 'show_in_table_field': case 'required_field':
+            case 'delete_field': case 'show_in_table_field': case 'required_field':
                 $Item = new User_Field((int)$this->id);
                 $f = str_replace('_field', '', $this->action);
                 $url2 .= '&action=fields';
@@ -38,6 +37,17 @@ class Sub_Dev extends \RAAS\Abstract_Sub_Controller
                 new Redirector(\RAAS\CMS\ViewSub_Dev::i()->url);
                 break;
         }
+    }
+
+
+    protected function fields()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['priority']) && is_array($_POST['priority'])) {
+                Package::i()->setEntitiesPriority('\RAAS\CMS\User_Field', (array)$_POST['priority']);
+            }
+        }
+        $this->view->fields(array('Set' => $this->model->dev_fields()));
     }
 
 
