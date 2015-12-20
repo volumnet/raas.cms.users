@@ -19,21 +19,52 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
                 $this->{$this->action}();
                 break;
             case 'delete': case 'chvis':
+                $ids = (array)$_GET['id'];
+                if (in_array('all', $ids, true)) {
+                    $items = User::getSet();
+                } else {
+                    $items = array_map(function($x) { return new User((int)$x); }, $ids);
+                    $items = array_values($items);
+                }
                 $action = $this->action;
-                $Item = new User($this->id);
-                StdSub::$action($Item, $this->url);
+                StdSub::$action($items, $this->url);
                 break;
             case 'delete_group': 
-                $Item = new Group((int)$this->id);
-                StdSub::delete($Item, $this->url);
+                $ids = (array)$_GET['id'];
+                if (in_array('all', $ids, true)) {
+                    $pids = (array)$_GET['pid'];
+                    $pids = array_filter($pids, 'trim');
+                    $pids = array_map('intval', $pids);
+                    if ($pids) {
+                        $items = Group::getSet(array('where' => "pid IN (" . implode(", ", $pids) . ")"));
+                    }
+                } else {
+                    $items = array_map(function($x) { return new Group((int)$x); }, $ids);
+                }
+                $items = array_values($items);
+                StdSub::delete($items, $this->url);
                 break;
             case 'add_group': 
+                $ids = (array)$_GET['id'];
+                if (in_array('all', $ids, true)) {
+                    $items = User::getSet();
+                } else {
+                    $items = array_map(function($x) { return new User((int)$x); }, $ids);
+                    $items = array_values($items);
+                }
                 $Group = new Group(isset($this->nav['gid']) ? (int)$this->nav['gid'] : 0);
-                StdSub::associate(new User((int)$this->id), $this->url . '&id=' . (int)$Group->id, true, $Group->id, $Group);
+                StdSub::associate($items, $this->url . '&id=' . (int)$Group->id, true, $Group->id, $Group);
                 break;
             case 'del_group':
+                $ids = (array)$_GET['id'];
+                if (in_array('all', $ids, true)) {
+                    $items = User::getSet();
+                } else {
+                    $items = array_map(function($x) { return new User((int)$x); }, $ids);
+                    $items = array_values($items);
+                }
                 $Group = new Group(isset($this->nav['gid']) ? (int)$this->nav['gid'] : 0);
-                StdSub::deassociate(new User((int)$this->id), $this->url . '&id=' . (int)$Group->id, true, $Group->id, $Group);
+                StdSub::deassociate($items, $this->url . '&id=' . (int)$Group->id, true, $Group->id, $Group);
                 break;
             default:
                 $this->showlist();

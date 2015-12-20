@@ -21,10 +21,12 @@ class Sub_Dev extends \RAAS\Abstract_Sub_Controller
                 $this->{$this->action}();
                 break;
             case 'delete_field': case 'show_in_table_field': case 'required_field':
-                $Item = new User_Field((int)$this->id);
+                $ids = (array)$_GET['id'];
+                $items = array_map(function($x) { return new User_Field((int)$x); }, $ids);
+                $items = array_values($items);
                 $f = str_replace('_field', '', $this->action);
                 $url2 .= '&action=fields';
-                StdSub::$f($Item, $this->url . $url2);
+                StdSub::$f($items, $this->url . $url2);
                 break;
             case 'webmaster':
                 if (isset($_GET['confirm']) && $_GET['confirm']) {
