@@ -45,6 +45,10 @@ class GroupsTable extends \RAAS\Table
             'caption' => $this->view->_('GROUPS'),
             'Set' => $params['Set'],
             'header' => false,
+            'data-role' => 'multitable',
+            'meta' => array(
+                'allContextMenu' => $view->getAllGroupsContextMenu(),
+            ),
         );
         unset($params['columns'], $params['order']);
         $arr = array_merge($defaultParams, $params);

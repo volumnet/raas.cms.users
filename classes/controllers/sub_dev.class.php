@@ -8,6 +8,7 @@ use \RAAS\StdSub;
 use \RAAS\CMS\User;
 use \RAAS\CMS\User_Field;
 use \RAAS\CMS\Package;
+use \RAAS\Application;
 
 class Sub_Dev extends \RAAS\Abstract_Sub_Controller
 {
@@ -22,7 +23,12 @@ class Sub_Dev extends \RAAS\Abstract_Sub_Controller
                 break;
             case 'delete_field': case 'show_in_table_field': case 'required_field':
                 $ids = (array)$_GET['id'];
-                $items = array_map(function($x) { return new User_Field((int)$x); }, $ids);
+                if (in_array('all', $ids, true)) {
+                    $parentClassname = 'RAAS\\CMS\\User';
+                    $items = User_Field::getSet(array('where' => "classname = '" . Application::i()->SQL->real_escape_string($parentClassname) . "'"));
+                } else {
+                    $items = array_map(function($x) { return new User_Field((int)$x); }, $ids);
+                }
                 $items = array_values($items);
                 $f = str_replace('_field', '', $this->action);
                 $url2 .= '&action=fields';

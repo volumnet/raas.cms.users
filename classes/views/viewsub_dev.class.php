@@ -62,4 +62,27 @@ class ViewSub_Dev extends \RAAS\Abstract_Sub_View
         );
         return $arr;
     }
+    
+    
+    public function getAllFieldsContextMenu()
+    {
+        $arr = array();
+        $arr[] = array(
+            'name' => $this->_('SHOW_IN_TABLE'), 
+            'href' => $this->url . '&action=show_in_table_field&back=1', 
+            'icon' => 'align-justify',
+        );
+        $arr[] = array(
+            'name' => $this->_('REQUIRED'), 
+            'href' => $this->url . '&action=required_field&back=1', 
+            'icon' => 'asterisk',
+        );
+        $arr[] = array(
+            'name' => $this->_('DELETE'), 
+            'href' => $this->url . '&action=delete_field&back=1', 
+            'icon' => 'remove', 
+            'onclick' => 'return confirm(\'' . $this->_('DELETE_MULTIPLE_TEXT') . '\')'
+        );
+        return $arr;
+    }
 }

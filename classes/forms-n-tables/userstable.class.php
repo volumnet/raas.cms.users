@@ -61,7 +61,11 @@ class UsersTable extends \RAAS\Table
             'callback' => function($Row) { if ($Row->source->new) { $Row->class = 'info'; } },
             'emptyString' => $this->view->_('NO_USERS_FOUND'),
             'template' => 'showlist',
-            'order' => ((strtolower($params['order']) == 'desc') ? Column::SORT_DESC : Column::SORT_ASC)
+            'order' => ((strtolower($params['order']) == 'desc') ? Column::SORT_DESC : Column::SORT_ASC),
+            'data-role' => 'multitable',
+            'meta' => array(
+                'allContextMenu' => $view->getAllUsersContextMenu($params['Group']),
+            ),
         );
         unset($params['columns'], $params['order']);
         $arr = array_merge($defaultParams, $params);

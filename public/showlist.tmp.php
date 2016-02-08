@@ -24,7 +24,7 @@
       </form>
       <?php 
       if ($Table->Set) { 
-          include \RAAS\Application::i()->view->context->tmp('/table.tmp.php');
+          include \RAAS\CMS\Package::i()->view->tmp('multitable.tmp.php');
        }
        ?>
     </div>
@@ -32,7 +32,7 @@
       <?php 
       if ($GroupsTable->Set) { 
           $Table = $GroupsTable;
-          include \RAAS\Application::i()->view->context->tmp('/table.tmp.php');
+          include \RAAS\CMS\Package::i()->view->tmp('multitable.tmp.php');
       }
       ?>
     </div>

@@ -98,11 +98,63 @@ class ViewSub_Users extends \RAAS\Abstract_Sub_View
         );
         return $arr;
     }
+    
+    
+    public function getAllUsersContextMenu(Group $Group)
+    {
+        $arr = array();
+        if ($Group->id) {
+            $arr[] = array(
+                'name' => $this->_('ADD_TO_GROUP'), 
+                'href' => $this->url . '&action=add_group&gid=' . (int)$Group->id . '&back=1', 
+                'icon' => 'ok-circle', 
+                'title' => $this->_('ADD_TO_GROUP')
+            );
+            $arr[] = array(
+                'name' => $this->_('DELETE_FROM_GROUP'), 
+                'href' => $this->url . '&action=del_group&gid=' . (int)$Group->id . '&back=1', 
+                'icon' => 'remove-circle', 
+                'title' => $this->_('DELETE_FROM_GROUP')
+            );
+        }
+        $arr[] = array(
+            'name' => $this->_('ACTIVATE'), 
+            'href' => $this->url . '&action=vis&back=1', 
+            'icon' => 'ok-circle', 
+            'title' => $this->_('ACTIVATE')
+        );
+        $arr[] = array(
+            'name' => $this->_('BLOCK_USER'), 
+            'href' => $this->url . '&action=invis&back=1', 
+            'icon' => 'ban-circle', 
+            'title' => $this->_('BLOCK_USER')
+        );
+        $arr[] = array(
+            'name' => $this->_('DELETE'), 
+            'href' => $this->url . '&action=delete&back=1', 
+            'icon' => 'remove', 
+            'onclick' => 'return confirm(\'' . $this->_('DELETE_MULTIPLE_TEXT') . '\')'
+        );
+        return $arr;
+    }
 
 
     public function getGroupContextMenu(Group $Item)
     {
         return $this->stdView->stdContextMenu($Item, 0, 0, 'edit_group', '', 'delete_group');
+    }
+    
+    
+    public function getAllGroupsContextMenu()
+    {
+        $arr = array();
+        $arr[] = array(
+            'name' => $this->_('DELETE'), 
+            'href' => $this->url . '&action=delete_group&back=1', 
+            'icon' => 'remove', 
+            'onclick' => 'return confirm(\'' . $this->_('DELETE_MULTIPLE_TEXT') . '\')'
+        );
+        return $arr;
     }
 
 
