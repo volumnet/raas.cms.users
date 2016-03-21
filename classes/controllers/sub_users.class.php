@@ -18,7 +18,7 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
             case 'edit': case 'edit_group':
                 $this->{$this->action}();
                 break;
-            case 'delete': case 'chvis':
+            case 'delete': case 'chvis': case 'vis': case 'invis':
                 $ids = (array)$_GET['id'];
                 if (in_array('all', $ids, true)) {
                     $items = User::getSet();

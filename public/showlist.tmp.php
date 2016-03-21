@@ -7,8 +7,14 @@
     <div class="tab-pane active" id="users">
       <form class="form-search" action="<?php echo \SOME\HTTP::queryString()?>" method="get">
         <?php foreach ($VIEW->nav as $key => $val) { ?>
-            <?php if (!in_array($key, array('page', 'search_string', 'group_only'))) { ?>
-                <input type="hidden" name="<?php echo htmlspecialchars($key)?>" value="<?php echo htmlspecialchars($val)?>" />
+            <?php if (!in_array($key, array('page', 'search_string', 'group_only', 'action', 'id'))) { ?>
+                <?php if (is_array($val)) { ?>
+                    <?php foreach ($val as $k => $v) { ?>
+                        <input type="hidden" name="<?php echo htmlspecialchars($key)?>[<?php echo htmlspecialchars($k)?>]" value="<?php echo htmlspecialchars($v)?>" />
+                    <?php } ?>
+                <?php } else { ?>
+                    <input type="hidden" name="<?php echo htmlspecialchars($key)?>" value="<?php echo htmlspecialchars($val)?>" />
+                <?php } ?>
             <?php } ?>
         <?php } ?>
         <div class="input-append">
