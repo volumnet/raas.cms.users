@@ -27,7 +27,7 @@ class Webmaster extends \RAAS\CMS\Webmaster
     /**
      * Создаем стандартные сниппеты
      */
-    public function checkStdSnippets()
+    public function checkStdInterfaces()
     {
         foreach (self::$snippets as $urn => $name) {
             $Item = Snippet::importByURN('__RAAS_users_' . $urn . '_interface');
@@ -53,7 +53,7 @@ class Webmaster extends \RAAS\CMS\Webmaster
     }
 
 
-    public function createCab() 
+    public function createCab()
     {
         // Добавим виджеты
         $VF = Snippet_Folder::importByURN('__RAAS_views');
@@ -86,7 +86,7 @@ class Webmaster extends \RAAS\CMS\Webmaster
         $F->show_in_table = 1;
         $F->commit();
 
-        
+
         $S = Snippet::importByURN('__RAAS_users_register_notify');
         $FRM = new \RAAS\CMS\Form();
         $FRM->name = $this->view->_('REGISTRATION_FORM');
@@ -140,7 +140,7 @@ class Webmaster extends \RAAS\CMS\Webmaster
         $F->commit();
 
         $Site = array_shift(Page::getSet(array('where' => "NOT pid")));
-        
+
         $register = $this->createPage(array('name' => $this->view->_('REGISTRATION'), 'urn' => 'register', 'cache' => 0, 'response_code' => 200), $Site);
         $activation = $this->createPage(array('name' => $this->view->_('ACTIVATION'), 'urn' => 'activate', 'cache' => 0, 'response_code' => 200), $Site);
         $login = $this->createPage(array('name' => $this->view->_('LOG_IN_INTO_THE_SYSTEM'), 'urn' => 'login', 'cache' => 0, 'response_code' => 200), $Site);

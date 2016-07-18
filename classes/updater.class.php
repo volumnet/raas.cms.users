@@ -14,7 +14,7 @@ class Updater extends \RAAS\Updater
     {
         $w = new Webmaster();
         $s = Snippet::importByURN('__RAAS_users_register_interface');
-        $w->checkStdSnippets();
+        $w->checkStdInterfaces();
         if (!$s || !$s->id) {
             $w->createCab();
         }
