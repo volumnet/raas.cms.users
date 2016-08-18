@@ -1,5 +1,6 @@
 <?php
 namespace RAAS\CMS\Users;
+
 use \RAAS\Application;
 use \RAAS\FormTab;
 use \RAAS\Field as RAASField;
@@ -35,12 +36,12 @@ class EditUserForm extends \RAAS\Form
         $Item = isset($params['Item']) ? $params['Item'] : null;
 
         $defaultParams = array(
-            'Item' => $Item, 
-            'parentUrl' => $this->url, 
+            'Item' => $Item,
+            'parentUrl' => $this->url,
             'caption' => $Item->id ? $this->view->_('EDITING_USER') : $this->view->_('CREATING_USER'),
             'children' => array(),
             'template' => 'edit',
-            'export' => function($Form) use ($t) {
+            'export' => function ($Form) use ($t) {
                 $oldVis = (int)$Form->Item->vis;
                 $Form->exportDefault();
                 $Form->Item->new = 0;
@@ -56,7 +57,7 @@ class EditUserForm extends \RAAS\Form
                 }
             },
         );
-        
+
         $arr = array_merge($defaultParams, $params);
         parent::__construct($arr);
         $this->children['common'] = $this->getCommonTab();
@@ -78,7 +79,7 @@ class EditUserForm extends \RAAS\Form
         // Логин
         $Field = new RAASField(array('name' => 'login', 'caption' => $this->view->_('LOGIN'), 'required' => 'required'));
         $Field->required = 'required';
-        $Field->check = function($Field) use ($t) {
+        $Field->check = function ($Field) use ($t) {
             $localError = $Field->getErrors();
             if (!$localError) {
                 if ($Field->Form->Item->checkLoginExists($_POST[$Field->name])) {
@@ -91,13 +92,13 @@ class EditUserForm extends \RAAS\Form
 
         // Пароль
         $Field = new RAASField(array(
-            'type' => 'password', 
-            'name' => 'password', 
+            'type' => 'password',
+            'name' => 'password',
             'caption' => $this->view->_('PASSWORD'),
-            'confirm' => true, 
-            'export' => function($Field) use ($t) { 
+            'confirm' => true,
+            'export' => function ($Field) use ($t) {
                 if ($_POST[$Field->name]) {
-                    $Field->Form->Item->password_md5 = \RAAS\Application::i()->md5It(trim($_POST[$Field->name])); 
+                    $Field->Form->Item->password_md5 = \RAAS\Application::i()->md5It(trim($_POST[$Field->name]));
                 }
             }
         ));
@@ -105,10 +106,10 @@ class EditUserForm extends \RAAS\Form
             $Field->required = 'required';
         }
         $tabChildren['password'] = $Field;
-        
+
         // E-mail
         $Field = new RAASField(array('type' => 'email', 'name' => 'email', 'caption' => $this->view->_('EMAIL')));
-        $Field->check = function($Field) use ($t) {
+        $Field->check = function ($Field) use ($t) {
             $localError = $Field->getErrors();
             if (!$localError) {
                 if ($Field->Form->Item->checkEmailExists($_POST[$Field->name])) {
@@ -128,7 +129,7 @@ class EditUserForm extends \RAAS\Form
             'type' => 'select', 'name' => 'lang', 'caption' => $this->view->_('LANGUAGE'), 'children' => $CONTENT['languages'], 'default' => $this->view->language
         ));
         $tabChildren['lang'] = $Field;
-                       
+
 
         // Кастомные поля
         foreach ($Item->fields as $row) {
@@ -137,11 +138,11 @@ class EditUserForm extends \RAAS\Form
 
         // Социальные сети
         $tabChildren['social'] = new RAASField(array(
-            'type' => 'text', 
-            'name' => 'social', 
-            'multiple' => true, 
+            'type' => 'text',
+            'name' => 'social',
+            'multiple' => true,
             'caption' => $this->view->_('SOCIAL_NETWORKS'),
-            'export' => function($Field) use ($t) {
+            'export' => function ($Field) use ($t) {
                 $Field->Form->Item->meta_social = isset($_POST[$Field->name]) ? (array)$_POST[$Field->name] : array();
             }
         ));
@@ -160,14 +161,14 @@ class EditUserForm extends \RAAS\Form
             'caption' => $this->view->_('GROUPS'),
             'children' => array(
                 'groups' => array(
-                    'type' => 'checkbox', 
+                    'type' => 'checkbox',
                     'name' => 'groups',
-                    'multiple' => 'multiple', 
+                    'multiple' => 'multiple',
                     'children' => array('Set' => $g->children),
-                    'import' => function($Field) use ($t) { 
-                        return $Field->Form->Item->groups_ids; 
-                    }, 
-                    'oncommit' => function($Field) use ($t) { 
+                    'import' => function ($Field) use ($t) {
+                        return $Field->Form->Item->groups_ids;
+                    },
+                    'oncommit' => function ($Field) use ($t) {
                         $SQL_query = "DELETE FROM cms_users_groups_assoc WHERE uid = " . (int)$Field->Form->Item->id;
                         $t->Item->_SQL()->query($SQL_query);
                         $arr = array();

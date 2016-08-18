@@ -1,13 +1,13 @@
 <?php
 namespace RAAS\CMS\Users;
+
 use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\Form;
 use \RAAS\Application;
 use \RAAS\CMS\User;
 use \RAAS\CMS\ULogin;
 
-$checkRedirect = function($referer)
-{
+$checkRedirect = function ($referer) {
     if ($_POST['AJAX']) {
         return true;
     } elseif ($referer) {
@@ -19,8 +19,7 @@ $checkRedirect = function($referer)
     }
 };
 
-$generatePass = function($length = 5)
-{
+$generatePass = function ($length = 5) {
     $text = '';
     for ($i = 0; $i < $length; $i++) {
         $x = rand(0, 61);
@@ -37,8 +36,7 @@ $generatePass = function($length = 5)
 };
 
 
-$notify = function(User $User, Form $Form, array $config = array(), $ADMIN = false)
-{
+$notify = function (User $User, Form $Form, array $config = array(), $ADMIN = false) {
     $emails = $sms = array();
     if (!$ADMIN) {
         if ($User->email) {
@@ -57,14 +55,14 @@ $notify = function(User $User, Form $Form, array $config = array(), $ADMIN = fal
     if ($Form->Interface->id) {
         $template = $Form->Interface->description;
     }
-    
+
     $subject = date(DATETIMEFORMAT) . ' ' . sprintf(REGISTRATION_ON_SITE, $_SERVER['HTTP_HOST']);
     if ($emails) {
         ob_start();
         eval('?' . '>' . $template);
         $message = ob_get_contents();
         ob_end_clean();
-        \RAAS\Application::i()->sendmail($emails, $subject, $message, 'info@' . $_SERVER['HTTP_HOST'], 'RAAS.CMS');
+        \RAAS\Application::i()->sendmail($emails, $subject, $message, $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
     }
     if ($sms) {
         ob_start();
@@ -72,7 +70,7 @@ $notify = function(User $User, Form $Form, array $config = array(), $ADMIN = fal
         eval('?' . '>' . $template);
         $message_sms = ob_get_contents();
         ob_end_clean();
-        \RAAS\Application::i()->sendmail($sms, $subject, $message_sms, 'info@' . $_SERVER['HTTP_HOST'], 'RAAS.CMS', false);
+        \RAAS\Application::i()->sendmail($sms, $subject, $message_sms, $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST'], false);
     }
 };
 
@@ -108,7 +106,8 @@ if ($Form->id) {
         $Item = $User;
         foreach ($Form->fields as $row) {
             switch ($row->datatype) {
-                case 'file': case 'image':
+                case 'file':
+                case 'image':
                     $val = isset($_FILES[$row->urn]['tmp_name']) ? $_FILES[$row->urn]['tmp_name'] : null;
                     if ($val && $row->multiple) {
                         $val = (array)$val;
@@ -181,8 +180,8 @@ if ($Form->id) {
                 $User->vis = (int)($config['activation_type'] == Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED);
                 $User->new = 1;
             }
-            
-            
+
+
             if (isset($Form->fields['email'])) {
                 $val = $User->email = trim($_POST['email']);
                 if ($val && $config['email_as_login']) {
@@ -219,12 +218,13 @@ if ($Form->id) {
                 if (isset($User->fields[$fname])) {
                     $row = $User->fields[$fname];
                     switch ($row->datatype) {
-                        case 'file': case 'image':
+                        case 'file':
+                        case 'image':
                             $row->deleteValues();
                             if ($row->multiple) {
                                 foreach ($_FILES[$row->urn]['tmp_name'] as $key => $val) {
                                     $row2 = array(
-                                        'vis' => (int)$_POST[$row->urn . '@vis'][$key], 
+                                        'vis' => (int)$_POST[$row->urn . '@vis'][$key],
                                         'name' => (string)$_POST[$row->urn . '@name'][$key],
                                         'description' => (string)$_POST[$row->urn . '@description'][$key],
                                         'attachment' => (int)$_POST[$row->urn . '@attachment'][$key]
@@ -254,8 +254,8 @@ if ($Form->id) {
                                 }
                             } else {
                                 $row2 = array(
-                                    'vis' => (int)$_POST[$row->urn . '@vis'], 
-                                    'name' => (string)$_POST[$row->urn . '@name'], 
+                                    'vis' => (int)$_POST[$row->urn . '@vis'],
+                                    'name' => (string)$_POST[$row->urn . '@name'],
                                     'description' => (string)$_POST[$row->urn . '@description'],
                                     'attachment' => (int)$_POST[$row->urn . '@attachment']
                                 );
@@ -302,7 +302,8 @@ if ($Form->id) {
             foreach ($User->fields as $fname => $temp) {
                 if (!isset($_POST[$fname])) {
                     switch ($temp->datatype) {
-                        case 'datetime': case 'datetime-local':
+                        case 'datetime':
+                        case 'datetime-local':
                             $temp->addValue(date('Y-m-d H:i:s'));
                             break;
                         case 'date':
@@ -323,7 +324,7 @@ if ($Form->id) {
                 $User->fields['user_agent']->deleteValues();
                 $User->fields['user_agent']->addValue((string)$_SERVER['HTTP_USER_AGENT']);
             }
-            
+
             if ($Form->email && ($new || $config['notify_about_edit'])) {
                 $notify($User, $Form, $config, true);
             }

@@ -1,13 +1,13 @@
-<?php 
+<?php
 namespace RAAS\CMS\Users;
+
 use \RAAS\Application;
 use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\User;
 use \RAAS\CMS\Snippet;
 use \RAAS\CMS\Auth;
 
-$notify = function(User $User, array $config = array())
-{
+$notify = function (User $User, array $config = array()) {
     $emails = array();
     if ($User->email) {
         $emails[] = $User->email;
@@ -22,7 +22,7 @@ $notify = function(User $User, array $config = array())
         eval('?' . '>' . $template);
         $message = ob_get_contents();
         ob_end_clean();
-        \RAAS\Application::i()->sendmail($emails, $subject, $message, 'info@' . $_SERVER['HTTP_HOST'], 'RAAS.CMS');
+        \RAAS\Application::i()->sendmail($emails, $subject, $message, $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
     }
 };
 
