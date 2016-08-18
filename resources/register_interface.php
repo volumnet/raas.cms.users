@@ -62,7 +62,7 @@ $notify = function (User $User, Form $Form, array $config = array(), $ADMIN = fa
         eval('?' . '>' . $template);
         $message = ob_get_contents();
         ob_end_clean();
-        \RAAS\Application::i()->sendmail($emails, $subject, $message, $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
+        \RAAS\Application::i()->sendmail($emails, $subject, $message, ADMINISTRATION_OF_SITE . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
     }
     if ($sms) {
         ob_start();
@@ -70,7 +70,7 @@ $notify = function (User $User, Form $Form, array $config = array(), $ADMIN = fa
         eval('?' . '>' . $template);
         $message_sms = ob_get_contents();
         ob_end_clean();
-        \RAAS\Application::i()->sendmail($sms, $subject, $message_sms, $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST'], false);
+        \RAAS\Application::i()->sendmail($sms, $subject, $message_sms, ADMINISTRATION_OF_SITE . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST'], false);
     }
 };
 

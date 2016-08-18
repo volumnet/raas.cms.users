@@ -22,7 +22,7 @@ $notify = function (User $User, array $config = array()) {
         eval('?' . '>' . $template);
         $message = ob_get_contents();
         ob_end_clean();
-        \RAAS\Application::i()->sendmail($emails, $subject, $message, $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
+        \RAAS\Application::i()->sendmail($emails, $subject, $message, ADMINISTRATION_OF_SITE . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
     }
 };
 
