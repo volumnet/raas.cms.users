@@ -1,11 +1,12 @@
 <?php
 namespace RAAS\CMS\Users;
 
-use \RAAS\Controller_Frontend as RAASController_Frontend;
-use \RAAS\CMS\Form;
-use \RAAS\Application;
-use \RAAS\CMS\User;
-use \RAAS\CMS\ULogin;
+use RAAS\Controller_Frontend as RAASController_Frontend;
+use RAAS\CMS\Form;
+use RAAS\Application;
+use RAAS\CMS\User;
+use RAAS\CMS\ULogin;
+use RAAS\Attachment;
 
 $checkRedirect = function ($referer) {
     if ($_POST['AJAX']) {
@@ -222,18 +223,18 @@ if ($Form->id) {
                         case 'image':
                             $row->deleteValues();
                             if ($row->multiple) {
-                                foreach ($_FILES[$row->urn]['tmp_name'] as $key => $val) {
+                                foreach ($_FILES[$fname]['tmp_name'] as $key => $val) {
                                     $row2 = array(
                                         'vis' => (int)$_POST[$row->urn . '@vis'][$key],
                                         'name' => (string)$_POST[$row->urn . '@name'][$key],
                                         'description' => (string)$_POST[$row->urn . '@description'][$key],
                                         'attachment' => (int)$_POST[$row->urn . '@attachment'][$key]
                                     );
-                                    if (is_uploaded_file($_FILES[$row->urn]['tmp_name'][$key]) && $row->validate($_FILES[$row->urn]['tmp_name'][$key])) {
+                                    if (is_uploaded_file($_FILES[$fname]['tmp_name'][$key]) && $row->validate($_FILES[$fname]['tmp_name'][$key])) {
                                         $att = new Attachment((int)$row2['attachment']);
-                                        $att->upload = $_FILES[$row->urn]['tmp_name'][$key];
-                                        $att->filename = $_FILES[$row->urn]['name'][$key];
-                                        $att->mime = $_FILES[$row->urn]['type'][$key];
+                                        $att->upload = $_FILES[$fname]['tmp_name'][$key];
+                                        $att->filename = $_FILES[$fname]['name'][$key];
+                                        $att->mime = $_FILES[$fname]['type'][$key];
                                         $att->parent = $Material;
                                         if ($row->datatype == 'image') {
                                             $att->image = 1;
@@ -259,11 +260,11 @@ if ($Form->id) {
                                     'description' => (string)$_POST[$row->urn . '@description'],
                                     'attachment' => (int)$_POST[$row->urn . '@attachment']
                                 );
-                                if (is_uploaded_file($_FILES[$row->urn]['tmp_name']) && $row->validate($_FILES[$row->urn]['tmp_name'])) {
+                                if (is_uploaded_file($_FILES[$fname]['tmp_name']) && $row->validate($_FILES[$fname]['tmp_name'])) {
                                     $att = new Attachment((int)$row2['attachment']);
-                                    $att->upload = $_FILES[$row->urn]['tmp_name'];
-                                    $att->filename = $_FILES[$row->urn]['name'];
-                                    $att->mime = $_FILES[$row->urn]['type'];
+                                    $att->upload = $_FILES[$fname]['tmp_name'];
+                                    $att->filename = $_FILES[$fname]['name'];
+                                    $att->mime = $_FILES[$fname]['type'];
                                     $att->parent = $Material;
                                     if ($row->datatype == 'image') {
                                         $att->image = 1;
@@ -286,8 +287,8 @@ if ($Form->id) {
                             break;
                         default:
                             $row->deleteValues();
-                            if (isset($_POST[$row->urn])) {
-                                foreach ((array)$_POST[$row->urn] as $val) {
+                            if (isset($_POST[$fname])) {
+                                foreach ((array)$_POST[$fname] as $val) {
                                     $row->addValue($val);
                                 }
                             }
