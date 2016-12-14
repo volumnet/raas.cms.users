@@ -1,9 +1,9 @@
-<?php 
+<?php
 namespace RAAS\CMS\Users;
 
-if ($_POST['AJAX']) { 
+if ($_POST['AJAX']) {
     $result = array();
-    if ($success) { 
+    if ($success) {
         $result['success'] = 1;
     }
     if ($localError) {
@@ -12,7 +12,7 @@ if ($_POST['AJAX']) {
     ob_clean();
     echo json_encode($result);
     exit;
-} else { 
+} else {
     ?>
     <div class="feedback">
       <form class="form-horizontal" method="post" enctype="multipart/form-data">
@@ -39,14 +39,14 @@ if ($_POST['AJAX']) {
                     <label for="password" class="control-label col-sm-3 col-md-2"><?php echo PASSWORD_CONFIRM?></label>
                     <div class="col-sm-9 col-md-4"><input type="password" class="form-control" name="password@confirm" /></div>
                   </div>
-                  <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-default" type="submit"><?php echo CHANGE?></button></div></div>
+                  <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-primary" type="submit"><?php echo CHANGE?></button></div></div>
               <?php } ?>
           <?php } else { ?>
               <div class="form-group">
                 <label for="password" class="control-label col-sm-3"><?php echo ENTER_LOGIN_OR_EMAIL?></label>
                 <div class="col-sm-9 col-md-4"><input type="text" name="login" class="form-control" /></div>
               </div>
-              <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-default" type="submit"><?php echo SEND?></button></div></div>
+              <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-primary" type="submit"><?php echo SEND?></button></div></div>
           <?php } ?>
         </div>
       </form>

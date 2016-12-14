@@ -1,11 +1,11 @@
-<?php 
+<?php
 namespace RAAS\CMS\Users;
 use \RAAS\CMS\Feedback;
 use \RAAS\CMS\SocialProfile;
 
-if ($_POST['AJAX']) { 
+if ($_POST['AJAX']) {
     $result = array();
-    if ($success[(int)$Block->id]) { 
+    if ($success[(int)$Block->id]) {
         $result['success'] = 1;
     }
     if ($localError) {
@@ -27,7 +27,7 @@ if ($_POST['AJAX']) {
         <?php include \RAAS\CMS\Package::i()->resourcesDir . '/form.inc.php'?>
         <div data-role="notifications" <?php echo ($success[(int)$Block->id] || $localError) ? '' : 'style="display: none"'?>>
           <div class="alert alert-success" <?php echo ($success[(int)$Block->id]) ? '' : 'style="display: none"'?>>
-            <?php 
+            <?php
             echo YOU_HAVE_SUCCESSFULLY_REGISTERED . ' ';
             switch ($config['activation_type']) {
                 case Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED:
@@ -134,7 +134,7 @@ if ($_POST['AJAX']) {
               </div>
           <?php } ?>
           <div class="form-group">
-            <div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-default" type="submit"><?php echo $User->id ? SAVE : DO_REGISTER?></button></div>
+            <div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-primary" type="submit"><?php echo $User->id ? SAVE : DO_REGISTER?></button></div>
           </div>
         </div>
       </form>

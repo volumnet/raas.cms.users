@@ -1,9 +1,9 @@
-<?php 
+<?php
 namespace RAAS\CMS\Users;
 
-if ($_POST['AJAX']) { 
+if ($_POST['AJAX']) {
     $result = array();
-    if ($success[(int)$Block->id]) { 
+    if ($success[(int)$Block->id]) {
         $result['success'] = 1;
     }
     if ($localError) {
@@ -24,7 +24,7 @@ if ($_POST['AJAX']) {
     ob_clean();
     echo json_encode($result);
     exit;
-} else { 
+} else {
     ?>
     <div class="feedback">
       <form class="form-horizontal" method="post" enctype="multipart/form-data">
@@ -69,7 +69,7 @@ if ($_POST['AJAX']) {
                 <div id="uLogin" data-ulogin="display=panel;fields=first_name,last_name;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=twitter,google,yandex,livejournal,youtube,webmoney;redirect_uri=<?php echo urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])?>"></div>
               </div>
           <?php } ?>
-          <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-default" type="submit"><?php echo DO_LOGIN?></button></div></div>
+          <div class="form-group"><div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2"><button class="btn btn-primary" type="submit"><?php echo DO_LOGIN?></button></div></div>
         </div>
       </form>
     </div>
