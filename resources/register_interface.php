@@ -7,6 +7,7 @@ use RAAS\Application;
 use RAAS\CMS\User;
 use RAAS\CMS\ULogin;
 use RAAS\Attachment;
+use RAAS\CMS\Package;
 
 $checkRedirect = function ($referer) {
     if ($_POST['AJAX']) {
