@@ -1,5 +1,6 @@
 <?php
 namespace RAAS\CMS\Users;
+
 use \RAAS\CMS\User;
 use \RAAS\CMS\Group;
 use \RAAS\CMS\User_Field;
@@ -7,6 +8,8 @@ use \RAAS\CMS\Block_Type;
 use \RAAS\Controller_Frontend;
 use \RAAS\IContext;
 use \RAAS\CMS\Page;
+use RAAS\Application;
+use RAAS\CMS\Package;
 
 class Module extends \RAAS\Module
 {
@@ -49,7 +52,7 @@ class Module extends \RAAS\Module
         if ($Group->id && (!isset($IN['search_string']) || isset($IN['group_only']))) {
             $SQL_query .= " LEFT JOIN " . User::_dbprefix() . "cms_users_groups_assoc AS tUGA ON tUGA.uid = tU.id";
         }
-       
+
         $SQL_query .= " WHERE 1 ";
         if ($Group->id && (!isset($IN['search_string']) || isset($IN['group_only']))) {
             $SQL_query .= " AND tUGA.gid = " . (int)$Group->id;
@@ -61,7 +64,7 @@ class Module extends \RAAS\Module
                                 OR ((SELECT COUNT(*) FROM " . User_Field::_dbprefix() . User_Field::data_table . " WHERE pid = tU.id AND value LIKE '%" . $this->SQL->escape_like($IN['search_string']) . "%') > 0)
                             ) ";
         }
-        
+
         $SQL_query .= " GROUP BY tU.id ORDER BY tU.new DESC, ";
         if (isset($columns[$IN['sort']])) {
             $SQL_query .= " tSort.value ";
@@ -102,14 +105,28 @@ class Module extends \RAAS\Module
     }
 
 
+    public function sendNotification(User $User)
+    {
+        $lang = $User->lang ? $User->lang : $this->view->language;
+        Controller_Frontend::i()->exportLang(Application::i(), $lang);
+        Controller_Frontend::i()->exportLang(Package::i(), $lang);
+        foreach (Package::i()->modules as $row) {
+            Controller_Frontend::i()->exportLang($row, $lang);
+        }
+        $text = $this->getActivationNotification($User);
+        $subject = sprintf($this->view->_($User->vis ? 'ACTIVATION_NOTIFICATION' : 'BLOCK_NOTIFICATION'), $_SERVER['HTTP_HOST']);
+        Application::i()->sendmail(trim($User->email), trim($subject), trim($text), $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
+    }
+
+
     public function getUsersBySearch($search, $limit = 10)
     {
-        $SQL_query = "SELECT tU.* FROM " . User::_tablename() . " AS tU 
+        $SQL_query = "SELECT tU.* FROM " . User::_tablename() . " AS tU
                         JOIN " . User_Field::_dbprefix() . User_Field::data_table . " AS tD ON tD.pid = tU.id
                         JOIN " . User_Field::_tablename() . " AS tF ON tF.classname = 'RAAS\\\\CMS\\\\User' AND tF.id = tD.fid
                        WHERE (
-                                tU.login LIKE '%" . $this->SQL->escape_like($search) . "%' 
-                             OR tU.email LIKE '%" . $this->SQL->escape_like($search) . "%' 
+                                tU.login LIKE '%" . $this->SQL->escape_like($search) . "%'
+                             OR tU.email LIKE '%" . $this->SQL->escape_like($search) . "%'
                              OR tD.value LIKE '%" . $this->SQL->escape_like($search) . "%'
                         ) ";
         $SQL_query .= " GROUP BY tU.id ORDER BY tU.login LIMIT " . (int)$limit;

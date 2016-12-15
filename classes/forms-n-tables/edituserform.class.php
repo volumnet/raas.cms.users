@@ -49,10 +49,10 @@ class EditUserForm extends \RAAS\Form
                 if (($an = Module::i()->registryGet('automatic_notification')) && $Form->Item->email) {
                     if (!$oldVis && $newVis && in_array($an, array(Module::AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION, Module::AUTOMATIC_NOTIFICATION_BOTH))) {
                         // Уведомление об активации
-                        $t->sendNotification($Form->Item);
+                        Module::i()->sendNotification($Form->Item);
                     } elseif ($oldVis && !$newVis && ($an == Module::AUTOMATIC_NOTIFICATION_BOTH)) {
                         // Уведомление о блокировке
-                        $t->sendNotification($Form->Item);
+                        Module::i()->sendNotification($Form->Item);
                     }
                 }
             },
@@ -184,19 +184,5 @@ class EditUserForm extends \RAAS\Form
             )
         ));
         return $tab;
-    }
-
-
-    public function sendNotification(User $User)
-    {
-        $lang = $User->lang ? $User->lang : $this->view->language;
-        Controller_Frontend::i()->exportLang(Application::i(), $lang);
-        Controller_Frontend::i()->exportLang(Package::i(), $lang);
-        foreach (Package::i()->modules as $row) {
-            Controller_Frontend::i()->exportLang($row, $lang);
-        }
-        $text = Module::i()->getActivationNotification($User);
-        $subject = sprintf($this->view->_($User->vis ? 'ACTIVATION_NOTIFICATION' : 'BLOCK_NOTIFICATION'), $_SERVER['HTTP_HOST']);
-        Application::i()->sendmail(trim($User->email), trim($subject), trim($text), $this->view->_('ADMINISTRATION_OF_SITE') . ' ' . $_SERVER['HTTP_HOST'], 'info@' . $_SERVER['HTTP_HOST']);
     }
 }
