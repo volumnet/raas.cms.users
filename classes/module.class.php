@@ -75,7 +75,7 @@ class Module extends \RAAS\Module
             $SQL_query .= $IN['sort'];
         }
         $SQL_query .= " " . $order;
-        $Pages = new \SOME\Pages((int)$IN['page'] ?: 1, $this->registryGet('rowsPerPage'));
+        $Pages = new \SOME\Pages((int)$IN['page'] ?: 1, Application::i()->registryGet('rowsPerPage'));
         $Set = User::getSQLSet($SQL_query, $Pages);
 
         $GSet = $Group->getChildSet('children');
