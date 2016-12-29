@@ -1,8 +1,9 @@
 <?php
+namespace RAAS\CMS;
+
 use \RAAS\CMS\Users\Block_Register;
 
-$smsField = function($field)
-{
+$smsField = function ($field) {
     $values = $field->getValues(true);
     $arr = array();
     foreach ($values as $key => $val) {
@@ -14,7 +15,8 @@ $smsField = function($field)
             case 'datetime-local':
                 $arr[$key] = date(DATETIMEFORMAT, strtotime($val));
                 break;
-            case 'file': case 'image':
+            case 'file':
+            case 'image':
                 $arr[$key] .= $val->name;
                 break;
             case 'htmlarea':
@@ -31,8 +33,7 @@ $smsField = function($field)
     }
     return $field->name . ': ' . implode(', ', $arr) . "\n";
 };
-$emailField = function($field)
-{
+$emailField = function ($field) {
     $values = $field->getValues(true);
     $arr = array();
     foreach ($values as $key => $val) {
@@ -51,13 +52,15 @@ $emailField = function($field)
                 $arr[$key] .= '<a href="mailto:' . htmlspecialchars($val) . '">' . htmlspecialchars($val) . '</a>';
                 break;
             case 'url':
-                $arr[$key] .= '<a href="http://' . htmlspecialchars(str_replace('http://', '', $val)) . '">' . htmlspecialchars($val) . '</a>';
+                $arr[$key] .= '<a href="http://' . (!preg_match('/^http(s)?:\\/\\//umi', trim($val)) ? 'http://' : '') . htmlspecialchars($val) . '">' . htmlspecialchars($val) . '</a>';
                 break;
             case 'file':
-                $arr[$key] .= '<a href="http://' . $_SERVER['HTTP_HOST'] . '/' . $val->fileURL . '">' . htmlspecialchars($val->name) . '</a>';
+                $arr[$key] .= '<a href="http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/' . $val->fileURL . '">' . htmlspecialchars($val->name) . '</a>';
                 break;
             case 'image':
-                $arr[$key] .= '<a href="http://' . $_SERVER['HTTP_HOST'] . '/' . $val->fileURL . '"><img src="http://' . $_SERVER['HTTP_HOST'] . '/' . $val->tnURL. '" alt="' . htmlspecialchars($val->name) . '" title="' . htmlspecialchars($val->name) . '" /></a>';
+                $arr[$key] .= '<a href="http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/' . $val->fileURL . '">
+                                 <img src="http://' . $_SERVER['HTTP_HOST'] . '/' . $val->tnURL. '" alt="' . htmlspecialchars($val->name) . '" title="' . htmlspecialchars($val->name) . '" />
+                               </a>';
                 break;
             case 'htmlarea':
                 $arr[$key] = '<div>' . $val . '</div>';
@@ -102,7 +105,7 @@ $emailField = function($field)
     <?php if ($ADMIN) { ?>
         <?php if ($User && $User->id) { ?>
             <p>
-              <a href="http://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'] . '/admin/?p=cms&m=users&action=edit&id=' . (int)$User->id)?>">
+              <a href="http<?php echo ($_SERVER['HTTPS'] == 'on' ? 's' : '')?>://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'] . '/admin/?p=cms&m=users&action=edit&id=' . (int)$User->id)?>">
                 <?php echo VIEW?>
               </a>
             </p>
@@ -111,17 +114,17 @@ $emailField = function($field)
           <small>
             <?php echo IP_ADDRESS?>: <?php echo htmlspecialchars($User->ip)?><br />
             <?php echo USER_AGENT?>: <?php echo htmlspecialchars($User->user_agent)?><br />
-            <?php echo PAGE?>: 
+            <?php echo PAGE?>:
             <?php if ($User->page->parents) { ?>
                 <?php foreach ($User->page->parents as $row) { ?>
-                    <a href="<?php echo htmlspecialchars($User->domain . $row->url)?>"><?php echo htmlspecialchars($row->name)?></a> / 
+                    <a href="<?php echo htmlspecialchars($User->domain . $row->url)?>"><?php echo htmlspecialchars($row->name)?></a> /
                 <?php } ?>
             <?php } ?>
             <a href="<?php echo htmlspecialchars($User->domain . $User->page->url)?>"><?php echo htmlspecialchars($User->page->name)?></a>
           </small>
         </p>
-        <?php 
-    } else { 
+        <?php
+    } else {
         switch ($config['activation_type']) {
             case Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED:
                 echo '<p>' . NOW_YOU_CAN_LOG_IN_INTO_THE_SYSTEM . '</p>';
@@ -130,7 +133,7 @@ $emailField = function($field)
                 echo '<p>' . PLEASE_WAIT_FOR_ADMINISTRATOR_TO_ACTIVATE . '</p>';
                 break;
             case Block_Register::ACTIVATION_TYPE_USER:
-                $link = 'http://' . $_SERVER['HTTP_HOST'] . '/activate/?key=' . $User->activationKey;
+                $link = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/activate/?key=' . $User->activationKey;
                 echo '<p>' . sprintf(ACTIVATION_LINK, $link, $link) . '</p>';
                 break;
         }
@@ -138,9 +141,9 @@ $emailField = function($field)
         <p>--</p>
         <p>
           <?php echo WITH_RESPECT?>,<br />
-          <?php echo ADMINISTRATION_OF_SITE?> <a href="http://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'])?>"><?php echo htmlspecialchars($_SERVER['HTTP_HOST'])?></a>
+          <?php echo ADMINISTRATION_OF_SITE?> <a href="http<?php echo ($_SERVER['HTTPS'] == 'on' ? 's' : '')?>://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'])?>"><?php echo htmlspecialchars($_SERVER['HTTP_HOST'])?></a>
         </p>
         <?php
-    } 
-} 
+    }
+}
 ?>

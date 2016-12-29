@@ -1,7 +1,8 @@
 <?php
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\Feedback;
-use \RAAS\CMS\SocialProfile;
+
+use RAAS\CMS\Feedback;
+use RAAS\CMS\SocialProfile;
 
 if ($_POST['AJAX']) {
     $result = array();
