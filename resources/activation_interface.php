@@ -1,5 +1,6 @@
-<?php 
+<?php
 namespace RAAS\CMS\Users;
+
 use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\User;
 use \RAAS\CMS\Auth;

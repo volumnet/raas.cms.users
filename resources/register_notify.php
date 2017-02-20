@@ -33,6 +33,8 @@ $smsField = function ($field) {
     }
     return $field->name . ': ' . implode(', ', $arr) . "\n";
 };
+
+
 $emailField = function ($field) {
     $values = $field->getValues(true);
     $arr = array();

@@ -1,12 +1,12 @@
 <?php
 namespace RAAS\CMS\Users;
+
 use \RAAS\Controller_Frontend as RAASController_Frontend;
 use \RAAS\CMS\Auth;
 use \RAAS\CMS\User as CMSUser;
 use \RAAS\CMS\ULogin;
 
-$checkRedirect = function($referer)
-{
+$checkRedirect = function ($referer) {
     if ($_POST['AJAX']) {
         return true;
     } elseif ($referer) {
@@ -59,7 +59,7 @@ if ($_GET['logout']) {
             } elseif (!isset($_POST['password'])) {
                 $localError['password'] = PASSWORD_REQUIRED;
             } else {
-                $savePassword = (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_SAVE_PASSWORD) && isset($_POST['save_password'])) 
+                $savePassword = (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_SAVE_PASSWORD) && isset($_POST['save_password']))
                              || (($config['password_save_type'] == Block_LogIn::SAVE_PASSWORD_FOREIGN_COMPUTER) && !isset($_POST['foreign_computer']));
                 $val = $a->login(trim($_POST['login']), $_POST['password'], $savePassword);
                 if ($val === -1) {

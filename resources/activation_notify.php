@@ -1,3 +1,7 @@
+<?php
+namespace RAAS\CMS\Users;
+
+?>
 <p><?php echo GREETINGS?></p>
 
 <?php if ($active) { ?>

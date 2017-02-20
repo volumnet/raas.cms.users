@@ -1,3 +1,7 @@
+<?php
+namespace RAAS\CMS\Users;
+
+?>
 <p><?php echo date(DATETIMEFORMAT) . ' ' . sprintf(YOU_HAVE_ASKED_PASSWORD_RECOVERY_ON_SITE, $_SERVER['HTTP_HOST'], $_SERVER['HTTP_HOST'])?></p>
 <?php
 $link = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/recovery/?key=' . $User->recoveryKey;
