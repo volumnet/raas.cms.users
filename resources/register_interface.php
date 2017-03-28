@@ -38,7 +38,7 @@ $generatePass = function ($length = 5) {
 };
 
 
-$notify = function (User $User, Form $Form, array $config = array(), $ADMIN = false) {
+$notify = function (User $User, Form $Form, array $config = array(), $ADMIN = false) use ($Page) {
     $emails = $sms = array();
     if (!$ADMIN) {
         if ($User->email) {
@@ -203,6 +203,8 @@ if ($Form->id) {
             }
             if (isset($Form->fields['lang']) && ($val = trim($_POST['lang']))) {
                 $User->lang = $val;
+            } else {
+                $User->lang = $Page->lang;
             }
             if ($config['allow_edit_social'] && isset($_POST['social']) && isset($_SESSION['confirmedSocial'])) {
                 $arr = array();

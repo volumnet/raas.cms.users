@@ -1,7 +1,8 @@
 <?php
 namespace RAAS\CMS;
 
-use \RAAS\CMS\Users\Block_Register;
+use RAAS\CMS\Users\Block_Register;
+use RAAS\CMS\Users\Block_Activation;
 
 $smsField = function ($field) {
     $values = $field->getValues(true);
@@ -35,11 +36,14 @@ $smsField = function ($field) {
 };
 
 
-$emailField = function ($field) {
+$emailField = function ($field, $formField = null) {
+    if (!$formField) {
+        $formField = $field;
+    }
     $values = $field->getValues(true);
     $arr = array();
     foreach ($values as $key => $val) {
-        $val = $field->doRich($val);
+        $val = $formField->doRich($val);
         switch ($field->datatype) {
             case 'date':
                 $arr[$key] = date(DATEFORMAT, strtotime($val));
@@ -76,7 +80,7 @@ $emailField = function ($field) {
                 break;
         }
     }
-    return '<div>' . htmlspecialchars($field->name) . ': ' . implode(', ', $arr) . '</div>';
+    return '<div>' . htmlspecialchars($formField->name) . ': ' . implode(', ', $arr) . '</div>';
 };
 ?>
 <p><?php echo sprintf($ADMIN ? NEW_USER_REGISTERED_ON_SITE : YOU_HAVE_SUCCESSFULLY_REGISTERED_ON_WEBSITE, $_SERVER['HTTP_HOST'], $_SERVER['HTTP_HOST'])?></p>
@@ -98,8 +102,9 @@ $emailField = function ($field) {
               echo '<div>' . htmlspecialchars($field->name) . ': <a href="mailto:' . htmlspecialchars($User->{$field->urn}) . '">' . htmlspecialchars($User->{$field->urn}) . '</a></div>';
           } elseif (!$ADMIN && ($field->urn == 'password')) {
               echo '<div>' . htmlspecialchars($field->name) . ': ' . htmlspecialchars($User->{$field->urn}) . '</div>';
-          } elseif (isset($User->fields[$field->urn]) && ($field = $User->fields[$field->urn])) {
-              echo $emailField($field);
+          } elseif (isset($User->fields[$field->urn]) && ($formField = $field) && ($field = $User->fields[$field->urn])) {
+              // 2017-03-28, AVS: добавил поле формы, для случая языковых версий - чтобы можно было отправлять письма на разных языках
+              echo $emailField($field, $formField);
           }
       }
       ?>
@@ -135,8 +140,36 @@ $emailField = function ($field) {
                 echo '<p>' . PLEASE_WAIT_FOR_ADMINISTRATOR_TO_ACTIVATE . '</p>';
                 break;
             case Block_Register::ACTIVATION_TYPE_USER:
-                $link = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/activate/?key=' . $User->activationKey;
-                echo '<p>' . sprintf(ACTIVATION_LINK, $link, $link) . '</p>';
+                $activationBlocks = Block_Activation::getSet(array(
+                    'where' => "block_type = 'RAAS\\\\CMS\\\\Users\\\\Block_Activation'",
+                    'orderBy' => 'id'
+                ));
+                $activationPages = array();
+                if ($activationBlocks) {
+                    $activationPages = array();
+                    foreach ($activationBlocks as $activationBlock) {
+                        $activationPages = array_merge($activationPages, $activationBlock->pages);
+                    }
+                }
+                $p = $Page->parent;
+                $activationPage = null;
+                while ($p->id) {
+                    $nearestActivationPages = array_filter($activationPages, function ($x) use ($p) {
+                        return $x->pid == $p->id;
+                    });
+                    if ($nearestActivationPages) {
+                        $activationPage = array_shift($nearestActivationPages);
+                        break;
+                    }
+                    $p = $p->parent;
+                }
+                if (!$activationPage->id && $activationPages) {
+                    $activationPage = array_shift($activationPages);
+                }
+                if ($activationPage->id) {
+                    $link = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $activationPage->url . '?key=' . $User->activationKey;
+                    echo '<p>' . sprintf(ACTIVATION_LINK, $link, $link) . '</p>';
+                }
                 break;
         }
         ?>
