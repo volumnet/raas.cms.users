@@ -7,7 +7,7 @@ use \RAAS\CMS\User;
 use \RAAS\CMS\Snippet;
 use \RAAS\CMS\Auth;
 
-$notify = function (User $User, array $config = array()) {
+$notify = function (User $User, array $config = array()) use ($Page) {
     $emails = array();
     if ($User->email) {
         $emails[] = $User->email;
