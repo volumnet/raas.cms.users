@@ -33,12 +33,37 @@ if ($_GET['logout']) {
             if ($temp = ULogin::getProfile($_POST['token'])) {
                 if ($a->loginBySocialNetwork($temp->profile)) {
                     $OUT['success'] = $checkRedirect();
-                } elseif ($config['social_login_type'] == Block_LogIn::SOCIAL_LOGIN_QUICK_REGISTER) {
+                } else {
+                    if ($temp->email) {
+                        $SQL_result = CMSUser::getSet(array('where' => 'email = "' . CMSUser::_SQL()->real_escape_string($temp->email) . '"'));
+                        if ($SQL_result) {
+                            $User = $SQL_result[0];
+                            $User->meta_social = array_merge((array)$User->social, array($temp->profile));
+                            $User->commit();
+                            $a = new Auth($User);
+                            $a->setSession();
+                            $OUT['success'] = $checkRedirect();
+                        }
+                    }
+                }
+                if ($config['social_login_type'] == Block_LogIn::SOCIAL_LOGIN_QUICK_REGISTER) {
                     $User = new CMSUser();
                     $User->vis = 1;
                     $User->meta_social = $temp->profile;
+                    if ($temp->email) {
+                        $User->email = $temp->email;
+                    }
+                    if ($temp->nickname) {
+                        $login = $temp->nickname;
+                    } elseif ($temp->profile) {
+                        $login = basename($temp->profile);
+                    }
+                    while ($User->checkLoginExists($login)) {
+                        $login = Application::i()->getNewURN($login);
+                    }
+                    $User->login = $login;
                     $User->commit();
-                    foreach (array('last_name', 'first_name', 'full_name') as $key) {
+                    foreach (array('last_name', 'first_name', 'full_name', 'phone') as $key) {
                         if (isset($User->fields[$key]) && ($row = $User->fields[$key])) {
                             $row->deleteValues();
                             $row->addValue($temp->$key);
