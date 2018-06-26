@@ -76,6 +76,7 @@ $notify = function (User $User, Form $Form, array $config = array(), $ADMIN = fa
     }
 };
 
+
 $OUT = array();
 $uid = (int)RAASController_Frontend::i()->user->id;
 $User = new User($uid);
@@ -84,6 +85,10 @@ foreach ($Form->fields as $fname => &$temp) {
     if ($User->id && $temp->datatype == 'password') {
         $temp->required = false;
     }
+}
+
+if ($User->id) {
+    $Page->h1 = $Page->meta_title = 'Редактирование профиля';
 }
 
 if ($Form->id) {
@@ -132,7 +137,7 @@ if ($Form->id) {
                         $val = array_shift($val);
                     }
                     if (!isset($val) || !$row->isFilled($val)) {
-                        if ($row->required) {
+                        if ($row->required && !($row->urn == 'agree' && $User->id)) {
                             $localError[$row->urn] = sprintf(ERR_CUSTOM_FIELD_REQUIRED, $row->name);
                         }
                     } elseif (!$row->multiple) {
