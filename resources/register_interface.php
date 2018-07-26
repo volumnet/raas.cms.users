@@ -8,6 +8,7 @@ use RAAS\CMS\User;
 use RAAS\CMS\ULogin;
 use RAAS\Attachment;
 use RAAS\CMS\Package;
+use SOME\Text;
 
 $checkRedirect = function ($referer) {
     if ($_POST['AJAX']) {
@@ -43,6 +44,9 @@ $notify = function (User $User, Form $Form, array $config = array(), $ADMIN = fa
     if (!$ADMIN) {
         if ($User->email) {
             $emails[] = $User->email;
+        }
+        if ($User->phone) {
+            $sms[] = Text::beautifyPhone($User->phone);
         }
     } else {
         $temp = array_values(array_filter(array_map('trim', preg_split('/( |;|,)/', $Form->email))));
@@ -204,7 +208,8 @@ if ($Form->id) {
                 $User->password = $val;
                 $User->password_md5 = Application::i()->md5It($val);
             } elseif ($new) {
-                $User->password_md5 = Application::i()->md5It($generatePass);
+                $val = $User->password = $generatePass();
+                $User->password_md5 = Application::i()->md5It($val);
             }
             if (isset($Form->fields['lang']) && ($val = trim($_POST['lang']))) {
                 $User->lang = $val;

@@ -21,7 +21,7 @@ class Block_Register extends Block
         'author' => array('FK' => 'author_id', 'classname' => 'RAAS\\User', 'cascade' => false),
         'editor' => array('FK' => 'editor_id', 'classname' => 'RAAS\\User', 'cascade' => false),
     );
-    
+
     public function commit()
     {
         if (!$this->name) {
@@ -46,12 +46,12 @@ class Block_Register extends Block
         }
         parent::process($Page);
     }
-    
 
-    protected function getAddData()
+
+    public function getAddData()
     {
         return array(
-            'id' => (int)$this->id, 
+            'id' => (int)$this->id,
             'form_id' => (int)$this->form_id,
             'email_as_login' => (int)$this->email_as_login,
             'notify_about_edit' => (int)$this->notify_about_edit,

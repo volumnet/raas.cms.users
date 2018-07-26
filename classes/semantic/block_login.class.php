@@ -23,10 +23,10 @@ class Block_LogIn extends Block
     }
 
 
-    protected function getAddData()
+    public function getAddData()
     {
         return array(
-            'id' => (int)$this->id, 
+            'id' => (int)$this->id,
             'email_as_login' => (int)$this->email_as_login,
             'social_login_type' => (int)$this->social_login_type,
             'password_save_type' => (int)$this->password_save_type,

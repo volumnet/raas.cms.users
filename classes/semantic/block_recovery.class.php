@@ -11,7 +11,7 @@ class Block_Recovery extends Block
         'author' => array('FK' => 'author_id', 'classname' => 'RAAS\\User', 'cascade' => false),
         'editor' => array('FK' => 'editor_id', 'classname' => 'RAAS\\User', 'cascade' => false),
     );
-    
+
     public function commit()
     {
         if (!$this->name) {
@@ -21,10 +21,10 @@ class Block_Recovery extends Block
     }
 
 
-    protected function getAddData()
+    public function getAddData()
     {
         return array(
-            'id' => (int)$this->id, 
+            'id' => (int)$this->id,
             'notification_id' => (int)$this->notification_id,
         );
     }
