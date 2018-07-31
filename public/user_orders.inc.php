@@ -11,9 +11,6 @@ $_RAASForm_FormTab = function (\RAAS\FormTab $formTab) use (&$_RAASForm_Form_Tab
               <thead>
                 <tr>
                   <th>
-                    <?php if ($Table->meta['allValue']) { ?>
-                        <input type="checkbox" data-role="checkbox-all" value="<?php echo htmlspecialchars($Table->meta['allValue'])?>">
-                    <?php } ?>
                   </th>
                   <?php
                   foreach ($Table->columns as $key => $col) {
