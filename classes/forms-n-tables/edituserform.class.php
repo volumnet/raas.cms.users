@@ -1,15 +1,16 @@
 <?php
 namespace RAAS\CMS\Users;
 
-use \RAAS\Application;
-use \RAAS\FormTab;
-use \RAAS\Field as RAASField;
-use \RAAS\Option;
-use \RAAS\CMS\Package;
-use \RAAS\CMS\User;
-use \RAAS\CMS\Group;
-use \RAAS\Controller_Frontend;
-use \RAAS\CMS\CMSAccess;
+use RAAS\Application;
+use RAAS\FormTab;
+use RAAS\Field as RAASField;
+use RAAS\Option;
+use RAAS\CMS\Package;
+use RAAS\CMS\User;
+use RAAS\CMS\Group;
+use RAAS\Controller_Frontend;
+use RAAS\CMS\CMSAccess;
+use RAAS\CMS\Shop\Order;
 
 class EditUserForm extends \RAAS\Form
 {
@@ -62,6 +63,9 @@ class EditUserForm extends \RAAS\Form
         parent::__construct($arr);
         $this->children['common'] = $this->getCommonTab();
         $this->children['groups'] = $this->getGroupsTab();
+        if (class_exists('RAAS\CMS\Shop\Order')) {
+            $this->children['orders'] = $this->getOrdersTab($this->Item);
+        }
     }
 
 
@@ -182,6 +186,41 @@ class EditUserForm extends \RAAS\Form
                     }
                 )
             )
+        ));
+        return $tab;
+    }
+
+
+    /**
+     * Вкладка "Заказы"
+     */
+    private function getOrdersTab(User $user)
+    {
+        $ordersTable = new UserOrdersTable(array(
+            'Item' => $user,
+            'Set' => Order::getSet(array(
+                'select' => array(
+                    "(
+                        SELECT SUM(tOG.amount)
+                          FROM " . Order::_dbprefix() . "cms_shop_orders_goods AS tOG
+                         WHERE tOG.order_id = Order.id
+                     ) AS c",
+                    "(
+                        SELECT SUM(tOG.realprice * tOG.amount)
+                          FROM " . Order::_dbprefix() . "cms_shop_orders_goods AS tOG
+                         WHERE tOG.order_id = Order.id
+                     ) AS total_sum",
+                ),
+                'where' => "uid = " . (int)$user->id,
+                'orderBy' => "post_date DESC",
+            )),
+            'columns' => array(),
+        ));
+        $tab = new FormTab(array(
+            'name' => 'orders',
+            'caption' => \RAAS\CMS\Shop\View_Web::i()->_('ORDERS'),
+            'meta' => array('Table' => $ordersTable),
+            'template' => 'user_orders.inc.php'
         ));
         return $tab;
     }
