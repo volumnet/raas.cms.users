@@ -1,7 +1,9 @@
 <?php
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\Block;
-use \RAAS\Controller_Frontend AS RAASController_Frontend;
+
+use RAAS\CMS\Block;
+use RAAS\Controller_Frontend as RAASController_Frontend;
+use RAAS\CMS\Page;
 
 class Block_Register extends Block
 {
