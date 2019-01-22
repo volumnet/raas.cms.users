@@ -302,7 +302,8 @@ if ($Form->id) {
                             $row->deleteValues();
                             if (isset($_POST[$fname])) {
                                 foreach ((array)$_POST[$fname] as $val) {
-                                    $row->addValue($val);
+                                    // 2019-01-22, AVS: закрываем XSS-уязвимость
+                                    $row->addValue(strip_tags($val));
                                 }
                             }
                             break;
