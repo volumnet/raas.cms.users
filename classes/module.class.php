@@ -49,12 +49,12 @@ class Module extends \RAAS\Module
         if (isset($columns[$IN['sort']]) && ($col = $columns[$IN['sort']])) {
             $SQL_query .= " LEFT JOIN " . User_Field::_dbprefix() . User_Field::data_table . " AS tSort ON tSort.pid = tU.id AND tSort.fid = " . (int)$col->id;
         }
-        if ($Group->id && (!isset($IN['search_string']) || isset($IN['group_only']))) {
+        if (($Group->id && (!isset($IN['search_string'])) || isset($IN['group_only']))) {
             $SQL_query .= " LEFT JOIN " . User::_dbprefix() . "cms_users_groups_assoc AS tUGA ON tUGA.uid = tU.id";
         }
 
         $SQL_query .= " WHERE 1 ";
-        if ($Group->id && (!isset($IN['search_string']) || isset($IN['group_only']))) {
+        if (($Group->id && (!isset($IN['search_string'])) || isset($IN['group_only']))) {
             $SQL_query .= " AND tUGA.gid = " . (int)$Group->id;
         }
         if (isset($IN['search_string']) && $IN['search_string']) {

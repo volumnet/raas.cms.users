@@ -7,7 +7,7 @@
     <div class="tab-pane active" id="users">
       <form class="form-search" action="<?php echo \SOME\HTTP::queryString()?>" method="get">
         <?php foreach ($VIEW->nav as $key => $val) { ?>
-            <?php if (!in_array($key, array('page', 'search_string', 'group_only', 'action', 'id'))) { ?>
+            <?php if (!in_array($key, array('page', 'search_string', 'group_only', 'action'))) { ?>
                 <?php if (is_array($val)) { ?>
                     <?php foreach ($val as $k => $v) { ?>
                         <input type="hidden" name="<?php echo htmlspecialchars($key)?>[<?php echo htmlspecialchars($k)?>]" value="<?php echo htmlspecialchars($v)?>" />
@@ -20,7 +20,7 @@
         <div class="input-append">
           <input type="search" class="span2 search-query" name="search_string" value="<?php echo htmlspecialchars($VIEW->nav['search_string'])?>" />
           <button type="submit" class="btn"><i class="icon-search"></i></button>
-        </div> &nbsp; 
+        </div> &nbsp;
         <?php if ($Group->id) { ?>
             <label class="checkbox" for="group_only">
               <input type="checkbox" name="group_only" id="group_only" value="1" <?php echo $VIEW->nav['group_only'] ? 'checked="checked"' : ''?> />
@@ -28,15 +28,15 @@
             </label>
         <?php } ?>
       </form>
-      <?php 
-      if ($Table->Set) { 
+      <?php
+      if ($Table->Set) {
           include \RAAS\CMS\Package::i()->view->tmp('multitable.tmp.php');
        }
        ?>
     </div>
     <div class="tab-pane" id="groups">
-      <?php 
-      if ($GroupsTable->Set) { 
+      <?php
+      if ($GroupsTable->Set) {
           $Table = $GroupsTable;
           include \RAAS\CMS\Package::i()->view->tmp('multitable.tmp.php');
       }
