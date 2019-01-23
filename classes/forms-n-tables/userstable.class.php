@@ -27,21 +27,21 @@ class UsersTable extends \RAAS\Table
         $columns['post_date'] = array(
             'caption' => $this->view->_('REGISTRATION_DATE'),
             'sortable' => Column::SORTABLE_REVERSABLE,
-            'callback' => function($row) use ($view) {
+            'callback' => function ($row) use ($view) {
                 return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . date(DATETIMEFORMAT, strtotime($row->post_date)) . '</a>';
             }
         );
         $columns['login'] = array(
             'caption' => $this->view->_('LOGIN'),
             'sortable' => Column::SORTABLE_REVERSABLE,
-            'callback' => function($row) use ($view) {
+            'callback' => function ($row) use ($view) {
                 return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($row->login) . '</a>';
             }
         );
         $columns['email'] = array(
             'caption' => $this->view->_('EMAIL'),
             'sortable' => Column::SORTABLE_REVERSABLE,
-            'callback' => function($row) use ($view) {
+            'callback' => function ($row) use ($view) {
                 return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($row->email) . '</a>';
             }
         );
@@ -49,16 +49,27 @@ class UsersTable extends \RAAS\Table
             $columns[$col->urn] = array(
                 'caption' => $col->name,
                 'sortable' => Column::SORTABLE_REVERSABLE,
-                'callback' => function($row) use ($col) { if (isset($row->fields[$col->urn])) { $y = $row->fields[$col->urn]->doRich(); } return $y ? '<span' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($y) . '</span>' : ''; }
+                'callback' => function ($row) use ($col) {
+                    if (isset($row->fields[$col->urn])) {
+                        $y = $row->fields[$col->urn]->doRich();
+                    }
+                    return $y ? '<span' . (!$row->vis ? ' class="muted"' : '') . '>' . htmlspecialchars($y) . '</span>' : '';
+                }
             );
         }
-        $columns[' '] = array('callback' => function ($row) use ($view, $params) { return rowContextMenu($view->getUserContextMenu($row, $params['Group'])); });
+        $columns[' '] = array('callback' => function ($row) use ($view, $params) {
+            return rowContextMenu($view->getUserContextMenu($row, $params['Group']));
+        });
         $defaultParams = array(
             'caption' => $this->view->_('USERS'),
             'columns' => $columns,
             'Set' => $params['Set'],
             'Pages' => $params['Pages'],
-            'callback' => function($Row) { if ($Row->source->new) { $Row->class = 'info'; } },
+            'callback' => function ($Row) {
+                if ($Row->source->new) {
+                    $Row->class = 'info';
+                }
+            },
             'emptyString' => $this->view->_('NO_USERS_FOUND'),
             'template' => 'showlist',
             'order' => ((strtolower($params['order']) == 'desc') ? Column::SORT_DESC : Column::SORT_ASC),
