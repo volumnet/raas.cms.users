@@ -1,11 +1,13 @@
 <?php
 namespace RAAS\CMS\Users;
-use \RAAS\Field as RAASField;
-use \RAAS\CMS\Form as CMSForm;
-use \RAAS\CMS\EditBlockForm;
-use \RAAS\CMS\Snippet;
-use \RAAS\CMS\Snippet_Folder;
-use \RAAS\Option;
+
+use RAAS\Field as RAASField;
+use RAAS\CMS\Form as CMSForm;
+use RAAS\CMS\EditBlockForm;
+use RAAS\CMS\Snippet;
+use RAAS\CMS\Snippet_Folder;
+use RAAS\Option;
+use RAAS\OptionCollection;
 
 class EditBlockRecoveryForm extends EditBlockForm
 {
@@ -32,7 +34,7 @@ class EditBlockRecoveryForm extends EditBlockForm
     protected function getInterfaceField()
     {
         $field = parent::getInterfaceField();
-        $snippet = Snippet::importByURN('__RAAS_users_recovery_interface');
+        $snippet = Snippet::importByURN('__raas_users_recovery_interface');
         if ($snippet) {
             $field->default = (int)$snippet->id;
         }
@@ -43,27 +45,27 @@ class EditBlockRecoveryForm extends EditBlockForm
     protected function getCommonTab()
     {
         $tab = parent::getCommonTab();
-        $snippet = Snippet::importByURN('__RAAS_users_recovery_notify');
+        $snippet = Snippet::importByURN('__raas_users_recovery_notify');
         $wf = function(Snippet_Folder $x) use (&$wf) {
             $temp = array();
             foreach ($x->children as $row) {
-                if ($row->urn != '__RAAS_views') {
-                    $o = new Option(array('value' => '', 'caption' => $row->name, 'disabled' => 'disabled'));
-                    $o->children = $wf($row);
+                if ($row->urn != '__raas_views') {
+                    $o = array('value' => '', 'caption' => $row->name, 'disabled' => 'disabled');
+                    $o['children'] = $wf($row);
                     $temp[] = $o;
                 }
             }
             foreach ($x->snippets as $row) {
-                $temp[] = new Option(array('value' => $row->id, 'caption' => $row->name));
+                $temp[] = array('value' => $row->id, 'caption' => $row->name);
             }
             return $temp;
         };
         $field = new RAASField(array(
             'type' => 'select',
             'class' => 'input-xxlarge',
-            'name' => 'notification_id', 
+            'name' => 'notification_id',
             'required' => true,
-            'caption' => $this->view->_('PASSWORD_RECOVERY_NOTIFICATION'), 
+            'caption' => $this->view->_('PASSWORD_RECOVERY_NOTIFICATION'),
             'default' => $snippet->id,
             'children' => $wf(new Snippet_Folder())
         ));

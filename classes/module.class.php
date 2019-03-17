@@ -148,7 +148,10 @@ class Module extends \RAAS\Module
     {
         if (!$this->registryGet('installDate')) {
             if (!trim($this->registryGet('activation_notify'))) {
-                $this->registrySet('activation_notify', file_get_contents($this->resourcesDir . '/activation_notify.php'));
+                $this->registrySet('activation_notify', file_get_contents(
+                    $this->resourcesDir .
+                    '/interfaces/activation_notification.php'
+                ));
             }
             if ($this->registryGet('automatic_notification') === null) {
                 $this->registrySet('automatic_notification', self::AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION);
