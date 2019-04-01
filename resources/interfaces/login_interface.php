@@ -90,7 +90,7 @@ if ($_GET['logout']) {
                 if ($val === -1) {
                     $localError[] = YOUR_ACCOUNT_IS_BLOCKED;
                 } elseif ($val) {
-                    $checkRedirect($_SERVER['HTTP_REFERER'] ?: ($_POST['HTTP_REFERER'] ?: $_GET['HTTP_REFERER']));
+                    $checkRedirect($_POST['HTTP_REFERER'] ?: $_GET['HTTP_REFERER']);
                 } else {
                     $localError[] = INVALID_LOGIN_OR_PASSWORD;
                 }
