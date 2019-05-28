@@ -1,13 +1,19 @@
 <?php
+/**
+ * Раздел "Пользователи"
+ */
 namespace RAAS\CMS\Users;
 
-use \RAAS\CMS\User;
-use \RAAS\CMS\Group;
-use \RAAS\StdSub;
-use \RAAS\Application;
+use RAAS\Abstract_Sub_Controller as RAASAbstractSubController;
 use RAAS\Redirector;
+use RAAS\StdSub;
+use RAAS\CMS\Group;
+use RAAS\CMS\User;
 
-class Sub_Users extends \RAAS\Abstract_Sub_Controller
+/**
+ * Класс раздела "Пользователи"
+ */
+class Sub_Users extends RAASAbstractSubController
 {
     protected static $instance;
 
@@ -15,7 +21,8 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
     {
         switch ($this->action) {
             case 'url':
-                return '?p=' . $this->packageName . '&module=' . $this->moduleName;
+                return '?p=' . $this->packageName .
+                       '&module=' . $this->moduleName;
                 break;
             case 'edit':
             case 'edit_group':
@@ -35,25 +42,36 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
                     $items = array_values($items);
                 }
                 $action = $this->action;
-                $notifyItems = $notifyActive = $notifyBlock = array();
-                if (in_array($action, array('chvis', 'vis', 'invis')) && ($an = Module::i()->registryGet('automatic_notification'))) {
+                $notifyItems = $notifyActive = $notifyBlock = [];
+                if (in_array($action, ['chvis', 'vis', 'invis']) &&
+                    ($an = Module::i()->registryGet('automatic_notification'))
+                ) {
                     $notifyItems = array_filter($items, function ($x) {
                         return $x->email;
                     });
                     // Уведомление об активации
-                    if (in_array($an, array(Module::AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION, Module::AUTOMATIC_NOTIFICATION_BOTH))) {
-                        if (in_array($action, array('chvis', 'vis'))) {
-                            $notifyActive = array_filter($notifyItems, function ($x) {
-                                return !$x->vis;
-                            });
+                    if (in_array($an, [
+                        Module::AUTOMATIC_NOTIFICATION_ONLY_ACTIVATION,
+                        Module::AUTOMATIC_NOTIFICATION_BOTH
+                    ])) {
+                        if (in_array($action, ['chvis', 'vis'])) {
+                            $notifyActive = array_filter(
+                                $notifyItems,
+                                function ($x) {
+                                    return !$x->vis;
+                                }
+                            );
                         }
                     }
                     // Уведомление о блокировке
                     if ($an == Module::AUTOMATIC_NOTIFICATION_BOTH) {
-                        if (in_array($action, array('chvis', 'invis'))) {
-                            $notifyBlock = array_filter($notifyItems, function ($x) {
-                                return $x->vis;
-                            });
+                        if (in_array($action, ['chvis', 'invis'])) {
+                            $notifyBlock = array_filter(
+                                $notifyItems,
+                                function ($x) {
+                                    return $x->vis;
+                                }
+                            );
                         }
                     }
                     $notifyItems = array_merge($notifyActive, $notifyBlock);
@@ -91,7 +109,9 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
                     $pids = array_filter($pids, 'trim');
                     $pids = array_map('intval', $pids);
                     if ($pids) {
-                        $items = Group::getSet(array('where' => "pid IN (" . implode(", ", $pids) . ")"));
+                        $items = Group::getSet([
+                            'where' => "pid IN (" . implode(", ", $pids) . ")"
+                        ]);
                     }
                 } else {
                     $items = array_map(function ($x) {
@@ -111,8 +131,18 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
                     }, $ids);
                     $items = array_values($items);
                 }
-                $Group = new Group(isset($this->nav['gid']) ? (int)$this->nav['gid'] : 0);
-                StdSub::associate($items, $this->url . '&id=' . (int)$Group->id, true, $Group->id, $Group);
+                $Group = new Group(
+                    isset($this->nav['gid']) ?
+                    (int)$this->nav['gid'] :
+                    0
+                );
+                StdSub::associate(
+                    $items,
+                    $this->url . '&id=' . (int)$Group->id,
+                    true,
+                    $Group->id,
+                    $Group
+                );
                 break;
             case 'del_group':
                 $ids = (array)$_GET['id'];
@@ -124,8 +154,18 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
                     }, $ids);
                     $items = array_values($items);
                 }
-                $Group = new Group(isset($this->nav['gid']) ? (int)$this->nav['gid'] : 0);
-                StdSub::deassociate($items, $this->url . '&id=' . (int)$Group->id, true, $Group->id, $Group);
+                $Group = new Group(
+                    isset($this->nav['gid']) ?
+                    (int)$this->nav['gid'] :
+                    0
+                );
+                StdSub::deassociate(
+                    $items,
+                    $this->url . '&id=' . (int)$Group->id,
+                    true,
+                    $Group->id,
+                    $Group
+                );
                 break;
             default:
                 $this->showlist();
@@ -134,10 +174,13 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
     }
 
 
+    /**
+     * Список пользователей и групп
+     */
     protected function showlist()
     {
         $Group = new Group($this->id);
-        foreach (array('sort', 'order') as $var) {
+        foreach (['sort', 'order'] as $var) {
             $OUT[$key] = isset($this->nav[$key]) ? $this->nav[$key] : null;
         }
         $OUT = $this->model->showlist($Group, $this->nav);
@@ -152,23 +195,43 @@ class Sub_Users extends \RAAS\Abstract_Sub_Controller
     }
 
 
+    /**
+     * Редактирование пользователя
+     */
     protected function edit()
     {
         $Item = new User((int)$this->id);
         $Item->visit();
-        $Form = new EditUserForm(array('Item' => $Item, 'view' => $this->view));
+        $Form = new EditUserForm(['Item' => $Item, 'view' => $this->view]);
+        if ($_POST['billing_transaction_amount']) {
+            foreach ((array)$_POST['billing_transaction_amount'] as $billingTypeId => $billingAmount) {
+                if ((float)$billingAmount &&
+                    trim($_POST['billing_transaction_name'][$billingTypeId])
+                ) {
+                    $billingType = new BillingType($billingTypeId);
+                    $billingType->transact(
+                        $Item,
+                        (float)$billingAmount,
+                        trim($_POST['billing_transaction_name'][$billingTypeId])
+                    );
+                }
+            }
+        }
         $OUT = $Form->process();
         $this->view->edit_user($OUT, 'getUserContextMenu');
     }
 
 
+    /**
+     * Редактирование группы
+     */
     protected function edit_group()
     {
         $Item = new Group((int)$this->id);
         if (!$Item->id) {
             $Item->pid = isset($_GET['pid']) ? (int)$_GET['pid'] : 0;
         }
-        $Form = new EditGroupForm(array('Item' => $Item));
+        $Form = new EditGroupForm(['Item' => $Item]);
         $this->view->edit_group($Form->process(), 'getGroupContextMenu');
     }
 }
