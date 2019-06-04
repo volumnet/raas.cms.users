@@ -67,7 +67,7 @@ class BillingTransactionsTable extends Table
                 'name' => [
                     'caption' => $this->view->_('BILLING_PAYMENT_BASIS'),
                     'callback' => function ($row) {
-                        return htmlspecialchars($row->name);
+                        return $row->name;
                     }
                 ],
             ],
