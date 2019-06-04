@@ -203,6 +203,7 @@ class Sub_Users extends RAASAbstractSubController
         $Item = new User((int)$this->id);
         $Item->visit();
         $Form = new EditUserForm(['Item' => $Item, 'view' => $this->view]);
+        $activeBillingTypeId = null;
         if ($_POST['billing_transaction_amount']) {
             foreach ((array)$_POST['billing_transaction_amount'] as $billingTypeId => $billingAmount) {
                 if ((float)$billingAmount &&
@@ -214,7 +215,11 @@ class Sub_Users extends RAASAbstractSubController
                         (float)$billingAmount,
                         trim($_POST['billing_transaction_name'][$billingTypeId])
                     );
+                    $activeBillingTypeId = $billingTypeId;
                 }
+            }
+            if ($activeBillingTypeId) {
+                new Redirector('history:back#billing' . $activeBillingTypeId);
             }
         }
         $OUT = $Form->process();
