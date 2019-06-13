@@ -29,3 +29,37 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_rec
   KEY (notification_id)
 ) COMMENT='Recovery blocks';
 
+CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_types (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
+    urn VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'URN',
+    name VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Name',
+    description TEXT NULL DEFAULT NULL COMMENT 'Description',
+
+    PRIMARY KEY (id)
+) COMMENT 'Billing types';
+
+CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_accounts (
+    uid INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User ID#',
+    billing_type_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Billing type ID#',
+    balance DECIMAL(8,2) NOT NULL DEFAULT 0 COMMENT 'Balance',
+
+    PRIMARY KEY (uid, billing_type_id),
+    KEY (uid),
+    KEY (billing_type_id),
+    INDEX (balance)
+) COMMENT 'Billing accounts';
+
+CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_transactions (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
+    uid INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User ID#',
+    billing_type_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Billing type ID#',
+    post_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Post date',
+    name VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'Name',
+    amount DECIMAL(8,2) NOT NULL DEFAULT 0 COMMENT 'Transaction amount',
+
+    PRIMARY KEY (id),
+    KEY (uid),
+    KEY (billing_type_id),
+    INDEX (post_date),
+    INDEX (amount)
+) COMMENT 'Billing transactions';

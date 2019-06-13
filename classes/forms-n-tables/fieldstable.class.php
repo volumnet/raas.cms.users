@@ -1,7 +1,16 @@
 <?php
+/**
+ * Таблица полей пользователей
+ */
 namespace RAAS\CMS\Users;
 
-class FieldsTable extends \RAAS\CMS\FieldsTable
+use RAAS\CMS\FieldsTable as CMSFieldsTable;
+
+/**
+ * Класс таблицы полей пользователей
+ * @property-read ViewSub_Dev $view Представление
+ */
+class FieldsTable extends CMSFieldsTable
 {
     public function __get($var)
     {
@@ -14,5 +23,4 @@ class FieldsTable extends \RAAS\CMS\FieldsTable
                 break;
         }
     }
-
 }
