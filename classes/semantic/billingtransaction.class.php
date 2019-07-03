@@ -5,11 +5,14 @@
 namespace RAAS\CMS\Users;
 
 use SOME\SOME;
+use RAAS\Application;
+use RAAS\User as RAASUser;
 use RAAS\CMS\User;
 
 /**
  * Класс транзакции в биллинге
  * @property-read User $user Пользователь
+ * @property-read RAASUser $author Автор транзакции
  * @property-read BillingType $billingType Тип биллинга
  */
 class BillingTransaction extends SOME
@@ -19,6 +22,11 @@ class BillingTransaction extends SOME
     protected static $defaultOrderBy = "post_date";
 
     protected static $references = [
+        'author' => [
+            'FK' => 'author_id',
+            'classname' => RAASUser::class,
+            'cascade' => false,
+        ],
         'user' => [
             'FK' => 'uid',
             'classname' => User::class,
@@ -33,8 +41,14 @@ class BillingTransaction extends SOME
 
     public function commit()
     {
+        if (!$this->amount) {
+            return;
+        }
         if (!$this->post_date) {
             $this->post_date = date('Y-m-d H:i:s');
+        }
+        if (!$this->author_id) {
+            $this->author_id = (int)Application::i()->user->id;
         }
         $amount = (float)$this->amount;
         parent::commit();
