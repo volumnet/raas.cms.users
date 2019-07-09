@@ -43,13 +43,13 @@ class EditUserForm extends RAASForm
         $view = $this->view;
         $t = $this;
         unset($params['view']);
-        $Item = isset($params['Item']) ? $params['Item'] : null;
+        $item = isset($params['Item']) ? $params['Item'] : null;
 
         $defaultParams = [
-            'Item' => $Item,
+            'Item' => $item,
             'parentUrl' => $this->url,
-            'caption' => $Item->id
-                      ?  $this->view->_('EDITING_USER')
+            'caption' => $item->id
+                      ?  ($item->full_name ? ($item->full_name . ' (' . $item->login . ')') : $item->login)
                       :  $this->view->_('CREATING_USER'),
             'children' => [],
             'template' => 'edit',
@@ -108,7 +108,7 @@ class EditUserForm extends RAASForm
     {
         $tabChildren = [];
         $t = $this;
-        $Item = $this->Item;
+        $item = $this->Item;
         $CONTENT = [];
         $CONTENT['languages'] = [];
         foreach ($this->view->availableLanguages as $key => $val) {
@@ -116,89 +116,89 @@ class EditUserForm extends RAASForm
         }
 
         // Логин
-        $Field = new RAASField([
+        $field = new RAASField([
             'name' => 'login',
             'caption' => $this->view->_('LOGIN'),
             'required' => 'required'
         ]);
-        $Field->required = 'required';
-        $Field->check = function ($Field) use ($t) {
-            $localError = $Field->getErrors();
+        $field->required = 'required';
+        $field->check = function ($field) use ($t) {
+            $localError = $field->getErrors();
             if (!$localError) {
-                if ($Field->Form->Item->checkLoginExists($_POST[$Field->name])) {
+                if ($field->Form->Item->checkLoginExists($_POST[$field->name])) {
                     $localError[] = [
                         'name' => 'INVALID',
-                        'value' => $Field->name,
+                        'value' => $field->name,
                         'description' => $t->view->_('ERR_LOGIN_EXISTS')
                     ];
                 }
             }
             return $localError;
         };
-        $tabChildren['login'] = $Field;
+        $tabChildren['login'] = $field;
 
         // Пароль
-        $Field = new RAASField([
+        $field = new RAASField([
             'type' => 'password',
             'name' => 'password',
             'caption' => $this->view->_('PASSWORD'),
             'confirm' => true,
-            'export' => function ($Field) use ($t) {
-                if ($_POST[$Field->name]) {
-                    $Field->Form->Item->password_md5 = Application::i()->md5It(
-                        trim($_POST[$Field->name])
+            'export' => function ($field) use ($t) {
+                if ($_POST[$field->name]) {
+                    $field->Form->Item->password_md5 = Application::i()->md5It(
+                        trim($_POST[$field->name])
                     );
                 }
             }
         ]);
-        if (!$Item->id) {
-            $Field->required = 'required';
+        if (!$item->id) {
+            $field->required = 'required';
         }
-        $tabChildren['password'] = $Field;
+        $tabChildren['password'] = $field;
 
         // E-mail
-        $Field = new RAASField([
+        $field = new RAASField([
             'type' => 'email',
             'name' => 'email',
             'caption' => $this->view->_('EMAIL')
         ]);
-        $Field->check = function ($Field) use ($t) {
-            $localError = $Field->getErrors();
+        $field->check = function ($field) use ($t) {
+            $localError = $field->getErrors();
             if (!$localError) {
-                if ($Field->Form->Item->checkEmailExists($_POST[$Field->name])) {
+                if ($field->Form->Item->checkEmailExists($_POST[$field->name])) {
                     $localError[] = [
                         'name' => 'INVALID',
-                        'value' => $Field->name,
+                        'value' => $field->name,
                         'description' => $t->view->_('ERR_EMAIL_EXISTS')
                     ];
                 }
             }
             return $localError;
         };
-        $tabChildren['email'] = $Field;
+        $tabChildren['email'] = $field;
 
         // Активирован
-        $Field = new RAASField([
+        $field = new RAASField([
             'type' => 'checkbox',
             'name' => 'vis',
             'caption' => $this->view->_('ACTIVATED'),
             'template' => 'edit.vis.tmp.php'
         ]);
-        $tabChildren['vis'] = $Field;
+        $tabChildren['vis'] = $field;
 
         // Язык
-        $Field = new RAASField([
+        $field = new RAASField([
             'type' => 'select',
             'name' => 'lang',
             'caption' => $this->view->_('LANGUAGE'),
             'children' => $CONTENT['languages'],
             'default' => $this->view->language
         ]);
-        $tabChildren['lang'] = $Field;
+        $tabChildren['lang'] = $field;
 
 
         // Кастомные поля
-        foreach ($Item->fields as $row) {
+        foreach ($item->fields as $row) {
             $tabChildren[$row->urn] = $row->Field;
         }
 
@@ -208,9 +208,9 @@ class EditUserForm extends RAASForm
             'name' => 'social',
             'multiple' => true,
             'caption' => $this->view->_('SOCIAL_NETWORKS'),
-            'export' => function ($Field) use ($t) {
-                $Field->Form->Item->meta_social = isset($_POST[$Field->name])
-                                                ? (array)$_POST[$Field->name]
+            'export' => function ($field) use ($t) {
+                $field->Form->Item->meta_social = isset($_POST[$field->name])
+                                                ? (array)$_POST[$field->name]
                                                 : [];
             }
         ]);
@@ -241,21 +241,21 @@ class EditUserForm extends RAASForm
                     'name' => 'groups',
                     'multiple' => 'multiple',
                     'children' => ['Set' => $g->children],
-                    'import' => function ($Field) use ($t) {
-                        return $Field->Form->Item->groups_ids;
+                    'import' => function ($field) use ($t) {
+                        return $field->Form->Item->groups_ids;
                     },
-                    'oncommit' => function ($Field) use ($t) {
+                    'oncommit' => function ($field) use ($t) {
                         $sqlQuery = "DELETE FROM cms_users_groups_assoc
                                       WHERE uid = ?";
                         $t->Item->_SQL()->query([
                             $sqlQuery,
-                            (int)$Field->Form->Item->id
+                            (int)$field->Form->Item->id
                         ]);
                         $arr = [];
-                        foreach ((array)$_POST[$Field->name] as $val) {
+                        foreach ((array)$_POST[$field->name] as $val) {
                             if ((int)$val) {
                                 $arr[] = [
-                                    'uid' => (int)$Field->Form->Item->id,
+                                    'uid' => (int)$field->Form->Item->id,
                                     'gid' => (int)$val
                                 ];
                             }

@@ -63,6 +63,16 @@ $_RAASForm_FormTab = function (FormTab $formTab) use (
       <tfoot>
         <tr>
           <td></td>
+          <td>
+            <?php
+            $author = Application::i()->user;
+            echo htmlspecialchars(
+                $author->full_name ?
+                $author->full_name . ' (' . $author->login . ')' :
+                $author->login
+            );
+            ?>
+          </td>
           <td colspan="2">
             <input type="number" step="0.01" name="billing_transaction_amount[<?php echo (int)$billingType->id?>]" value="" placeholder="<?php echo ViewSub_Users::i()->_('PAYMENT_AMOUNT')?>" style="margin: 0 auto;" />
           </td>

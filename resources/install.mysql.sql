@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_ac
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_transactions (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
+    author_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Author ID#',
     uid INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User ID#',
     billing_type_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Billing type ID#',
     post_date DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Post date',
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_tr
     amount DECIMAL(8,2) NOT NULL DEFAULT 0 COMMENT 'Transaction amount',
 
     PRIMARY KEY (id),
+    KEY (author_id),
     KEY (uid),
     KEY (billing_type_id),
     INDEX (post_date),

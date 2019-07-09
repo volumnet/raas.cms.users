@@ -32,15 +32,26 @@ class BillingTransactionsTable extends Table
             'columns' => [
                 'post_date' => [
                     'caption' => $this->view->_('DATE'),
-                    'class' => 'span3',
                     'callback' => function ($row) {
                         $t = strtotime($row->post_date);
                         return ($t > 0) ? date(DATETIMEFORMAT, $t) : '';
                     }
                 ],
+                'author' => [
+                    'caption' => $this->view->_('TRANSACTION_INITIATOR'),
+                    'callback' => function ($row) {
+                        $text = '<a href="?p=/&mode=admin&sub=users&action=edit_user&id=' . (int)$row->id . '">';
+                        if ($row->author->full_name) {
+                            $text .= htmlspecialchars($row->author->full_name . ' (' . $row->author->login . ')');
+                        } else {
+                            $text .= htmlspecialchars($row->author->login);
+                        }
+                        $text .= '</a>';
+                        return $text;
+                    }
+                ],
                 'debit' => [
                     'caption' => $this->view->_('BILLING_DEBIT'),
-                    'class' => 'span2',
                     'callback' => function ($row) {
                         $text = '';
                         if ((float)$row->amount >= 0) {
@@ -53,7 +64,6 @@ class BillingTransactionsTable extends Table
                 ],
                 'credit' => [
                     'caption' => $this->view->_('BILLING_CREDIT'),
-                    'class' => 'span2',
                     'callback' => function ($row) {
                         $text = '';
                         if ((float)$row->amount < 0) {

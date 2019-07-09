@@ -1,12 +1,15 @@
 <?php
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\Snippet;
+
+use SOME\SOME;
+use RAAS\CMS\Snippet;
 
 class Updater extends \RAAS\Updater
 {
     public function preInstall()
     {
         $this->update20151129();
+        $this->update20190702();
     }
 
 
@@ -22,9 +25,31 @@ class Updater extends \RAAS\Updater
 
     public function update20151129()
     {
-        if (in_array(\SOME\SOME::_dbprefix() . "cms_forms", $this->tables) && in_array('urn', $this->columns(\SOME\SOME::_dbprefix() . "cms_forms"))) {
-            $SQL_query = "UPDATE " . \SOME\SOME::_dbprefix() . "cms_forms SET urn = 'register' WHERE (urn = '') AND (name = 'Форма для регистрации' OR name = 'Registration form')";
-            $this->SQL->query($SQL_query);
+        if (in_array(SOME::_dbprefix() . "cms_forms", $this->tables) &&
+            in_array('urn', $this->columns(SOME::_dbprefix() . "cms_forms"))) {
+            $sqlQuery = "UPDATE " . SOME::_dbprefix() . "cms_forms
+                             SET urn = 'register'
+                           WHERE (urn = '')
+                             AND (
+                                    name = 'Форма для регистрации'
+                                 OR name = 'Registration form'
+                             )";
+            $this->SQL->query($sqlQuery);
+        }
+    }
+
+
+    /**
+     * Добавление поле "Автор" в транзакции
+     */
+    public function update20190702()
+    {
+        if (in_array(SOME::_dbprefix() . "cms_users_billing_transactions", $this->tables) &&
+            !in_array('author_id', $this->columns(SOME::_dbprefix() . "cms_users_billing_transactions"))) {
+            $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "cms_users_billing_transactions
+                           ADD author_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Author ID#' AFTER id,
+                           ADD KEY (author_id)";
+            $this->SQL->query($sqlQuery);
         }
     }
 
