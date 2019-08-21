@@ -1,0 +1,561 @@
+<?php
+/**
+ * Файл стандартного интерфейса регистрации
+ */
+namespace RAAS\CMS\Users;
+
+// use SOME\SOME;
+// use RAAS\Attachment;
+// use RAAS\Application;
+// use Mustache_Engine;
+// use RAAS\Controller_Frontend as RAASControllerFrontend;
+
+use RAAS\CMS\FormInterface;
+
+/**
+ * Класс стандартного интерфейса регистрации
+ */
+class RegisterInterface extends FormInterface
+{
+    /**
+     * Конструктор класса
+     * @param Block_Form|null $block Блок, для которого применяется
+     *                               интерфейс
+     * @param Page|null $page Страница, для которой применяется интерфейс
+     * @param array $get Поля $_GET параметров
+     * @param array $post Поля $_POST параметров
+     * @param array $cookie Поля $_COOKIE параметров
+     * @param array $session Поля $_SESSION параметров
+     * @param array $server Поля $_SERVER параметров
+     * @param array $files Поля $_FILES параметров
+     */
+    public function __construct(
+        Block_Register $block = null,
+        Page $page = null,
+        array $get = [],
+        array $post = [],
+        array $cookie = [],
+        array $session = [],
+        array $server = [],
+        array $files = []
+    ) {
+        parent::__construct(
+            $block,
+            $page,
+            $get,
+            $post,
+            $cookie,
+            $session,
+            $server,
+            $files
+        );
+    }
+
+
+    public function process()
+    {
+        $result = [];
+        // 2019-08-21, AVS: пока не помню, для чего создается новый пользователь,
+        // но вероятно в этом есть какой-то смысл
+        $uid = RAASControllerFrontend::i()->user->id;
+        $user = new User($uid);
+        $new = !$user->id;
+        if ($user->id && $this->block->Edit_Form->id) {
+            $form = $this->block->Edit_Form;
+            $this->page->h1 = $this->page->meta_title
+                            = 'Редактирование профиля';
+        } else {
+            $form = $this->block->Register_Form;
+        }
+        foreach ($form->fields as $fieldURN => $field) {
+            if ($user->id && $field->datatype == 'password') {
+                $field->required = false;
+            }
+        }
+
+        if ($form->id) {
+            if ($this->block->allow_edit_social && isset($this->post['token'])) {
+                $result = array_merge($result, $this->processSocialToken(
+                    $user,
+                    $this->post,
+                    $this->session,
+                    $this->server
+                ));
+            } elseif ($this->isFormProceed(
+                $this->block,
+                $form,
+                $this->server['REQUEST_METHOD'],
+                $this->post
+            )) {
+                $Item = $user;
+
+                $localError = $this->checkRegisterForm(
+                    $user,
+                    $form,
+                    $this->post,
+                    $this->session,
+                    $this->files
+                );
+
+                if (!$localError) {
+                    $result = array_merge($result, $this->processRegisterForm(
+                        $user,
+                        $block,
+                        $form,
+                        $this->page,
+                        $this->post,
+                        $this->session,
+                        $this->server,
+                        $this->files
+                    ));
+
+                    if ($new) {
+                        $result['success'][(int)$Block->id] = true;
+                    } else {
+                        $result['success'][(int)$Block->id] = $this->checkRedirect($post, $server);
+                    }
+                }
+                $result['DATA'] = $this->post;
+                $result['localError'] = $localError;
+            } else {
+                $result['DATA'] = $user->getArrayCopy();
+                unset($result['DATA']['password_md5']);
+                foreach ($form->fields as $fieldURN => $formField) {
+                    if ($user->id && isset($user->fields[$fieldURN])) {
+                        $userField = $user->fields[$fieldURN];
+                        $result['DATA'][$fieldURN] = $userField->getValues();
+                    } elseif (!$user->id) {
+                        $result['DATA'][$fieldURN] = $formField->default;
+                    }
+                }
+                if ($this->block->allow_edit_social) {
+                    $result['DATA']['social'] = $user->social;
+                }
+                $result['localError'] = [];
+            }
+        }
+        $result['Form'] = $form;
+        $result['User'] = $user;
+
+        return $result;
+    }
+
+
+    /**
+     * Регистрация по токену соц. сети
+     * @param User $user Пользователь
+     * @param array $post Данные $_POST-полей
+     * @param array $session Данные $_SESSION-полей
+     * @param array $server Данные $_SERVER-полей
+     * @return [
+     *             'social' => string Адрес профиля в соц. сети,
+     *             'socialNetwork' => int Идентификатор соц. сети -
+     *                                    константа вида SocialProfile::SN_...,
+     *             'redirect' =>? string В режиме отладки - адрес редиректа
+     *         ]
+     */
+    protected function processSocialToken(
+        User $user,
+        array $post = [],
+        array $session = [],
+        array $server = [],
+        $debug = false
+    ) {
+        if (!isset($session['confirmedSocial'])) {
+            $_SESSION['confirmedSocial'] = [];
+        }
+        if ($profile = ULogin::getProfile($post['token'])) {
+            if ($post['AJAX']) {
+                $_SESSION['confirmedSocial'][] = $profile->profile;
+                $_SESSION['confirmedSocial'] = array_values(
+                    array_unique($session['confirmedSocial'])
+                );
+                $result['social'] = $profile->profile;
+                $result['socialNetwork'] = $profile->socialNetwork;
+            } else {
+                $user->addSocial($profile->profile);
+                $url = $server['REQUEST_URI'];
+                if ($debug) {
+                    $result['redirect'] = $url;
+                } else {
+                    header('Location: ' . $server['REQUEST_URI']);
+                    exit;
+                }
+            }
+        }
+        return $result;
+    }
+
+
+    /**
+     * По необходимости применяет редирект
+     * @param array $post Данные $_POST-полей
+     * @param array $server Данные $_SERVER-полей
+     * @param string $referer URL реферера
+     * @param bool $debug Режим отладки
+     * @return string|true true, когда редирект не нужен, string - URL редиректа в режиме отладки
+     */
+    protected function checkRedirect(
+        array $post = [],
+        array $server = [],
+        $referer = null,
+        $debug = false
+    ) {
+        if ($post['AJAX']) {
+            return true;
+        } elseif ($referer) {
+            $url = $referer;
+        } else {
+            $url = $server['REQUEST_URI'];
+        }
+        if ($debug) {
+            return $url;
+        } else {
+            header('Location: ' . $url);
+            exit;
+        }
+    }
+
+
+    /**
+     * Проверяет правильность заполнения формы
+     * @param User $user Текущий пользователь
+     * @param Form $form Форма регистрации
+     * @param array $post Данные $_POST-полей
+     * @param array $files Данные $_FILES-полей
+     * @param array $files Данные $_SESSION-полей
+     * @return array<string[] URN поля => string Текстовое описание ошибки>
+     */
+    protected function checkRegisterForm(
+        User $user,
+        Form $form,
+        array $post = [],
+        array $session = [],
+        array $files = []
+    ) {
+        $localError = [];
+        foreach ($form->fields as $fieldURN => $row) {
+            switch ($row->datatype) {
+                case 'file':
+                case 'image':
+                    if ($fieldError = $this->checkFileField($field, $files)) {
+                        $localError[$fieldURN] = $fieldError;
+                    }
+                    break;
+                default:
+                    if (($fieldURN != 'agree') || !$user->id) {
+                        if ($fieldError = $this->checkRegularField($field, $post)) {
+                            $localError[$fieldURN] = $fieldError;
+                        }
+                    }
+                    break;
+            }
+        }
+        // Проверка на антиспам
+        if (!$user->id &&
+            ($fieldError = $this->checkAntispamField($form, $post, $session))
+        ) {
+            $localError[$fieldURN] = $fieldError;
+        }
+
+        if (isset($post['login']) && $post['login'] && isset($form->fields['login'])) {
+            if ($user->checkLoginExists(trim($post['login']))) {
+                $localError['login'] = ERR_LOGIN_EXISTS;
+            }
+        }
+        if (isset($post['email']) && $post['email'] && isset($form->fields['email'])) {
+            if ($user->checkEmailExists(trim($post['email']))) {
+                $localError['email'] = ERR_EMAIL_EXISTS;
+            } elseif (!isset($form->fields['email'])) {
+                if ($user->checkLoginExists(trim($post['email']))) {
+                    $localError['email'] = ERR_LOGIN_EXISTS;
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Обрабатывает форму
+     * @param User $user Текущий пользователь
+     * @param Block_Register $block Текущий блок
+     * @param Form $form Форма регистрации
+     * @param Page $page Текущая страница
+     * @param array $post Данные $_POST-полей
+     * @param array $session Данные $_SESSION-полей
+     * @param array $server Данные $_SERVER-полей
+     * @param array $files Данные $_FILES-полей
+     * @return [
+     *             'Item' =>? Feedback Уведомление обратной связи,
+     *             'Material' =>? Material Созданный материал
+     *         ]
+     */
+    protected function processRegisterForm(
+        User $user,
+        Block_Register $block,
+        Form $form,
+        Page $page,
+        array $post = [],
+        array $session = [],
+        array $server = [],
+        array $files = []
+    ) {
+        $user->page_id = (int)$page->id;
+        $user->page = $page;
+        $this->processUserData($user, $server);
+        if ($new = !$user->id) {
+            $user->vis = (int)($block->activation_type == Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED);
+            $user->new = 1;
+        }
+
+        if (isset($form->fields['email'])) {
+            $val = $user->email = trim($post['email']);
+            if ($val && $block->email_as_login) {
+                $user->login = $val;
+            }
+        }
+        if (isset($form->fields['login']) && !$block->email_as_login) {
+            if ($val = trim($post['login'])) {
+                $user->login = $val;
+            }
+        }
+        if (isset($form->fields['password']) &&
+            ($val = trim($post['password']))
+        ) {
+            $user->password = $val;
+            $user->password_md5 = Application::i()->md5It($val);
+        } elseif ($new) {
+            $val = $user->password = $this->generatePass();
+            $user->password_md5 = Application::i()->md5It($val);
+        }
+        if (isset($form->fields['lang']) && ($val = trim($post['lang']))) {
+            $user->lang = $val;
+        } else {
+            $user->lang = $page->lang;
+        }
+        if ($block->allow_edit_social &&
+            isset($post['social'], $session['confirmedSocial'])
+        ) {
+            $arr = [];
+            foreach ((array)$post['social'] as $val) {
+                $val = trim($val);
+                if ($val && in_array($val, array_merge(
+                    (array)$session['confirmedSocial'],
+                    (array)$user->social
+                ))) {
+                    $arr[] = $val;
+                }
+            }
+            unset($_SESSION['confirmedSocial']);
+            $user->meta_social = $arr;
+        }
+        $user->commit();
+
+        $this->processObjectFields($user, $form, $post, $files);
+        $this->processObjectDates($user, $post);
+        $this->processObjectUserData($user, $server);
+
+        if ($form->email && ($new || $block->notify_about_edit)) {
+            $this->notifyRegister($user, $form, $page, $block->config, true);
+        }
+        if ($user->email && $new) {
+            $this->notifyRegister($user, $form, $page, $block->config, false);
+        }
+    }
+
+    /**
+     * Генерирует пароль
+     * @param int $length Длина пароля, в символах
+     * @return string
+     */
+    protected function generatePass($length = 5)
+    {
+        $text = '';
+        for ($i = 0; $i < $length; $i++) {
+            $x = rand(0, 61);
+            if ($x < 10) {
+                $c = (string)(int)$x;
+            } elseif ($x < 36) {
+                $c = chr((int)$x - 10 + 65);
+            } else {
+                $c = chr((int)$x - 36 + 97);
+            }
+            $text .= $c;
+        }
+        return $text;
+    }
+
+
+    /**
+     * Уведомление о заполненной форме
+     * @param User $user Пользователь
+     * @param Form $form Форма регистрации
+     * @param Page $page Текущая страница
+     * @param array $config Конфигурация блока
+     * @param bool $forAdmin Уведомление для администратора
+     *                       (если нет, то для пользователя)
+     * @param bool $debug Режим отладки
+     * @return array<[
+     *             'emails' => array<string> e-mail адреса,
+     *             'subject' => string Тема письма,
+     *             'message' => string Тело письма,
+     *             'from' => string Поле "от",
+     *             'fromEmail' => string Обратный адрес
+     *         ] | string URL SMS-шлюза>|null Набор отправляемых писем
+     *                                        либо URL SMS-шлюза
+     *                                        (только в режиме отладки)
+     */
+    protected function notifyRegister(
+        User $user,
+        Form $form,
+        Page $page,
+        array $config = [],
+        $forAdmin = false,
+        $debug = false
+    ) {
+        if (!$form->Interface->id) {
+            return;
+        }
+        if ($forAdmin) {
+            $addresses = $this->parseFormAddresses($form);
+        } else {
+            $addresses = $this->parseUserAddresses($user);
+        }
+        $template = $form->Interface;
+
+        $notificationData = [
+            'Item' => $user,
+            'User' => $user,
+            'Form' => $form,
+            'config' => $config,
+            'ADMIN' => $admin,
+            'registerInterface' => $this,
+        ];
+
+        $subject = $this->getEmailRegisterSubject();
+        $message = $this->getMessageBody(
+            $template,
+            array_merge($notificationData, ['SMS' => false])
+        );
+        $smsMessage = $this->getMessageBody(
+            $template,
+            array_merge($notificationData, ['SMS' => true])
+        );
+        $fromName = $this->getFromName();
+        $fromEmail = $this->getFromEmail();
+        $debugMessages = [];
+
+        if ($emails = $addresses['emails']) {
+            if ($debug) {
+                $debugMessages[] = [
+                    'emails' => $emails,
+                    'subject' => $subject,
+                    'message' => $message,
+                    'from' => $fromName,
+                    'fromEmail' => $fromEmail,
+                ];
+            } else {
+                Application::i()->sendmail(
+                    $emails,
+                    $subject,
+                    $message,
+                    $fromName,
+                    $fromEmail
+                );
+            }
+        }
+
+        if ($smsEmails = $addresses['smsEmails']) {
+            if ($debug) {
+                $debugMessages[] = [
+                    'emails' => $emails,
+                    'subject' => $subject,
+                    'message' => $message,
+                    'from' => $fromName,
+                    'fromEmail' => $fromEmail,
+                ];
+            } else {
+                Application::i()->sendmail(
+                    $smsEmails,
+                    $subject,
+                    $smsMessage,
+                    $fromName,
+                    $fromEmail,
+                    false
+                );
+            }
+        }
+
+        if ($smsPhones = $addresses['smsPhones']) {
+            $urlTemplate = Package::i()->registryGet('sms_gate');
+            $m = new Mustache_Engine();
+            foreach ($smsPhones as $phone) {
+                $url = $m->render($urlTemplate, [
+                    'PHONE' => urlencode($phone),
+                    'TEXT' => urlencode($smsMessage)
+                ]);
+                if ($debug) {
+                    $debugMessages[] = $url;
+                } else {
+                    $result = file_get_contents($url);
+                }
+            }
+        }
+        if ($debug) {
+            return $debugMessages;
+        }
+    }
+
+
+    /**
+     * Получает список адресов пользователя
+     * @param User $user Пользователь
+     * @return [
+     *             'emails' => array<string> Список настоящих e-mail,
+     *             'smsPhones' => array<string> Список телефонов
+     *                                          для SMS-уведомлений
+     *                                          в формате +79990000000
+     *                                          или 79990000000
+     *         ]
+     */
+    protected function parseUserAddresses(User $user)
+    {
+        $result = [];
+        if ($user->email) {
+            $result['emails'][] = $user->email;
+        }
+        $phonesRaw = [];
+        if ($user->phone) {
+            $phonesRaw[] = $user->phone;
+        } else {
+            foreach ($user->fields as $field) {
+                if ($user->datatype == 'phone') {
+                    $phonesRaw = array_merge($phonesRaw, $field->getValues(true));
+                }
+            }
+        }
+        foreach ($phonesRaw as $phoneRaw) {
+            if (preg_match('/(\\+)?\\d+/umi', $phoneRaw)) {
+                $result['smsPhones'][] = '+7' . Text::beautifyPhone($phoneRaw);
+            }
+        }
+        $result['smsPhones'] = array_values(array_unique($result['smsPhones']));
+        return $result;
+    }
+
+
+    /**
+     * Получает заголовок e-mail сообщения
+     * @return string
+     */
+    protected function getEmailRegisterSubject()
+    {
+        $host = $this->server['HTTP_HOST'];
+        if (function_exists('idn_to_utf8')) {
+            $host = idn_to_utf8($host);
+        }
+        $subject = date(DATETIMEFORMAT) . ' '
+                 . sprintf(REGISTRATION_ON_SITE, $host);
+        return $subject;
+    }
+}
