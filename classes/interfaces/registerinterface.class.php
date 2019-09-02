@@ -4,13 +4,16 @@
  */
 namespace RAAS\CMS\Users;
 
-// use SOME\SOME;
-// use RAAS\Attachment;
-// use RAAS\Application;
-// use Mustache_Engine;
-// use RAAS\Controller_Frontend as RAASControllerFrontend;
-
+use Mustache_Engine;
+use SOME\Text;
+use RAAS\Application;
+use RAAS\Controller_Frontend as RAASControllerFrontend;
+use RAAS\View_Web as RAASViewWeb;
 use RAAS\CMS\FormInterface;
+use RAAS\CMS\Package;
+use RAAS\CMS\ULogin;
+use RAAS\CMS\User;
+use RAAS\CMS\View_Web as PackageViewWeb;
 
 /**
  * Класс стандартного интерфейса регистрации
@@ -60,8 +63,10 @@ class RegisterInterface extends FormInterface
         $uid = RAASControllerFrontend::i()->user->id;
         $user = new User($uid);
         $new = !$user->id;
-        if ($user->id && $this->block->Edit_Form->id) {
-            $form = $this->block->Edit_Form;
+        if ($user->id) {
+            $form = $this->block->Edit_Form->id
+                  ? $this->block->Edit_Form
+                  : $this->block->Register_Form;
             $this->page->h1 = $this->page->meta_title
                             = 'Редактирование профиля';
         } else {
@@ -87,8 +92,6 @@ class RegisterInterface extends FormInterface
                 $this->server['REQUEST_METHOD'],
                 $this->post
             )) {
-                $Item = $user;
-
                 $localError = $this->checkRegisterForm(
                     $user,
                     $form,
@@ -100,7 +103,7 @@ class RegisterInterface extends FormInterface
                 if (!$localError) {
                     $result = array_merge($result, $this->processRegisterForm(
                         $user,
-                        $block,
+                        $this->block,
                         $form,
                         $this->page,
                         $this->post,
@@ -110,9 +113,12 @@ class RegisterInterface extends FormInterface
                     ));
 
                     if ($new) {
-                        $result['success'][(int)$Block->id] = true;
+                        $result['success'][(int)$this->block->id] = true;
                     } else {
-                        $result['success'][(int)$Block->id] = $this->checkRedirect($post, $server);
+                        $result['success'][(int)$this->block->id] = $this->checkRedirect(
+                            $this->post,
+                            $this->server
+                        );
                     }
                 }
                 $result['DATA'] = $this->post;
@@ -134,6 +140,7 @@ class RegisterInterface extends FormInterface
                 $result['localError'] = [];
             }
         }
+        unset($result['DATA']['password'], $result['DATA']['password@confirm']);
         $result['Form'] = $form;
         $result['User'] = $user;
 
@@ -154,22 +161,27 @@ class RegisterInterface extends FormInterface
      *             'redirect' =>? string В режиме отладки - адрес редиректа
      *         ]
      */
-    protected function processSocialToken(
+    public function processSocialToken(
         User $user,
         array $post = [],
         array $session = [],
         array $server = [],
         $debug = false
     ) {
+        $result = [];
         if (!isset($session['confirmedSocial'])) {
-            $_SESSION['confirmedSocial'] = [];
+            $_SESSION['confirmedSocial'] =
+            $session['confirmedSocial'] =
+            $this->session['confirmedSocial'] = [];
         }
-        if ($profile = ULogin::getProfile($post['token'])) {
+        if ($profile = $this->getProfile($post['token'])) {
             if ($post['AJAX']) {
                 $_SESSION['confirmedSocial'][] = $profile->profile;
                 $_SESSION['confirmedSocial'] = array_values(
-                    array_unique($session['confirmedSocial'])
+                    array_unique((array)$_SESSION['confirmedSocial'])
                 );
+                $this->session['confirmedSocial'] =
+                $session['confirmedSocial'] = $_SESSION['confirmedSocial'];
                 $result['social'] = $profile->profile;
                 $result['socialNetwork'] = $profile->socialNetwork;
             } else {
@@ -178,12 +190,23 @@ class RegisterInterface extends FormInterface
                 if ($debug) {
                     $result['redirect'] = $url;
                 } else {
-                    header('Location: ' . $server['REQUEST_URI']);
+                    header('Location: ' . $url);
                     exit;
                 }
             }
         }
         return $result;
+    }
+
+
+    /**
+     * Получает профиль пользователя в соц. сети по токену
+     * @param string $token Токен
+     * @return SocialProfile
+     */
+    public function getProfile($token)
+    {
+        return ULogin::getProfile($token);
     }
 
 
@@ -195,7 +218,7 @@ class RegisterInterface extends FormInterface
      * @param bool $debug Режим отладки
      * @return string|true true, когда редирект не нужен, string - URL редиректа в режиме отладки
      */
-    protected function checkRedirect(
+    public function checkRedirect(
         array $post = [],
         array $server = [],
         $referer = null,
@@ -226,7 +249,7 @@ class RegisterInterface extends FormInterface
      * @param array $files Данные $_SESSION-полей
      * @return array<string[] URN поля => string Текстовое описание ошибки>
      */
-    protected function checkRegisterForm(
+    public function checkRegisterForm(
         User $user,
         Form $form,
         array $post = [],
@@ -234,8 +257,8 @@ class RegisterInterface extends FormInterface
         array $files = []
     ) {
         $localError = [];
-        foreach ($form->fields as $fieldURN => $row) {
-            switch ($row->datatype) {
+        foreach ($form->fields as $fieldURN => $field) {
+            switch ($field->datatype) {
                 case 'file':
                 case 'image':
                     if ($fieldError = $this->checkFileField($field, $files)) {
@@ -255,23 +278,24 @@ class RegisterInterface extends FormInterface
         if (!$user->id &&
             ($fieldError = $this->checkAntispamField($form, $post, $session))
         ) {
-            $localError[$fieldURN] = $fieldError;
+            $localError[$form->antispam_field_name] = $fieldError;
         }
 
         if (isset($post['login']) && $post['login'] && isset($form->fields['login'])) {
             if ($user->checkLoginExists(trim($post['login']))) {
-                $localError['login'] = ERR_LOGIN_EXISTS;
+                $localError['login'] = RAASViewWeb::i()->_('ERR_LOGIN_EXISTS');
             }
         }
         if (isset($post['email']) && $post['email'] && isset($form->fields['email'])) {
             if ($user->checkEmailExists(trim($post['email']))) {
-                $localError['email'] = ERR_EMAIL_EXISTS;
-            } elseif (!isset($form->fields['email'])) {
+                $localError['email'] = View_Web::i()->_('ERR_EMAIL_EXISTS');
+            } elseif (!isset($form->fields['login'])) {
                 if ($user->checkLoginExists(trim($post['email']))) {
-                    $localError['email'] = ERR_LOGIN_EXISTS;
+                    $localError['email'] = RAASViewWeb::i()->_('ERR_LOGIN_EXISTS');
                 }
             }
         }
+        return $localError;
     }
 
 
@@ -290,7 +314,7 @@ class RegisterInterface extends FormInterface
      *             'Material' =>? Material Созданный материал
      *         ]
      */
-    protected function processRegisterForm(
+    public function processRegisterForm(
         User $user,
         Block_Register $block,
         Form $form,
@@ -323,11 +347,11 @@ class RegisterInterface extends FormInterface
             ($val = trim($post['password']))
         ) {
             $user->password = $val;
-            $user->password_md5 = Application::i()->md5It($val);
         } elseif ($new) {
             $val = $user->password = $this->generatePass();
-            $user->password_md5 = Application::i()->md5It($val);
         }
+        $user->password_md5 = Application::i()->md5It($val);
+
         if (isset($form->fields['lang']) && ($val = trim($post['lang']))) {
             $user->lang = $val;
         } else {
@@ -347,6 +371,8 @@ class RegisterInterface extends FormInterface
                 }
             }
             unset($_SESSION['confirmedSocial']);
+            unset($this->session['confirmedSocial']);
+            unset($session['confirmedSocial']);
             $user->meta_social = $arr;
         }
         $user->commit();
@@ -361,6 +387,7 @@ class RegisterInterface extends FormInterface
         if ($user->email && $new) {
             $this->notifyRegister($user, $form, $page, $block->config, false);
         }
+        return ['User' => $user];
     }
 
     /**
@@ -368,7 +395,7 @@ class RegisterInterface extends FormInterface
      * @param int $length Длина пароля, в символах
      * @return string
      */
-    protected function generatePass($length = 5)
+    public function generatePass($length = 5)
     {
         $text = '';
         for ($i = 0; $i < $length; $i++) {
@@ -395,17 +422,19 @@ class RegisterInterface extends FormInterface
      * @param bool $forAdmin Уведомление для администратора
      *                       (если нет, то для пользователя)
      * @param bool $debug Режим отладки
-     * @return array<[
-     *             'emails' => array<string> e-mail адреса,
-     *             'subject' => string Тема письма,
-     *             'message' => string Тело письма,
-     *             'from' => string Поле "от",
-     *             'fromEmail' => string Обратный адрес
-     *         ] | string URL SMS-шлюза>|null Набор отправляемых писем
-     *                                        либо URL SMS-шлюза
-     *                                        (только в режиме отладки)
+     * @return array<
+     *             ('emails'|'smsEmails')[] => [
+     *                 'emails' => array<string> e-mail адреса,
+     *                 'subject' => string Тема письма,
+     *                 'message' => string Тело письма,
+     *                 'from' => string Поле "от",
+     *                 'fromEmail' => string Обратный адрес
+     *             ],
+     *             'smsPhones' => array<string URL SMS-шлюза>
+     *         >|null Набор отправляемых писем либо URL SMS-шлюза
+     *                            (только в режиме отладки)
      */
-    protected function notifyRegister(
+    public function notifyRegister(
         User $user,
         Form $form,
         Page $page,
@@ -428,7 +457,7 @@ class RegisterInterface extends FormInterface
             'User' => $user,
             'Form' => $form,
             'config' => $config,
-            'ADMIN' => $admin,
+            'ADMIN' => $forAdmin,
             'registerInterface' => $this,
         ];
 
@@ -447,7 +476,7 @@ class RegisterInterface extends FormInterface
 
         if ($emails = $addresses['emails']) {
             if ($debug) {
-                $debugMessages[] = [
+                $debugMessages['emails'] = [
                     'emails' => $emails,
                     'subject' => $subject,
                     'message' => $message,
@@ -467,10 +496,10 @@ class RegisterInterface extends FormInterface
 
         if ($smsEmails = $addresses['smsEmails']) {
             if ($debug) {
-                $debugMessages[] = [
-                    'emails' => $emails,
+                $debugMessages['smsEmails'] = [
+                    'emails' => $smsEmails,
                     'subject' => $subject,
-                    'message' => $message,
+                    'message' => $smsMessage,
                     'from' => $fromName,
                     'fromEmail' => $fromEmail,
                 ];
@@ -495,7 +524,7 @@ class RegisterInterface extends FormInterface
                     'TEXT' => urlencode($smsMessage)
                 ]);
                 if ($debug) {
-                    $debugMessages[] = $url;
+                    $debugMessages['smsPhones'][] = $url;
                 } else {
                     $result = file_get_contents($url);
                 }
@@ -518,7 +547,7 @@ class RegisterInterface extends FormInterface
      *                                          или 79990000000
      *         ]
      */
-    protected function parseUserAddresses(User $user)
+    public function parseUserAddresses(User $user)
     {
         $result = [];
         if ($user->email) {
@@ -529,7 +558,7 @@ class RegisterInterface extends FormInterface
             $phonesRaw[] = $user->phone;
         } else {
             foreach ($user->fields as $field) {
-                if ($user->datatype == 'phone') {
+                if ($field->datatype == 'phone') {
                     $phonesRaw = array_merge($phonesRaw, $field->getValues(true));
                 }
             }
@@ -548,14 +577,15 @@ class RegisterInterface extends FormInterface
      * Получает заголовок e-mail сообщения
      * @return string
      */
-    protected function getEmailRegisterSubject()
+    public function getEmailRegisterSubject()
     {
         $host = $this->server['HTTP_HOST'];
         if (function_exists('idn_to_utf8')) {
             $host = idn_to_utf8($host);
         }
-        $subject = date(DATETIMEFORMAT) . ' '
-                 . sprintf(REGISTRATION_ON_SITE, $host);
+        $host = mb_strtoupper($host);
+        $subject = date(RAASViewWeb::i()->_('DATETIMEFORMAT')) . ' '
+                 . sprintf(View_Web::i()->_('REGISTRATION_ON_SITE'), $host);
         return $subject;
     }
 }
