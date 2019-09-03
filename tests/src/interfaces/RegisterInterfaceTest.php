@@ -10,6 +10,8 @@ use RAAS\Controller_Frontend;
 use RAAS\CMS\Block;
 use RAAS\CMS\Form;
 use RAAS\CMS\Form_Field;
+use RAAS\CMS\Material;
+use RAAS\CMS\Material_Type;
 use RAAS\CMS\Page;
 use RAAS\CMS\Package;
 use RAAS\CMS\SocialProfile;
@@ -459,6 +461,166 @@ class MaterialInterfaceTest extends BaseDBTest
 
 
     /**
+     * Тест получения материального поля
+     */
+    public function testGetMaterialTypeField()
+    {
+        $form = new Form(4);
+        $form->material_type = 3; // Новости
+        $newsField = new User_Field([
+            'urn' => 'news',
+            'datatype' => 'material',
+            'source' => 3,
+        ]);
+        $newsField->commit();
+
+        $interface = new RegisterInterface();
+
+        $result = $interface->getMaterialTypeField(new Material_Type(3), new User());
+
+        $this->assertInstanceof(User_Field::class, $result);
+        $this->assertEquals($newsField->id, $result->id);
+
+        User_Field::delete($newsField);
+    }
+
+
+    /**
+     * Тест получения материального поля
+     * (случай, когда поле не найдено)
+     */
+    public function testGetMaterialTypeFieldWithoutField()
+    {
+        $form = new Form(4);
+        $form->material_type = 3; // Новости
+
+        $interface = new RegisterInterface();
+
+        $result = $interface->getMaterialTypeField(new Material_Type(3), new User());
+
+        $this->assertNull($result);
+    }
+
+
+    /**
+     * Тест получения пользовательского материала
+     */
+    public function testGetUserMaterial()
+    {
+        $form = new Form(4);
+        $form->material_type = 3; // Новости
+        $newsField = new User_Field([
+            'urn' => 'news',
+            'datatype' => 'material',
+            'source' => 3,
+        ]);
+        $newsField->commit();
+        $user = new User(1);
+        $user->fields['news']->addValue(7);
+
+        $interface = new RegisterInterface();
+
+        $result = $interface->getUserMaterial($form, $user);
+
+        $this->assertInstanceof(Material::class, $result);
+        $this->assertEquals(7, $result->id);
+
+        User_Field::delete($newsField);
+    }
+
+
+    /**
+     * Тест получения пользовательского материала
+     * (случай с новым пользователем)
+     */
+    public function testGetUserMaterialWithNewUser()
+    {
+        $form = new Form(4);
+        $form->material_type = 3; // Новости
+        $newsField = new User_Field([
+            'urn' => 'news',
+            'datatype' => 'material',
+            'source' => 3,
+        ]);
+        $newsField->commit();
+
+        $interface = new RegisterInterface();
+
+        $result = $interface->getUserMaterial($form, new User());
+
+        $this->assertInstanceof(Material::class, $result);
+        $this->assertEquals(0, $result->id);
+        $this->assertEquals(3, $result->pid);
+        $this->assertEquals(0, $result->vis);
+
+        User_Field::delete($newsField);
+    }
+
+
+    /**
+     * Тест получения пользовательского материала
+     * (случай с отсутствием типа материала в форме)
+     */
+    public function testGetUserMaterialWithNoField()
+    {
+        $interface = new RegisterInterface();
+
+        $result = $interface->getUserMaterial(new Form(4), new User());
+
+        $this->assertNull($result);
+    }
+
+
+    public function testProcessUserMaterial()
+    {
+        $form = new Form(4);
+        $form->material_type = 4; // Новости
+        $nameField = new Form_Field([
+            'pid' => 4,
+            'urn' => '_name_',
+            'datatype' => 'text',
+        ]);
+        $nameField->commit();
+        $priceField = new Form_Field([
+            'pid' => 4,
+            'urn' => 'price',
+            'datatype' => 'number',
+        ]);
+        $priceField->commit();
+        $catalogField = new User_Field([
+            'urn' => 'catalog',
+            'datatype' => 'material',
+            'source' => 4,
+        ]);
+        $catalogField->commit();
+        $user = new User(1);
+
+        $interface = new RegisterInterface();
+
+        $interface->processUserMaterial(
+            $user,
+            $form,
+            true,
+            new Page(1),
+            ['_name_' => 'Новый товар', 'price' => '12345']
+        );
+        $result = $user->fields['catalog']->getValue();
+
+        $this->assertInstanceof(Material::class, $result);
+        $this->assertEquals(4, $result->pid);
+        $this->assertEquals(0, $result->vis);
+        $this->assertEquals('Новый товар', $result->name);
+        $this->assertEquals('12345', $result->price);
+        $this->assertEquals([1], $result->pages_ids);
+
+        User_Field::delete($catalogField);
+        Form_Field::delete($nameField);
+        Form_Field::delete($priceField);
+        Material::delete($result);
+    }
+
+
+    /**
      * Тест обработки формы
      */
     public function testProcessRegisterForm()
@@ -472,7 +634,27 @@ class MaterialInterfaceTest extends BaseDBTest
         $fullNameField = new User_Field(['urn' => 'full_name', 'datatype' => 'text']);
         $fullNameField->commit();
 
+        $nameField = new Form_Field([
+            'pid' => 4,
+            'urn' => '_name_',
+            'datatype' => 'text',
+        ]);
+        $nameField->commit();
+        $priceField = new Form_Field([
+            'pid' => 4,
+            'urn' => 'price',
+            'datatype' => 'number',
+        ]);
+        $priceField->commit();
+        $catalogField = new User_Field([
+            'urn' => 'catalog',
+            'datatype' => 'material',
+            'source' => 4,
+        ]);
+        $catalogField->commit();
+
         $form = new Form(4); // Обратная связь
+        $form->material_type = 4; // Новости
         $form->email = 'test@test.org';
         $block = Block::spawn(45);
         $block->allow_edit_social = 1;
@@ -488,6 +670,8 @@ class MaterialInterfaceTest extends BaseDBTest
             'social' => [
                 'https://vk.com/user123',
             ],
+            '_name_' => 'Новый товар',
+            'price' => 12345,
         ];
         $interface = new RegisterInterface();
 
@@ -520,11 +704,23 @@ class MaterialInterfaceTest extends BaseDBTest
         $this->assertEquals(0, $user->vis);
         $this->assertEquals(1, $user->new);
 
+        $this->assertInstanceof(Material::class, $result['Material']);
+        $material = $result['Material'];
+        $this->assertEquals(4, $material->pid);
+        $this->assertEquals(0, $material->vis);
+        $this->assertEquals('Новый товар', $material->name);
+        $this->assertEquals('12345', $material->price);
+        $this->assertEquals([30], $material->pages_ids);
+
         User_Field::delete($langField);
         User_Field::delete($ipField);
         User_Field::delete($dateField);
         User_Field::delete($fullNameField);
+        User_Field::delete($catalogField);
+        Form_Field::delete($nameField);
+        Form_Field::delete($priceField);
         User::delete($user);
+        Material::delete($material);
     }
 
 

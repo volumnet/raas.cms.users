@@ -9,8 +9,10 @@ use SOME\Text;
 use RAAS\Application;
 use RAAS\Controller_Frontend as RAASControllerFrontend;
 use RAAS\View_Web as RAASViewWeb;
+use RAAS\CMS\Form;
 use RAAS\CMS\FormInterface;
 use RAAS\CMS\Package;
+use RAAS\CMS\Page;
 use RAAS\CMS\ULogin;
 use RAAS\CMS\User;
 use RAAS\CMS\View_Web as PackageViewWeb;
@@ -324,6 +326,7 @@ class RegisterInterface extends FormInterface
         array $server = [],
         array $files = []
     ) {
+        $result = [];
         $user->page_id = (int)$page->id;
         $user->page = $page;
         $this->processUserData($user, $server);
@@ -376,10 +379,22 @@ class RegisterInterface extends FormInterface
             $user->meta_social = $arr;
         }
         $user->commit();
+        $result['User'] = $user;
 
         $this->processObjectFields($user, $form, $post, $files);
         $this->processObjectDates($user, $post);
         $this->processObjectUserData($user, $server);
+        if ($material = $this->processUserMaterial(
+            $user,
+            $form,
+            $new,
+            $page,
+            $post,
+            $server,
+            $files
+        )) {
+            $result['Material'] = $material;
+        }
 
         if ($form->email && ($new || $block->notify_about_edit)) {
             $this->notifyRegister($user, $form, $page, $block->config, true);
@@ -387,8 +402,107 @@ class RegisterInterface extends FormInterface
         if ($user->email && $new) {
             $this->notifyRegister($user, $form, $page, $block->config, false);
         }
-        return ['User' => $user];
+        return $result;
     }
+
+
+    /**
+     * Обрабатывает пользовательский материал
+     * @param User $user Пользователь
+     * @param Form $form Форма
+     * @param bool $new Новый пользователь
+     *                  (т.к. пользователь уже сохранен, с ID#)
+     * @param array $post Данные $_POST-полей
+     * @param array $server Данные $_SERVER-полей
+     * @param array $files Данные $_FILES-полей
+     * @return Material|null
+     */
+    public function processUserMaterial(
+        User $user,
+        Form $form,
+        $new,
+        Page $page,
+        array $post = [],
+        array $server = [],
+        array $files = []
+    ) {
+        if ($material = $this->getUserMaterial($form, $user, $new)) {
+            $materialType = $form->Material_Type;
+            $materialField = $this->getMaterialTypeField(
+                $form->Material_Type,
+                $user
+            );
+            if (!$materialType->global_type) {
+                $material->cats = [(int)$page->id];
+            }
+            $this->processObject($material, $form, $post, $server, $files);
+            if ($new) {
+                $materialField->addValue($material->id);
+            }
+            return $material;
+        }
+        return null;
+    }
+
+
+    /**
+     * Получает поле пользователя по типу материала
+     * @param Material_Type $materialType Тип материала
+     * @param User $user Пользователь
+     * @return User_Field|null
+     */
+    public function getMaterialTypeField(
+        Material_Type $materialType,
+        User $user
+    ) {
+        $mTypeId = $materialType->id;
+        $materialFields = array_filter(
+            $user->fields,
+            function ($field) use ($mTypeId) {
+                return ($field->datatype == 'material') &&
+                       ($field->source == $mTypeId);
+            }
+        );
+        if ($materialFields) {
+            return array_shift($materialFields);
+        }
+        return null;
+    }
+
+
+    /**
+     * Получает пользовательский материал
+     * @param Form $form Текущая форма
+     * @param User $user Пользователь
+     * @param bool $new Новый пользователь
+     *                  (т.к. пользователь уже сохранен, с ID#)
+     * @return Material|null
+     */
+    public function getUserMaterial(Form $form, User $user, $new = null)
+    {
+        if ($new === null) {
+            $new = !$user->id;
+        }
+        $mTypeId = $form->Material_Type->id;
+        $materialField = $this->getMaterialTypeField(
+            $form->Material_Type,
+            $user
+        );
+        if (!($mTypeId && $materialField->id)) {
+            return null;
+        }
+        $material = null;
+        if ($new) {
+            $material = $this->getRawMaterial($form);
+        } else {
+            $materials = $materialField->getValues(true);
+            if ($materials) {
+                $material = array_shift($materials);
+            }
+        }
+        return $material;
+    }
+
 
     /**
      * Генерирует пароль
