@@ -24,8 +24,8 @@ class RegisterInterface extends FormInterface
 {
     /**
      * Конструктор класса
-     * @param Block_Form|null $block Блок, для которого применяется
-     *                               интерфейс
+     * @param Block_Register|null $block Блок, для которого применяется
+     *                                   интерфейс
      * @param Page|null $page Страница, для которой применяется интерфейс
      * @param array $get Поля $_GET параметров
      * @param array $post Поля $_POST параметров
@@ -128,12 +128,21 @@ class RegisterInterface extends FormInterface
             } else {
                 $result['DATA'] = $user->getArrayCopy();
                 unset($result['DATA']['password_md5']);
+                $material = $this->getUserMaterial($form, $user, $new);
+                $materialId = $material->id;
                 foreach ($form->fields as $fieldURN => $formField) {
                     if ($user->id && isset($user->fields[$fieldURN])) {
                         $userField = $user->fields[$fieldURN];
                         $result['DATA'][$fieldURN] = $userField->getValues();
+                    } elseif ($materialId && isset($material->fields[$fieldURN])) {
+                        $materialField = $material->fields[$fieldURN];
+                        $result['DATA'][$fieldURN] = $materialField->getValues();
+                    } elseif ($materialId &&
+                        in_array($fieldURN, ['_name_', '_description_'])
+                    ) {
+                        $result['DATA'][$fieldURN] = $material->{trim($fieldURN, '_')};
                     } elseif (!$user->id) {
-                        $result['DATA'][$fieldURN] = $formField->default;
+                        $result['DATA'][$fieldURN] = $formField->defval;
                     }
                 }
                 if ($this->block->allow_edit_social) {
@@ -427,16 +436,17 @@ class RegisterInterface extends FormInterface
         array $files = []
     ) {
         if ($material = $this->getUserMaterial($form, $user, $new)) {
+            $newMaterial = !$material->id;
             $materialType = $form->Material_Type;
             $materialField = $this->getMaterialTypeField(
                 $form->Material_Type,
                 $user
             );
-            if (!$materialType->global_type) {
+            if ($newMaterial && !$materialType->global_type) {
                 $material->cats = [(int)$page->id];
             }
             $this->processObject($material, $form, $post, $server, $files);
-            if ($new) {
+            if ($newMaterial) {
                 $materialField->addValue($material->id);
             }
             return $material;
@@ -492,13 +502,14 @@ class RegisterInterface extends FormInterface
             return null;
         }
         $material = null;
-        if ($new) {
-            $material = $this->getRawMaterial($form);
-        } else {
+        if (!$new) {
             $materials = $materialField->getValues(true);
             if ($materials) {
                 $material = array_shift($materials);
             }
+        }
+        if (!$material) {
+            $material = $this->getRawMaterial($form);
         }
         return $material;
     }

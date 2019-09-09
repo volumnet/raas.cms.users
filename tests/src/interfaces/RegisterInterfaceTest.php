@@ -22,7 +22,7 @@ use RAAS\CMS\User_Field;
 /**
  * Класс теста стандартного интерфейса регистрации
  */
-class MaterialInterfaceTest extends BaseDBTest
+class RegisterInterfaceTest extends BaseDBTest
 {
     /**
      * Тест регистрации по токену соц. сети
@@ -574,7 +574,7 @@ class MaterialInterfaceTest extends BaseDBTest
     public function testProcessUserMaterial()
     {
         $form = new Form(4);
-        $form->material_type = 4; // Новости
+        $form->material_type = 4; // Каталог продукции
         $nameField = new Form_Field([
             'pid' => 4,
             'urn' => '_name_',
@@ -654,7 +654,7 @@ class MaterialInterfaceTest extends BaseDBTest
         $catalogField->commit();
 
         $form = new Form(4); // Обратная связь
-        $form->material_type = 4; // Новости
+        $form->material_type = 4; // Каталог продукции
         $form->email = 'test@test.org';
         $block = Block::spawn(45);
         $block->allow_edit_social = 1;
@@ -932,10 +932,34 @@ class MaterialInterfaceTest extends BaseDBTest
      */
     public function testProcessWithUserAndNoFormData()
     {
+        $nameField = new Form_Field([
+            'pid' => 4,
+            'urn' => '_name_',
+            'datatype' => 'text',
+        ]);
+        $nameField->commit();
+        $priceField = new Form_Field([
+            'pid' => 4,
+            'urn' => 'price',
+            'datatype' => 'number',
+        ]);
+        $priceField->commit();
+        $catalogField = new User_Field([
+            'urn' => 'catalog',
+            'datatype' => 'material',
+            'source' => 4,
+        ]);
+        $catalogField->commit();
+
         $block = Block::spawn(45);
         $block->allow_edit_social = 1;
+        $form = $block->Register_Form;
+        $form->material_type = 4; // Каталог продукции
+        $form->commit();
+
         $page = new Page(30); // Главная
         $user = Controller_Frontend::i()->user = new User(1);
+        $user->fields['catalog']->addValue(10);
         $post = [];
         $postWithoutPassword = $post;
         unset(
@@ -963,11 +987,19 @@ class MaterialInterfaceTest extends BaseDBTest
         $this->assertEmpty($result['DATA']['password']);
         $this->assertEmpty($result['DATA']['password_md5']);
         $this->assertEmpty($result['DATA']['password@confirm']);
+        $this->assertEquals('Товар 1', $result['DATA']['_name_']);
+        $this->assertEquals('83620', $result['DATA']['price']);
         $this->assertInstanceof(Form::class, $result['Form']);
         $this->assertEquals(4, $result['Form']->id);
         $this->assertEquals($user, $result['User']);
         $this->assertEquals('Редактирование профиля', $page->getH1());
         $this->assertEquals('Редактирование профиля', $page->meta_title);
         $this->assertContains('https://vk.com/test', $result['DATA']['social']);
+
+        User_Field::delete($catalogField);
+        Form_Field::delete($nameField);
+        Form_Field::delete($priceField);
+        $form->material_type = 0;
+        $form->commit();
     }
 }
