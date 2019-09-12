@@ -17,7 +17,6 @@ use RAAS\CMS\Package;
 use RAAS\CMS\Page;
 use RAAS\CMS\ULogin;
 use RAAS\CMS\User;
-use RAAS\CMS\View_Web as PackageViewWeb;
 
 /**
  * Класс стандартного интерфейса регистрации
