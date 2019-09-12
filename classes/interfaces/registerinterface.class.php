@@ -11,6 +11,8 @@ use RAAS\Controller_Frontend as RAASControllerFrontend;
 use RAAS\View_Web as RAASViewWeb;
 use RAAS\CMS\Form;
 use RAAS\CMS\FormInterface;
+use RAAS\CMS\Material;
+use RAAS\CMS\Material_Type;
 use RAAS\CMS\Package;
 use RAAS\CMS\Page;
 use RAAS\CMS\ULogin;
@@ -22,41 +24,6 @@ use RAAS\CMS\View_Web as PackageViewWeb;
  */
 class RegisterInterface extends FormInterface
 {
-    /**
-     * Конструктор класса
-     * @param Block_Register|null $block Блок, для которого применяется
-     *                                   интерфейс
-     * @param Page|null $page Страница, для которой применяется интерфейс
-     * @param array $get Поля $_GET параметров
-     * @param array $post Поля $_POST параметров
-     * @param array $cookie Поля $_COOKIE параметров
-     * @param array $session Поля $_SESSION параметров
-     * @param array $server Поля $_SERVER параметров
-     * @param array $files Поля $_FILES параметров
-     */
-    public function __construct(
-        Block_Register $block = null,
-        Page $page = null,
-        array $get = [],
-        array $post = [],
-        array $cookie = [],
-        array $session = [],
-        array $server = [],
-        array $files = []
-    ) {
-        parent::__construct(
-            $block,
-            $page,
-            $get,
-            $post,
-            $cookie,
-            $session,
-            $server,
-            $files
-        );
-    }
-
-
     public function process()
     {
         $result = [];
@@ -641,17 +608,18 @@ class RegisterInterface extends FormInterface
         }
 
         if ($smsPhones = $addresses['smsPhones']) {
-            $urlTemplate = Package::i()->registryGet('sms_gate');
-            $m = new Mustache_Engine();
-            foreach ($smsPhones as $phone) {
-                $url = $m->render($urlTemplate, [
-                    'PHONE' => urlencode($phone),
-                    'TEXT' => urlencode($smsMessage)
-                ]);
-                if ($debug) {
-                    $debugMessages['smsPhones'][] = $url;
-                } else {
-                    $result = file_get_contents($url);
+            if ($urlTemplate = Package::i()->registryGet('sms_gate')) {
+                $m = new Mustache_Engine();
+                foreach ($smsPhones as $phone) {
+                    $url = $m->render($urlTemplate, [
+                        'PHONE' => urlencode($phone),
+                        'TEXT' => urlencode($smsMessage)
+                    ]);
+                    if ($debug) {
+                        $debugMessages['smsPhones'][] = $url;
+                    } else {
+                        $result = file_get_contents($url);
+                    }
                 }
             }
         }
