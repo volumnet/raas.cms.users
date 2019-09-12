@@ -12,6 +12,7 @@ use RAAS\View_Web as RAASViewWeb;
 use RAAS\CMS\Block_Form;
 use RAAS\CMS\Form;
 use RAAS\CMS\FormInterface;
+use RAAS\CMS\Material;
 use RAAS\CMS\Package;
 use RAAS\CMS\Page;
 use RAAS\CMS\ULogin;
@@ -74,7 +75,18 @@ class EditUserMaterialInterface extends RegisterInterface
                 foreach ($form->fields as $fieldURN => $formField) {
                     if ($materialId && isset($material->fields[$fieldURN])) {
                         $materialField = $material->fields[$fieldURN];
-                        $result['DATA'][$fieldURN] = $materialField->getValues();
+                        $values = array_map(function ($x) {
+                            if ($x instanceof Material) {
+                                return $x->id;
+                            } else {
+                                return $x;
+                            }
+                        }, $materialField->getValues(true));
+                        if ($formField->multiple) {
+                            $result['DATA'][$fieldURN] = $values;
+                        } else {
+                            $result['DATA'][$fieldURN] = array_shift($values);
+                        }
                     } elseif ($materialId &&
                         in_array($fieldURN, ['_name_', '_description_'])
                     ) {

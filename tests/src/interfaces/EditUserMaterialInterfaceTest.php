@@ -44,6 +44,14 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
             'datatype' => 'number',
         ]);
         $priceField->commit();
+        $relatedField = new Form_Field([
+            'pid' => 4,
+            'urn' => 'related',
+            'datatype' => 'material',
+            'source' => 4,
+            'multiple' => 1,
+        ]);
+        $relatedField->commit();
         $catalogField = new User_Field([
             'urn' => 'catalog',
             'datatype' => 'material',
@@ -79,13 +87,15 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
         $form->material_type = 0; // Новости
         $form->commit();
 
-        $nameField = new $form->fields['_name_'];
-        $priceField = new $form->fields['price'];
+        $nameField = $form->fields['_name_'];
+        $priceField = $form->fields['price'];
+        $relatedField = $form->fields['related'];
         $user = new User();
-        $catalogField = new $user->fields['catalog'];
+        $catalogField = $user->fields['catalog'];
 
         Form_Field::delete($nameField);
         Form_Field::delete($priceField);
+        Form_Field::delete($relatedField);
         User_Field::delete($catalogField);
 
         $loginField = $form->fields['login'];
@@ -114,6 +124,7 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
         $post = [
             '_name_' => 'Новый товар',
             'price' => 12345,
+            'related' => [11, 12, 13],
             'form_signature' => md5('form427'),
         ];
         $interface = new EditUserMaterialInterface($block, $page, [], $post);
@@ -126,6 +137,11 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
         $this->assertNotNull($material->id);
         $this->assertEquals(10, $material->id);
         $this->assertEquals('Новый товар', $material->name);
+        $this->assertCount(3, $material->related);
+        $this->assertInstanceof(Material::class, $material->related[0]);
+        $this->assertEquals(11, $material->related[0]->id);
+        $this->assertEquals(12, $material->related[1]->id);
+        $this->assertEquals(13, $material->related[2]->id);
         $this->assertEquals('12345', $material->price);
 
         $material = new Material(10);
@@ -133,6 +149,7 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
         $material->commit();
         $material->fields['price']->deleteValues();
         $material->fields['price']->addValue(83620);
+        $material->fields['related']->deleteValues();
         $user->fields['catalog']->deleteValues();
     }
 
@@ -215,6 +232,10 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
         $page = new Page(30); // Главная
         $user = Controller_Frontend::i()->user = new User(1);
         $user->fields['catalog']->addValue(10);
+        $material = new Material(10);
+        $material->fields['related']->addValue(11);
+        $material->fields['related']->addValue(12);
+        $material->fields['related']->addValue(13);
         $post = [];
 
         $interface = new EditUserMaterialInterface(
@@ -234,10 +255,15 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
         $this->assertNull($result['success']);
         $this->assertEquals('Товар 1', $result['DATA']['_name_']);
         $this->assertEquals('83620', $result['DATA']['price']);
+        $this->assertCount(3, $result['DATA']['related']);
+        $this->assertEquals(11, $result['DATA']['related'][0]);
+        $this->assertEquals(12, $result['DATA']['related'][1]);
+        $this->assertEquals(13, $result['DATA']['related'][2]);
         $this->assertInstanceof(Form::class, $result['Form']);
         $this->assertEquals(4, $result['Form']->id);
         $this->assertEquals($user, $result['User']);
 
         $user->fields['catalog']->deleteValues();
+        $material->fields['related']->deleteValues();
     }
 }
