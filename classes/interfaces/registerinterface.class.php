@@ -81,14 +81,7 @@ class RegisterInterface extends FormInterface
                         $this->files
                     ));
 
-                    if ($new) {
-                        $result['success'][(int)$this->block->id] = true;
-                    } else {
-                        $result['success'][(int)$this->block->id] = $this->checkRedirect(
-                            $this->post,
-                            $this->server
-                        );
-                    }
+                    $result['success'][(int)$this->block->id] = true;
                 }
                 $result['DATA'] = $this->post;
                 $result['localError'] = $localError;
