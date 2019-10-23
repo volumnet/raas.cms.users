@@ -28,6 +28,8 @@ class Webmaster extends CMSWebmaster
     {
         switch ($var) {
             case 'Site':
+            case 'interfacesFolder':
+            case 'widgetsFolder':
                 return parent::__get($var);
                 break;
             default:
@@ -42,32 +44,42 @@ class Webmaster extends CMSWebmaster
      */
     public function checkStdInterfaces()
     {
-        $interfacesFolder = Snippet_Folder::importByURN('__raas_interfaces');
-        $interfacesData = [];
-        foreach (self::$snippets as $urn => $name) {
-            $interfacesData['__raas_users_' . $urn . '_interface'] = [
-                'name' => $name . '_STANDARD_INTERFACE',
-                'description' => file_get_contents(
-                    $this->resourcesDir . '/interfaces/' .
-                    $urn . '_interface.php'
-                ),
-            ];
-        }
-        foreach (self::$notifications as $urn => $name) {
-            $interfacesData['__raas_users_' . $urn . '_notify'] = [
-                'name' => $name . '_STANDARD_NOTIFICATION',
-                'description' => file_get_contents(
-                    $this->resourcesDir . '/interfaces/' .
-                    $urn . '_notification.php'
-                ),
-            ];
-        }
+        $interfaces = [];
+        $interfacesData = [
+            '__raas_users_register_interface' => [
+                'name' => 'REGISTRATION_STANDARD_INTERFACE',
+                'filename' => 'register_interface',
+            ],
+            '__raas_users_activation_interface' => [
+                'name' => 'ACTIVATION_STANDARD_INTERFACE',
+                'filename' => 'activation_interface',
+            ],
+            '__raas_users_login_interface' => [
+                'name' => 'LOG_IN_INTO_THE_SYSTEM_STANDARD_INTERFACE',
+                'filename' => 'login_interface',
+            ],
+            '__raas_users_recovery_interface' => [
+                'name' => 'PASSWORD_RECOVERY_STANDARD_INTERFACE',
+                'filename' => 'recovery_interface',
+            ],
+            '__raas_users_register_notify' => [
+                'name' => 'REGISTRATION_STANDARD_NOTIFICATION',
+                'filename' => 'register_notification',
+            ],
+            '__raas_users_recovery_notify' => [
+                'name' => 'PASSWORD_RECOVERY_STANDARD_NOTIFICATION',
+                'filename' => 'recovery_notification',
+            ],
+        ];
         foreach ($interfacesData as $interfaceURN => $interfaceData) {
             $interfaces[$interfaceURN] = $this->checkSnippet(
-                $interfacesFolder,
+                $this->interfacesFolder,
                 $interfaceURN,
                 $interfaceData['name'],
-                $interfaceData['description']
+                file_get_contents(
+                    Module::i()->resourcesDir .
+                    '/interfaces/' . $interfaceData['filename'] . '.php'
+                )
             );
         }
         return $interfaces;
@@ -77,15 +89,14 @@ class Webmaster extends CMSWebmaster
     public function createCab()
     {
         // Добавим виджеты
-        $VF = Snippet_Folder::importByURN('__RAAS_views');
         foreach (self::$snippets as $urn => $name) {
             $temp = Snippet::importByURN($urn);
             if (!$temp->id) {
                 $S = new Snippet();
                 $S->name = $this->view->_($name);
                 $S->urn = $urn;
-                $S->pid = $VF->id;
-                $f = $this->resourcesDir . '/' . $urn . '.tmp.php';
+                $S->pid = $this->widgetsFolder->id;
+                $f = Module::i()->resourcesDir . '/' . $urn . '.tmp.php';
                 $S->description = file_get_contents($f);
                 $S->commit();
             }
