@@ -1,8 +1,9 @@
 <?php
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\ViewBlock;
-use \RAAS\CMS\Page;
-use \RAAS\CMS\Location;
+
+use RAAS\CMS\ViewBlock;
+use RAAS\CMS\Page;
+use RAAS\CMS\Location;
 
 class ViewBlockLogIn extends ViewBlock
 {

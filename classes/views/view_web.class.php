@@ -1,5 +1,5 @@
 <?php
-namespace RAAS\Cms\Users;
+namespace RAAS\CMS\Users;
 
 class View_Web extends \RAAS\Module_View_Web
 {
@@ -10,7 +10,7 @@ class View_Web extends \RAAS\Module_View_Web
         $this->css[] = $this->publicURL . '/style.css';
         $c = Module::i()->newUsers();
         $menuItem = array(array(
-            'href' => '?p=' . $this->package->alias . '&m=' . $this->module->alias, 
+            'href' => '?p=' . $this->package->alias . '&m=' . $this->module->alias,
             'name' => $this->_('__NAME') . ($c ? ' (' . $c . ')' : ''),
             'active' => ($this->moduleName == 'users') && ($this->sub != 'dev')
         ));
