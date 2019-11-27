@@ -1,8 +1,10 @@
 {
     "name": "volumnet/raas.cms.users",
     "description": "RAAS.CMS.Users",
-    "version": "4.2.4",
+    "version": "4.2.5",
     "license": "GPL-3.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=5.6",
         "ext-session": ">=0",
@@ -30,5 +32,11 @@
     ],
     "autoload": {
         "classmap": ["classes/"] 
-    }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
 }
