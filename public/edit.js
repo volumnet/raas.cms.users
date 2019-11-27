@@ -9,7 +9,7 @@ jQuery(document).ready(function($) {
         var $textarea = $('<textarea id="notification_text" name="notification_text"></textarea>');
         $textarea.val(text)
         $('#notifyUserModal [data-role="text-container"]').empty().append($textarea);
-        $textarea.ckeditor();
+        $textarea.ckeditor(ckEditorConfig);
     }
 
     var checkVis = function(vis)
