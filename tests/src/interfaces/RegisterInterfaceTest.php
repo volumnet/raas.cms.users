@@ -213,8 +213,8 @@ class RegisterInterfaceTest extends BaseDBTest
     public function testParseUserAddressesWithoutPhoneField()
     {
         $phoneField = new User_Field(37);
-        $phoneField->urn = 'tel';
-        $phoneField->datatype = 'phone';
+        $phoneField->urn = 'phone';
+        $phoneField->datatype = 'tel';
         $phoneField->commit();
 
         $interface = new RegisterInterface();

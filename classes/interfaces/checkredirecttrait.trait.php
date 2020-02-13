@@ -1,0 +1,40 @@
+<?php
+/**
+ * Файл трейта проверки редиректа
+ */
+namespace RAAS\CMS\Users;
+
+/**
+ * Трейт проверки редиректа
+ */
+trait CheckRedirectTrait
+{
+    /**
+     * По необходимости применяет редирект
+     * @param array $post Данные $_POST-полей
+     * @param array $server Данные $_SERVER-полей
+     * @param string $referer URL реферера
+     * @param bool $debug Режим отладки
+     * @return string|true true, когда редирект не нужен, string - URL редиректа в режиме отладки
+     */
+    public function checkRedirect(
+        array $post = [],
+        array $server = [],
+        $referer = null,
+        $debug = false
+    ) {
+        if ($post['AJAX']) {
+            return true;
+        } elseif ($referer) {
+            $url = $referer;
+        } else {
+            $url = $server['REQUEST_URI'];
+        }
+        if ($debug) {
+            return $url;
+        } else {
+            header('Location: ' . $url);
+            exit;
+        }
+    }
+}

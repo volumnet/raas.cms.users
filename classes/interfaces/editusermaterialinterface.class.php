@@ -6,6 +6,7 @@ namespace RAAS\CMS\Users;
 
 use RAAS\Controller_Frontend as RAASControllerFrontend;
 use RAAS\CMS\Block_Form;
+use RAAS\CMS\FormInterface;
 use RAAS\CMS\Material;
 use RAAS\CMS\Page;
 use RAAS\CMS\User;
@@ -37,7 +38,7 @@ class EditUserMaterialInterface extends RegisterInterface
         array $server = [],
         array $files = []
     ) {
-        parent::__construct(
+        FormInterface::__construct(
             $block,
             $page,
             $get,

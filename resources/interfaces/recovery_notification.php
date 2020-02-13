@@ -1,5 +1,5 @@
 <?php
-namespace RAAS\CMS\Users;
+namespace RAAS\CMS;
 
 $link = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $Page->url . '?key=' . $User->recoveryKey;
 ?>

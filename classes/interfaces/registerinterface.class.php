@@ -9,6 +9,7 @@ use SOME\Text;
 use RAAS\Application;
 use RAAS\Controller_Frontend as RAASControllerFrontend;
 use RAAS\View_Web as RAASViewWeb;
+use RAAS\CMS\AbstractInterface;
 use RAAS\CMS\Form;
 use RAAS\CMS\FormInterface;
 use RAAS\CMS\Material;
@@ -23,6 +24,8 @@ use RAAS\CMS\User;
  */
 class RegisterInterface extends FormInterface
 {
+    use CheckRedirectTrait;
+
     /**
      * Конструктор класса
      * @param Block_Register|null $block Блок, для которого применяется
@@ -45,7 +48,7 @@ class RegisterInterface extends FormInterface
         array $server = [],
         array $files = []
     ) {
-        parent::__construct(
+        AbstractInterface::__construct(
             $block,
             $page,
             $get,
@@ -216,36 +219,6 @@ class RegisterInterface extends FormInterface
 
 
     /**
-     * По необходимости применяет редирект
-     * @param array $post Данные $_POST-полей
-     * @param array $server Данные $_SERVER-полей
-     * @param string $referer URL реферера
-     * @param bool $debug Режим отладки
-     * @return string|true true, когда редирект не нужен, string - URL редиректа в режиме отладки
-     */
-    public function checkRedirect(
-        array $post = [],
-        array $server = [],
-        $referer = null,
-        $debug = false
-    ) {
-        if ($post['AJAX']) {
-            return true;
-        } elseif ($referer) {
-            $url = $referer;
-        } else {
-            $url = $server['REQUEST_URI'];
-        }
-        if ($debug) {
-            return $url;
-        } else {
-            header('Location: ' . $url);
-            exit;
-        }
-    }
-
-
-    /**
      * Проверяет правильность заполнения формы
      * @param User $user Текущий пользователь
      * @param Form $form Форма регистрации
@@ -399,10 +372,10 @@ class RegisterInterface extends FormInterface
             $result['Material'] = $material;
         }
 
-        if ($form->email && ($new || $block->notify_about_edit)) {
+        if ($new || $block->notify_about_edit) {
             $this->notifyRegister($user, $form, $page, $block->config, true);
         }
-        if ($user->email && $new) {
+        if ($new) {
             $this->notifyRegister($user, $form, $page, $block->config, false);
         }
         return $result;
@@ -577,6 +550,7 @@ class RegisterInterface extends FormInterface
             'Form' => $form,
             'config' => $config,
             'ADMIN' => $forAdmin,
+            'forUser' => !$forAdmin,
             'registerInterface' => $this,
         ];
 
@@ -653,43 +627,6 @@ class RegisterInterface extends FormInterface
         if ($debug) {
             return $debugMessages;
         }
-    }
-
-
-    /**
-     * Получает список адресов пользователя
-     * @param User $user Пользователь
-     * @return [
-     *             'emails' => array<string> Список настоящих e-mail,
-     *             'smsPhones' => array<string> Список телефонов
-     *                                          для SMS-уведомлений
-     *                                          в формате +79990000000
-     *                                          или 79990000000
-     *         ]
-     */
-    public function parseUserAddresses(User $user)
-    {
-        $result = [];
-        if ($user->email) {
-            $result['emails'][] = $user->email;
-        }
-        $phonesRaw = [];
-        if ($user->phone) {
-            $phonesRaw[] = $user->phone;
-        } else {
-            foreach ($user->fields as $field) {
-                if ($field->datatype == 'phone') {
-                    $phonesRaw = array_merge($phonesRaw, $field->getValues(true));
-                }
-            }
-        }
-        foreach ($phonesRaw as $phoneRaw) {
-            if (preg_match('/(\\+)?\\d+/umi', $phoneRaw)) {
-                $result['smsPhones'][] = '+7' . Text::beautifyPhone($phoneRaw);
-            }
-        }
-        $result['smsPhones'] = array_values(array_unique($result['smsPhones']));
-        return $result;
     }
 
 
