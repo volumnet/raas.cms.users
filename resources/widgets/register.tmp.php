@@ -1,7 +1,15 @@
 <?php
+/**
+ * Виджет регистрации
+ * @param Block_Register $Block Текущий блок
+ * @param Page $Page Текущая страница
+ * @param bool $success Успешная активация
+ * @param array<string[] URN поля => string Текст ошибки> $localError
+ */
 namespace RAAS\CMS\Users;
 
 use RAAS\CMS\Feedback;
+use RAAS\CMS\Package;
 use RAAS\CMS\SocialProfile;
 
 if ($_POST['AJAX']) {
@@ -25,7 +33,7 @@ if ($_POST['AJAX']) {
     <a name="feedback"></a>
     <div class="feedback">
       <form class="form-horizontal" <?php /*data-role="raas-ajaxform"*/?> action="" method="post" enctype="multipart/form-data">
-        <?php include \RAAS\CMS\Package::i()->resourcesDir . '/form2.inc.php'?>
+        <?php include Package::i()->resourcesDir . '/form2.inc.php'?>
         <div data-role="notifications" <?php echo ($success[(int)$Block->id] || $localError) ? '' : 'style="display: none"'?>>
           <div class="alert alert-success" <?php echo ($success[(int)$Block->id]) ? '' : 'style="display: none"'?>>
             <?php
@@ -53,7 +61,9 @@ if ($_POST['AJAX']) {
         </div>
 
         <div data-role="feedback-form" <?php echo $success[(int)$Block->id] ? 'style="display: none"' : ''?>>
-          <p><?php echo ASTERISK_MARKED_FIELDS_ARE_REQUIRED?></p>
+          <p>
+            <?php echo ASTERISK_MARKED_FIELDS_ARE_REQUIRED?>
+          </p>
           <?php if ($Form->signature) { ?>
                 <input type="hidden" name="form_signature" value="<?php echo md5('form' . (int)$Form->id . (int)$Block->id)?>" />
           <?php } ?>
@@ -62,8 +72,12 @@ if ($_POST['AJAX']) {
           <?php } ?>
           <?php foreach ($Form->fields as $row) { ?>
               <div class="form-group">
-                <label<?php echo !$row->multiple ? ' for="' . htmlspecialchars($row->urn . $row->id . '_' . $Block->id) . '"' : ''?> class="control-label col-sm-3"><?php echo htmlspecialchars($row->name . ($row->required ? '*' : ''))?></label>
-                <div class="col-sm-9 col-md-4"><?php $getField($row, $DATA)?></div>
+                <label<?php echo !$row->multiple ? ' for="' . htmlspecialchars($row->urn . $row->id . '_' . $Block->id) . '"' : ''?> class="control-label col-sm-3">
+                  <?php echo htmlspecialchars($row->name . ($row->required ? '*' : ''))?>
+                </label>
+                <div class="col-sm-9 col-md-4">
+                  <?php $getField($row, $DATA)?>
+                </div>
               </div>
           <?php } ?>
           <?php if ($config['allow_edit_social']) { ?>
@@ -91,7 +105,9 @@ if ($_POST['AJAX']) {
                           <span class="raas-social raas-social<?php echo (int)SocialProfile::getSocialNetwork($temp)?>"></span>
                           <?php echo htmlspecialchars($temp)?>
                         </a>
-                        <a href="#" class="close" style="float: right;" data-role="raas-repo-del">&times;</a>
+                        <a href="#" class="close" style="float: right;" data-role="raas-repo-del">
+                          &times;
+                        </a>
                       </div>
                   <?php } ?>
                 </div>
@@ -127,7 +143,9 @@ if ($_POST['AJAX']) {
           <?php } ?>
           <?php if ($Form->antispam == 'captcha' && $Form->antispam_field_name && !$User->id) { ?>
               <div class="form-group">
-                <label for="<?php echo htmlspecialchars($Form->antispam_field_name)?>" class="control-label col-sm-3"><?php echo CAPTCHA?></label>
+                <label for="<?php echo htmlspecialchars($Form->antispam_field_name)?>" class="control-label col-sm-3">
+                  <?php echo CAPTCHA?>
+                </label>
                 <div class="col-sm-9 col-md-4">
                   <img src="/assets/kcaptcha/?<?php echo session_name() . '=' . session_id()?>" /><br />
                   <input type="text" name="<?php echo htmlspecialchars($Form->antispam_field_name)?>" class="form-control" />
@@ -135,7 +153,11 @@ if ($_POST['AJAX']) {
               </div>
           <?php } ?>
           <div class="form-group">
-            <div class="col-sm-9 col-md-4 col-sm-offset-3"><button class="btn btn-primary" type="submit"><?php echo $User->id ? SAVE : DO_REGISTER?></button></div>
+            <div class="col-sm-9 col-md-4 col-sm-offset-3">
+              <button class="btn btn-primary" type="submit">
+                <?php echo $User->id ? SAVE : DO_REGISTER?>
+              </button>
+            </div>
           </div>
         </div>
       </form>
