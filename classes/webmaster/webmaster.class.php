@@ -2,6 +2,7 @@
 namespace RAAS\CMS\Users;
 
 use RAAS\Application;
+use RAAS\CMS\Block_PHP;
 use RAAS\CMS\CMSAccess;
 use RAAS\CMS\Form;
 use RAAS\CMS\Form_Field;
@@ -87,9 +88,10 @@ class Webmaster extends CMSWebmaster
         $widgetsData = [
             'register' => View_Web::i()->_('REGISTRATION'),
             'activation' => View_Web::i()->_('ACTIVATION'),
-            'login' => View_Web::i()->_('LOG_IN_INTO_THE_SYSTEM'),
+            'login' => View_Web::i()->_('LOG_IN'),
             'recovery' => View_Web::i()->_('PASSWORD_RECOVERY'),
             'menu_user' => View_Web::i()->_('USER_MENU'),
+            'menu_user_block' => View_Web::i()->_('USER_MENU_BLOCK'),
         ];
         foreach ($widgetsData as $url => $name) {
             $urn = explode('/', $url);
@@ -124,7 +126,6 @@ class Webmaster extends CMSWebmaster
         $widgets = $this->createWidgets();
 
         $F = new User_Field([
-            'pid' => $MT->id,
             'name' => $this->view->_('YOUR_NAME'),
             'urn' => 'full_name',
             'datatype' => 'text',
@@ -133,7 +134,6 @@ class Webmaster extends CMSWebmaster
         $F->commit();
 
         $F = new User_Field([
-            'pid' => $MT->id,
             'name' => $this->view->_('PHONE'),
             'urn' => 'phone',
             'datatype' => 'text',
@@ -229,16 +229,17 @@ class Webmaster extends CMSWebmaster
         $login = $this->createLogIn();
         $recovery = $this->createRecovery();
 
+        if (Snippet::importByURN('my_orders')->id &&
+            Snippet::importByURN('__raas_my_orders_interface')->id
+        ) {
+            $myOrders = $this->createMyOrders();
+        }
+
         $this->createBlock(
-            new Block_HTML([
-                'name' => View_Web::i()->_('USER_MENU'),
-                'description' => '<nav class="menu-user"></nav>' . "\n"
-                              .  '<script src="/js/menu-user.js?v=' . date('Y-m-d') . '"></script>',
-                'wysiwyg' => 0,
-            ]),
+            new Block_PHP(['name' => View_Web::i()->_('USER_MENU')]),
             'menu_user',
             null,
-            null,
+            'menu_user_block',
             $this->site,
             true
         );
@@ -341,6 +342,7 @@ class Webmaster extends CMSWebmaster
 
             $this->createBlock(
                 new Block_Register([
+                    'name' => $this->view->_('EDIT_PROFILE'),
                     'form_id' => Form::importByURN('edit_profile')->id,
                     'email_as_login' => 0,
                     'notify_about_edit' => 0,
@@ -407,7 +409,7 @@ class Webmaster extends CMSWebmaster
         } else {
             $login = $this->createPage(
                 [
-                    'name' => $this->view->_('LOG_IN_INTO_THE_SYSTEM'),
+                    'name' => $this->view->_('LOG_IN'),
                     'urn' => 'login',
                     'cache' => 0,
                     'response_code' => 200
@@ -499,5 +501,54 @@ class Webmaster extends CMSWebmaster
             );
         }
         return $userMenu;
+    }
+
+
+    /**
+     * Создает страницу истории заказов
+     * @return Page Созданная или существующая страница
+     */
+    public function createMyOrders()
+    {
+        $set = Page::getSet([
+            'where' => "urn = 'my_orders' AND pid = " . (int)$this->Site->id
+        ]);
+        if ($set) {
+            $myOrders = $set[0];
+            $myOrders->trust();
+        } else {
+            $myOrders = $this->createPage(
+                [
+                    'name' => $this->view->_('MY_ORDERS'),
+                    'urn' => 'my_orders',
+                    'cache' => 0,
+                    'response_code' => 200
+                ],
+                $this->Site
+            );
+            $access = new CMSAccess([
+                'page_id' => $myOrders->id,
+                'to_type' => CMSAccess::TO_ALL,
+                'allow' => 0,
+                'priority' => 0,
+            ]);
+            $access->commit();
+            $access = new CMSAccess([
+                'page_id' => $myOrders->id,
+                'to_type' => CMSAccess::TO_REGISTERED,
+                'allow' => 1,
+                'priority' => 1,
+            ]);
+            $access->commit();
+
+            $this->createBlock(
+                new Block_PHP(),
+                'content',
+                '__raas_my_orders_interface',
+                'my_orders',
+                $myOrders
+            );
+        }
+        return $myOrders;
     }
 }

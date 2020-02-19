@@ -37,17 +37,21 @@ if ($_POST['AJAX']) {
         <div data-role="notifications" <?php echo ($success[(int)$Block->id] || $localError) ? '' : 'style="display: none"'?>>
           <div class="alert alert-success" <?php echo ($success[(int)$Block->id]) ? '' : 'style="display: none"'?>>
             <?php
-            echo YOU_HAVE_SUCCESSFULLY_REGISTERED . ' ';
-            switch ($config['activation_type']) {
-                case Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED:
-                    echo NOW_YOU_CAN_LOG_IN_INTO_THE_SYSTEM;
-                    break;
-                case Block_Register::ACTIVATION_TYPE_ADMINISTRATOR:
-                    echo PLEASE_WAIT_FOR_ADMINISTRATOR_TO_ACTIVATE;
-                    break;
-                case Block_Register::ACTIVATION_TYPE_USER:
-                    echo PLEASE_ACTIVATE_BY_EMAIL;
-                    break;
+            if ($User->id) {
+                echo PROFILE_SUCCESSFULLY_UPDATED;
+            } else {
+                echo YOU_HAVE_SUCCESSFULLY_REGISTERED . ' ';
+                switch ($config['activation_type']) {
+                    case Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED:
+                        echo NOW_YOU_CAN_LOG_IN_INTO_THE_SYSTEM;
+                        break;
+                    case Block_Register::ACTIVATION_TYPE_ADMINISTRATOR:
+                        echo PLEASE_WAIT_FOR_ADMINISTRATOR_TO_ACTIVATE;
+                        break;
+                    case Block_Register::ACTIVATION_TYPE_USER:
+                        echo PLEASE_ACTIVATE_BY_EMAIL;
+                        break;
+                }
             }
             ?>
           </div>
@@ -60,7 +64,7 @@ if ($_POST['AJAX']) {
           </div>
         </div>
 
-        <div data-role="feedback-form" <?php echo $success[(int)$Block->id] ? 'style="display: none"' : ''?>>
+        <div data-role="feedback-form" <?php echo ($success[(int)$Block->id] && !$User->id) ? 'style="display: none"' : ''?>>
           <p>
             <?php echo ASTERISK_MARKED_FIELDS_ARE_REQUIRED?>
           </p>

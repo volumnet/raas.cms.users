@@ -329,7 +329,9 @@ class RegisterInterface extends FormInterface
         } elseif ($new) {
             $val = $user->password = $this->generatePass();
         }
-        $user->password_md5 = Application::i()->md5It($val);
+        if ($val) {
+            $user->password_md5 = Application::i()->md5It($val);
+        }
 
         if (isset($form->fields['lang']) && ($val = trim($post['lang']))) {
             $user->lang = $val;
