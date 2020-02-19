@@ -37,7 +37,7 @@ if ($_POST['AJAX']) {
         <div data-role="notifications" <?php echo ($success[(int)$Block->id] || $localError) ? '' : 'style="display: none"'?>>
           <div class="alert alert-success" <?php echo ($success[(int)$Block->id]) ? '' : 'style="display: none"'?>>
             <?php
-            if ($User->id) {
+            if (Controller_Frontend::i()->user->id) {
                 echo PROFILE_SUCCESSFULLY_UPDATED;
             } else {
                 echo YOU_HAVE_SUCCESSFULLY_REGISTERED . ' ';
@@ -64,14 +64,14 @@ if ($_POST['AJAX']) {
           </div>
         </div>
 
-        <div data-role="feedback-form" <?php echo ($success[(int)$Block->id] && !$User->id) ? 'style="display: none"' : ''?>>
+        <div data-role="feedback-form" <?php echo ($success[(int)$Block->id] && !Controller_Frontend::i()->user->id) ? 'style="display: none"' : ''?>>
           <p>
             <?php echo ASTERISK_MARKED_FIELDS_ARE_REQUIRED?>
           </p>
           <?php if ($Form->signature) { ?>
                 <input type="hidden" name="form_signature" value="<?php echo md5('form' . (int)$Form->id . (int)$Block->id)?>" />
           <?php } ?>
-          <?php if ($Form->antispam == 'hidden' && $Form->antispam_field_name && !$User->id) { ?>
+          <?php if ($Form->antispam == 'hidden' && $Form->antispam_field_name && !Controller_Frontend::i()->user->id) { ?>
                 <input type="text" autocomplete="off" name="<?php echo htmlspecialchars($Form->antispam_field_name)?>" value="<?php echo htmlspecialchars($DATA[$Form->antispam_field_name])?>" style="position: absolute; left: -9999px" />
           <?php } ?>
           <?php foreach ($Form->fields as $row) { ?>
@@ -145,7 +145,7 @@ if ($_POST['AJAX']) {
               });
               </script>
           <?php } ?>
-          <?php if ($Form->antispam == 'captcha' && $Form->antispam_field_name && !$User->id) { ?>
+          <?php if ($Form->antispam == 'captcha' && $Form->antispam_field_name && !Controller_Frontend::i()->user->id) { ?>
               <div class="form-group">
                 <label for="<?php echo htmlspecialchars($Form->antispam_field_name)?>" class="control-label col-sm-3">
                   <?php echo CAPTCHA?>
