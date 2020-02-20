@@ -187,6 +187,7 @@ class Module extends RAASModule
     public function getActivationNotification(User $user, $active = null)
     {
         $snippet = $this->registryGet('activation_notify');
+        $User = $user;
         if ($active === null) {
             $active = (bool)$user->vis;
         }

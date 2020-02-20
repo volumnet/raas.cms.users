@@ -22,6 +22,13 @@ if ($_GET['mobile']) {
             <?php echo EDIT_PROFILE?>
           </a>
         </li>
+        <?php if (class_exists(ShopModule::class)) { ?>
+            <li class="menu-mobile__item menu-mobile__item_main menu-mobile__item_level_0 menu-mobile__item_my-orders">
+              <a href="/my_orders/" class="menu-mobile__link menu-mobile__link_main menu-mobile__link_level_0 menu-mobile__link_my-orders">
+                <?php echo MY_ORDERS?>
+              </a>
+            </li>
+        <?php } ?>
         <li class="menu-mobile__item menu-mobile__item_main menu-mobile__item_level_0 menu-mobile__item_logout">
           <a href="/login/?logout=1" class="menu-mobile__link menu-mobile__link_main menu-mobile__link_level_0 menu-mobile__link_logout">
             <?php echo LOG_OUT?>
