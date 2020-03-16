@@ -8,9 +8,9 @@ class ViewBlockActivation extends ViewBlock
 {
     const blockListItemClass = 'cms-block-users-activation';
 
-    public function renderLegend()
+    public function renderBlockTypeName()
     {
-        return parent::renderLegend($this->view->_('BLOCK_LEGEND_ACTIVATION'));
+        return $this->view->_('BLOCK_LEGEND_ACTIVATION');
     }
 
 

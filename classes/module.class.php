@@ -299,7 +299,10 @@ class Module extends RAASModule
 
     public function install()
     {
-        if (!$this->registryGet('installDate')) {
+        if (!$this->registryGet('installDate') ||
+            !$this->registryGet('baseVersion') ||
+            ($this->registryGet('baseVersion') != $this->version)
+        ) {
             if (!trim($this->registryGet('activation_notify'))) {
                 $this->registrySet('activation_notify', file_get_contents(
                     $this->resourcesDir .

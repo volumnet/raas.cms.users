@@ -8,9 +8,9 @@ class ViewBlockRegister extends ViewBlock
 {
     const blockListItemClass = 'cms-block-users-register';
 
-    public function renderLegend()
+    public function renderBlockTypeName()
     {
-        return parent::renderLegend($this->view->_('BLOCK_LEGEND_REGISTER'));
+        return $this->view->_('BLOCK_LEGEND_REGISTER');
     }
 
 
