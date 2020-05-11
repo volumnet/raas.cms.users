@@ -51,7 +51,6 @@ if ($_GET['mobile']) {
           </a>
         </li>
     <?php } ?>
-    <li class="menu-mobile__item menu-mobile__item_main menu-mobile__item_level_0 menu-mobile__item_separator">
 <?php } else { ?>
       <ul class="menu-user__list menu-user__list_level_0 menu-user__list_main">
         <?php if ($user->id) { ?>
