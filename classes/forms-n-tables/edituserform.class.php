@@ -104,7 +104,7 @@ class EditUserForm extends RAASForm
      * Получает основную вкладку редактирования пользователя
      * @return FormTab
      */
-    private function getCommonTab()
+    protected function getCommonTab()
     {
         $tabChildren = [];
         $t = $this;
