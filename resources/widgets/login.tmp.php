@@ -82,15 +82,15 @@ if ($_POST['AJAX']) {
           <div class="form-group">
             <label class="control-label col-sm-3 col-md-2">&nbsp;</label>
             <div class="col-sm-9 col-md-4">
+              <a href="/register/">Зарегистрировать учетную запись</a>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-3 col-md-2">&nbsp;</label>
+            <div class="col-sm-9 col-md-4">
               <a href="/recovery/"><?php echo LOST_PASSWORD?></a>
             </div>
           </div>
-          <?php if ($config['social_login_type']) { ?>
-              <div class="col-sm-offset-3 col-md-offset-2" style="margin-bottom: 25px">
-                <script src="//ulogin.ru/js/ulogin.js"></script>
-                <div id="uLogin" data-ulogin="display=panel;optional=first_name,last_name,phone,email,sex,nickname,bdate,city,country;providers=vkontakte,odnoklassniki,mailru,facebook;hidden=twitter,google,yandex,livejournal,youtube,webmoney;redirect_uri=<?php echo urlencode('http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])?>"></div>
-              </div>
-          <?php } ?>
           <div class="form-group">
             <div class="col-sm-9 col-md-4 col-sm-offset-3 col-md-offset-2">
               <button class="btn btn-primary" type="submit">
@@ -98,6 +98,22 @@ if ($_POST['AJAX']) {
               </button>
             </div>
           </div>
+          <?php if ($config['social_login_type']) { ?>
+              <div class="form-group">
+                <label class="control-label col-sm-3 col-md-2">&nbsp;</label>
+                <div class="col-sm-9 col-md-10" style="margin-top: 30px">
+                  <div class="h5">Войти через социальные сети</div>
+                  <div id="uLogin" data-ulogin="display=panel;optional=first_name,last_name,phone,email,sex,nickname,bdate,city,country;providers=vkontakte,facebook,twitter,google,yandex,odnoklassniki,mailru;hidden=livejournal,youtube,webmoney;redirect_uri=<?php echo urlencode('http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'])?>"></div>
+                  <script>
+                  jQuery(document).ready(function($) {
+                      window.setTimeout(function () {
+                          $('body').append('<script src="//ulogin.ru/js/ulogin.js"><' + '/script>');
+                      }, 100);
+                  });
+                  </script>
+                </div>
+              </div>
+          <?php } ?>
         </div>
       </form>
     </div>

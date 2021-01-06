@@ -33,7 +33,7 @@ class Block_Register extends Block
     }
 
 
-    public function process(Page $Page)
+    public function process(Page $Page, $nocache = false)
     {
         if ($this->allow_to != static::ALLOW_TO_ALL) {
             $r = (bool)RAASController_Frontend::i()->user->id;

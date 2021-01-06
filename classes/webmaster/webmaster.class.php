@@ -511,7 +511,7 @@ class Webmaster extends CMSWebmaster
     public function createMyOrders()
     {
         $set = Page::getSet([
-            'where' => "urn = 'my_orders' AND pid = " . (int)$this->Site->id
+            'where' => "urn = 'my-orders' AND pid = " . (int)$this->Site->id
         ]);
         if ($set) {
             $myOrders = $set[0];
@@ -520,7 +520,7 @@ class Webmaster extends CMSWebmaster
             $myOrders = $this->createPage(
                 [
                     'name' => $this->view->_('MY_ORDERS'),
-                    'urn' => 'my_orders',
+                    'urn' => 'my-orders',
                     'cache' => 0,
                     'response_code' => 200
                 ],

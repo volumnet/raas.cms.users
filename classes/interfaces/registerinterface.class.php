@@ -69,7 +69,9 @@ class RegisterInterface extends FormInterface
         $uid = RAASControllerFrontend::i()->user->id;
         $user = new User($uid);
         $new = !$user->id;
-        if ($user->id) {
+        if ($user->id && ($this->page->urn == 'register')) {
+            // @deprecated Для совместимости со старыми сайтами, где страница
+            // редактирования профиля совпадала со страницей регистрации
             $form = $this->block->Edit_Form->id
                   ? $this->block->Edit_Form
                   : $this->block->Register_Form;
