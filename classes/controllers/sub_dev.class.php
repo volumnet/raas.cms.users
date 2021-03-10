@@ -29,6 +29,9 @@ class Sub_Dev extends RAASAbstractSubController
             case 'fields':
                 $this->{$this->action}();
                 break;
+            case 'chvis_field':
+            case 'vis_field':
+            case 'invis_field':
             case 'delete_field':
             case 'show_in_table_field':
             case 'required_field':

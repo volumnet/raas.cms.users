@@ -87,15 +87,17 @@ class EditUserForm extends RAASForm
         parent::__construct($arr);
         $this->children['common'] = $this->getCommonTab();
         $this->children['groups'] = $this->getGroupsTab();
-        if (class_exists('RAAS\CMS\Shop\Order')) {
-            $this->children['orders'] = $this->getOrdersTab($this->Item);
-        }
-        $billingTypes = BillingType::getSet();
-        foreach ($billingTypes as $billingType) {
-            $this->children['billing' . (int)$billingType->id] = $this->getBillingTab(
-                $this->Item,
-                $billingType
-            );
+        if ($item->id) {
+            if (class_exists('RAAS\CMS\Shop\Order')) {
+                $this->children['orders'] = $this->getOrdersTab($this->Item);
+            }
+            $billingTypes = BillingType::getSet();
+            foreach ($billingTypes as $billingType) {
+                $this->children['billing' . (int)$billingType->id] = $this->getBillingTab(
+                    $this->Item,
+                    $billingType
+                );
+            }
         }
     }
 

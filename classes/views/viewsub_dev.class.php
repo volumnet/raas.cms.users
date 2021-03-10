@@ -173,6 +173,15 @@ class ViewSub_Dev extends RAASAbstractSubView
         $arr = [];
         if ($field->id) {
             $arr[] = [
+                'name' => $field->vis
+                       ?  $this->_('VISIBLE')
+                       :  '<span class="muted">' . $this->_('INVISIBLE') . '</span>',
+                'href' => $this->url . '&action=chvis_field&id='
+                       .  (int)$field->id . '&back=1',
+                'icon' => $field->vis ? 'ok' : '',
+                'title' => $this->_($field->vis ? 'HIDE' : 'SHOW')
+            ];
+            $arr[] = [
                 'name' => $this->_('SHOW_IN_TABLE'),
                 'href' => $this->url . '&action=show_in_table_field&id='
                        .  (int)$field->id . '&back=1',
@@ -213,6 +222,18 @@ class ViewSub_Dev extends RAASAbstractSubView
     public function getAllFieldsContextMenu()
     {
         $arr = [];
+        $arr[] = [
+            'name' => $this->_('SHOW'),
+            'href' => $this->url . '&action=vis_field&back=1',
+            'icon' => 'eye-open',
+            'title' => $this->_('SHOW')
+        ];
+        $arr[] = [
+            'name' => $this->_('HIDE'),
+            'href' => $this->url . '&action=invis_field&back=1',
+            'icon' => 'eye-close',
+            'title' => $this->_('HIDE')
+        ];
         $arr[] = [
             'name' => $this->_('SHOW_IN_TABLE'),
             'href' => $this->url . '&action=show_in_table_field&back=1',

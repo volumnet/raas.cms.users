@@ -90,7 +90,7 @@ class Webmaster extends CMSWebmaster
             'activation' => View_Web::i()->_('ACTIVATION'),
             'login' => View_Web::i()->_('LOG_IN'),
             'recovery' => View_Web::i()->_('PASSWORD_RECOVERY'),
-            'menu_user' => View_Web::i()->_('USER_MENU'),
+            'user_ajax' => View_Web::i()->_('USER_AJAX'),
             'menu_user_block' => View_Web::i()->_('USER_MENU_BLOCK'),
         ];
         foreach ($widgetsData as $url => $name) {
@@ -145,83 +145,88 @@ class Webmaster extends CMSWebmaster
             'where' => "urn = 'ajax' AND pid = " . (int)$this->Site->id
         ]));
 
-        $this->createForms(
+        $this->createForms([
             [
-                [
-                    'name' => $this->view->_('REGISTRATION_FORM'),
-                    'urn' => 'register',
-                    'interface_id' => (int)Snippet::importByURN('__raas_users_register_notify')->id,
-                    'fields' => [
-                        [
-                            'name' => $this->view->_('LOGIN'),
-                            'urn' => 'login',
-                            'datatype' => 'text',
-                            'required' => 1,
-                            'show_in_table' => 1,
-                        ],
-                        [
-                            'name' => $this->view->_('PASSWORD'),
-                            'urn' => 'password',
-                            'datatype' => 'password',
-                            'required' => 1,
-                            'show_in_table' => 1,
-                        ],
-                        [
-                            'name' => $this->view->_('EMAIL'),
-                            'urn' => 'email',
-                            'datatype' => 'text',
-                            'show_in_table' => 1,
-                        ],
-                        [
-                            'name' => $this->view->_('YOUR_NAME'),
-                            'urn' => 'full_name',
-                            'required' => 1,
-                            'datatype' => 'text',
-                            'show_in_table' => 1,
-                        ],
-                        [
-                            'name' => $this->view->_('PHONE'),
-                            'urn' => 'phone',
-                            'datatype' => 'text',
-                            'show_in_table' => 1,
-                        ],
+                'name' => $this->view->_('REGISTRATION_FORM'),
+                'urn' => 'register',
+                'interface_id' => (int)Snippet::importByURN('__raas_users_register_notify')->id,
+                'fields' => [
+                    [
+                        'name' => $this->view->_('LOGIN'),
+                        'urn' => 'login',
+                        'datatype' => 'text',
+                        'required' => 1,
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'name' => $this->view->_('PASSWORD'),
+                        'urn' => 'password',
+                        'datatype' => 'password',
+                        'required' => 1,
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'name' => $this->view->_('EMAIL'),
+                        'urn' => 'email',
+                        'datatype' => 'text',
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'name' => $this->view->_('YOUR_NAME'),
+                        'urn' => 'full_name',
+                        'required' => 1,
+                        'datatype' => 'text',
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'name' => $this->view->_('PHONE'),
+                        'urn' => 'phone',
+                        'datatype' => 'text',
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'vis' => 1,
+                        'name' => View_Web::i()->_('AGREE_PRIVACY_POLICY'),
+                        'urn' => 'agree',
+                        'required' => 1,
+                        'datatype' => 'checkbox',
                     ],
                 ],
-                [
-                    'name' => $this->view->_('EDIT_PROFILE'),
-                    'urn' => 'edit_profile',
-                    'interface_id' => (int)Snippet::importByURN('__raas_users_register_notify')->id,
-                    'fields' => [
-                        [
-                            'name' => $this->view->_('PASSWORD'),
-                            'urn' => 'password',
-                            'datatype' => 'password',
-                            'required' => 1,
-                            'show_in_table' => 1,
-                        ],
-                        [
-                            'name' => $this->view->_('EMAIL'),
-                            'urn' => 'email',
-                            'datatype' => 'text',
-                            'show_in_table' => 1,
-                        ],
-                        [
-                            'name' => $this->view->_('YOUR_NAME'),
-                            'urn' => 'full_name',
-                            'required' => 1,
-                            'datatype' => 'text',
-                            'show_in_table' => 1,
-                        ],
-                        [
-                            'name' => $this->view->_('PHONE'),
-                            'urn' => 'phone',
-                            'datatype' => 'text',
-                            'show_in_table' => 1,
-                        ],
+            ],
+            [
+                'name' => $this->view->_('EDIT_PROFILE'),
+                'urn' => 'edit_profile',
+                'interface_id' => (int)Snippet::importByURN('__raas_users_register_notify')->id,
+                'fields' => [
+                    [
+                        'name' => $this->view->_('PASSWORD'),
+                        'urn' => 'password',
+                        'datatype' => 'password',
+                        'required' => 1,
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'name' => $this->view->_('EMAIL'),
+                        'urn' => 'email',
+                        'datatype' => 'text',
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'name' => $this->view->_('YOUR_NAME'),
+                        'urn' => 'full_name',
+                        'required' => 1,
+                        'datatype' => 'text',
+                        'show_in_table' => 1,
+                    ],
+                    [
+                        'name' => $this->view->_('PHONE'),
+                        'urn' => 'phone',
+                        'datatype' => 'text',
+                        'show_in_table' => 1,
                     ],
                 ],
-            ]
-        );
+            ],
+        ]);
 
         $register = $this->createRegister();
         $profile = $this->createEditProfile();
@@ -243,7 +248,7 @@ class Webmaster extends CMSWebmaster
             $this->site,
             true
         );
-        $this->createAJAXUserMenu($ajax);
+        $this->createAJAXUser($ajax);
     }
 
 
@@ -469,14 +474,14 @@ class Webmaster extends CMSWebmaster
 
 
     /**
-     * Создает страницу пользовательского меню для AJAX
+     * Создает страницу пользователя для AJAX
      * @param Page $ajax Страница AJAX
      * @return Page Созданная или существующая страница
      */
-    public function createAJAXUserMenu(Page $ajax)
+    public function createAJAXUser(Page $ajax)
     {
         $set = Page::getSet([
-            'where' => "urn = 'user_menu' AND pid = " . (int)$ajax->id
+            'where' => "urn = 'user' AND pid = " . (int)$ajax->id
         ]);
         if ($set) {
             $userMenu = $set[0];
@@ -484,19 +489,20 @@ class Webmaster extends CMSWebmaster
         } else {
             $userMenu = $this->createPage(
                 [
-                    'name' => $this->view->_('USER_MENU'),
-                    'urn' => 'user_menu',
+                    'name' => $this->view->_('USER'),
+                    'urn' => 'user',
                     'template' => 0,
                     'cache' => 0,
-                    'response_code' => 200
+                    'mime' => 'application/json',
+                    'response_code' => 200,
                 ],
                 $ajax
             );
             $this->createBlock(
-                new Block_PHP(),
+                new Block_PHP(['name' => $this->view->_('USER')]),
                 '',
                 null,
-                'menu_user',
+                'user_ajax',
                 $userMenu
             );
         }
