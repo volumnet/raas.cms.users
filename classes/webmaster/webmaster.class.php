@@ -91,7 +91,7 @@ class Webmaster extends CMSWebmaster
             'login' => View_Web::i()->_('LOG_IN'),
             'recovery' => View_Web::i()->_('PASSWORD_RECOVERY'),
             'user_ajax' => View_Web::i()->_('USER_AJAX'),
-            'menu_user_block' => View_Web::i()->_('USER_MENU_BLOCK'),
+            'menu_user' => View_Web::i()->_('USER_MENU_BLOCK'),
         ];
         foreach ($widgetsData as $url => $name) {
             $urn = explode('/', $url);
@@ -244,7 +244,7 @@ class Webmaster extends CMSWebmaster
             new Block_PHP(['name' => View_Web::i()->_('USER_MENU')]),
             'menu_user',
             null,
-            'menu_user_block',
+            'menu_user',
             $this->site,
             true
         );

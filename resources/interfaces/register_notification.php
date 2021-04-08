@@ -1,137 +1,84 @@
 <?php
+/**
+ * Уведомление о регистрации
+ * @param bool $SMS Уведомление отправляется по SMS
+ * @param Form $Form Форма регистрации
+ * @param bool $ADMIN Отправка сообщения для администратора
+ *     (если false то для пользователя)
+ * @param User $User Пользователь
+ * @param array $config Конфигурация блока
+ * @param Page $Page Текущая страница
+ */
 namespace RAAS\CMS;
 
+use RAAS\Controller_Frontend as ControllerFrontend;
 use RAAS\CMS\Users\Block_Register;
 use RAAS\CMS\Users\Block_Activation;
 
-$smsField = function ($field) {
-    $values = $field->getValues(true);
-    $arr = array();
-    foreach ($values as $key => $val) {
-        $val = $field->doRich($val);
-        switch ($field->datatype) {
-            case 'date':
-                $arr[$key] = date(DATEFORMAT, strtotime($val));
-                break;
-            case 'datetime-local':
-                $arr[$key] = date(DATETIMEFORMAT, strtotime($val));
-                break;
-            case 'file':
-            case 'image':
-                $arr[$key] .= $val->name;
-                break;
-            case 'htmlarea':
-                $arr[$key] = strip_tags($val);
-                break;
-            default:
-                if (!$field->multiple && ($field->datatype == 'checkbox')) {
-                    $arr[$key] = $val ? _YES : _NO;
-                } else {
-                    $arr[$key] = $val;
-                }
-                break;
-        }
-    }
-    return $field->name . ': ' . implode(', ', $arr) . "\n";
-};
+$cf = ControllerFrontend::i();
+$adminUrl = $cf->schemeHost . '/admin/?p=cms';
 
+$page = $User->page;
 
-$emailField = function ($field, $formField = null) {
-    if (!$formField) {
-        $formField = $field;
+if ($ADMIN) {
+    $headerTemplate = NEW_USER_REGISTERED_ON_SITE;
+} else {
+    $headerTemplate = YOU_HAVE_SUCCESSFULLY_REGISTERED_ON_WEBSITE;
+}
+if ($SMS) {
+    if ($ADMIN) {
+        echo sprintf($headerTemplate, $cf->schemeHost, $cf->idnHost) . "\n";
     }
-    $values = $field->getValues(true);
-    $arr = array();
-    foreach ($values as $key => $val) {
-        $val = $formField->doRich($val);
-        switch ($field->datatype) {
-            case 'date':
-                $arr[$key] = date(DATEFORMAT, strtotime($val));
-                break;
-            case 'datetime-local':
-                $arr[$key] = date(DATETIMEFORMAT, strtotime($val));
-                break;
-            case 'color':
-                $arr[$key] = '<span style="display: inline-block; height: 16px; width: 16px; background-color: ' . htmlspecialchars($val) . '"></span>';
-                break;
-            case 'email':
-                $arr[$key] .= '<a href="mailto:' . htmlspecialchars($val) . '">' . htmlspecialchars($val) . '</a>';
-                break;
-            case 'url':
-                $arr[$key] .= '<a href="http://' . (!preg_match('/^http(s)?:\\/\\//umi', trim($val)) ? 'http://' : '') . htmlspecialchars($val) . '">' . htmlspecialchars($val) . '</a>';
-                break;
-            case 'file':
-                $arr[$key] .= '<a href="http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/' . $val->fileURL . '">' . htmlspecialchars($val->name) . '</a>';
-                break;
-            case 'image':
-                $arr[$key] .= '<a href="http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/' . $val->fileURL . '">
-                                 <img src="http://' . $_SERVER['HTTP_HOST'] . '/' . $val->tnURL. '" alt="' . htmlspecialchars($val->name) . '" title="' . htmlspecialchars($val->name) . '" />
-                               </a>';
-                break;
-            case 'htmlarea':
-                $arr[$key] = '<div>' . $val . '</div>';
-                break;
-            default:
-                if (!$field->multiple && ($field->datatype == 'checkbox')) {
-                    $arr[$key] = $val ? _YES : _NO;
-                } else {
-                    $arr[$key] = nl2br(htmlspecialchars($val));
-                }
-                break;
-        }
-    }
-    return '<div>' . htmlspecialchars($formField->name) . ': ' . implode(', ', $arr) . '</div>';
-};
-?>
-<p><?php echo sprintf($ADMIN ? NEW_USER_REGISTERED_ON_SITE : YOU_HAVE_SUCCESSFULLY_REGISTERED_ON_WEBSITE, $_SERVER['HTTP_HOST'], $_SERVER['HTTP_HOST'])?></p>
-<?php if ($SMS) {
     foreach ($Form->fields as $field) {
-        if (in_array($field->urn, array('login', 'email'))) {
-            echo $field->name . ': ' . $User->{$field->urn} . "\n";
-        } elseif (isset($User->fields[$field->urn]) && ($field = $User->fields[$field->urn])) {
-            echo $smsField($field);
-        }
+        $renderer = NotificationFieldRenderer::spawn($field, $USER);
+        echo $renderer->render(['admin' => $ADMIN, 'sms' => true]);
     }
 } else { ?>
+    <p>
+      <?php echo sprintf($headerTemplate, $cf->schemeHost, $cf->idnHost)?>
+    </p>
     <div>
       <?php
-      foreach ($Form->fields as $field) {
-          if ($field->urn == 'login') {
-              echo '<div>' . htmlspecialchars($field->name) . ': ' . htmlspecialchars($User->{$field->urn}) . '</div>';
-          } elseif ($field->urn == 'email') {
-              echo '<div>' . htmlspecialchars($field->name) . ': <a href="mailto:' . htmlspecialchars($User->{$field->urn}) . '">' . htmlspecialchars($User->{$field->urn}) . '</a></div>';
-          } elseif (!$ADMIN && ($field->urn == 'password')) {
-              echo '<div>' . htmlspecialchars($field->name) . ': ' . htmlspecialchars($User->{$field->urn}) . '</div>';
-          } elseif (isset($User->fields[$field->urn]) && ($formField = $field) && ($field = $User->fields[$field->urn])) {
-              // 2017-03-28, AVS: добавил поле формы, для случая языковых версий - чтобы можно было отправлять письма на разных языках
-              echo $emailField($field, $formField);
-          }
+      if (!$ADMIN) {
+          $fields = $Form->visFields;
+      } else {
+          $fields = $Form->fields;
+      }
+      foreach ($fields as $field) {
+          $renderer = NotificationFieldRenderer::spawn($field, $User);
+          echo $renderer->render(['admin' => $ADMIN, 'sms' => false]);
       }
       ?>
     </div>
-    <?php if ($ADMIN) { ?>
-        <?php if ($User && $User->id) { ?>
+    <?php if ($ADMIN) {
+        if ($User && $User->id) { ?>
             <p>
-              <a href="http<?php echo ($_SERVER['HTTPS'] == 'on' ? 's' : '')?>://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'] . '/admin/?p=cms&m=users&action=edit&id=' . (int)$User->id)?>">
+              <a href="<?php echo htmlspecialchars($adminUrl . '&m=users&action=edit&id=' . (int)$User->id)?>">
                 <?php echo VIEW?>
               </a>
             </p>
         <?php } ?>
         <p>
           <small>
-            <?php echo IP_ADDRESS?>: <?php echo htmlspecialchars($User->ip)?><br />
-            <?php echo USER_AGENT?>: <?php echo htmlspecialchars($User->user_agent)?><br />
-            <?php echo PAGE?>:
-            <?php if ($User->page->parents) { ?>
-                <?php foreach ($User->page->parents as $row) { ?>
-                    <a href="<?php echo htmlspecialchars($User->domain . $row->url)?>"><?php echo htmlspecialchars($row->name)?></a> /
-                <?php } ?>
-            <?php } ?>
-            <a href="<?php echo htmlspecialchars($User->domain . $User->page->url)?>"><?php echo htmlspecialchars($User->page->name)?></a>
+            <?php
+            echo IP_ADDRESS . ': ' .
+                htmlspecialchars($User->ip) . '<br />' .
+                USER_AGENT . ': ' .
+                htmlspecialchars($User->user_agent) . '<br />' .
+                PAGE . ': ';
+            if ($page->parents) {
+                foreach ($page->parents as $row) { ?>
+                    <a href="<?php echo htmlspecialchars($adminUrl . '&id=' . (int)$row->id)?>">
+                      <?php echo htmlspecialchars($row->name)?>
+                    </a> /
+                <?php }
+            } ?>
+            <a href="<?php echo htmlspecialchars($adminUrl . '&id=' . (int)$page->id)?>">
+              <?php echo htmlspecialchars($page->name)?>
+            </a>
           </small>
         </p>
-        <?php
-    } else {
+    <?php } else {
         switch ($config['activation_type']) {
             case Block_Register::ACTIVATION_TYPE_ALREADY_ACTIVATED:
                 echo '<p>' . NOW_YOU_CAN_LOG_IN_INTO_THE_SYSTEM . '</p>';
@@ -140,23 +87,29 @@ $emailField = function ($field, $formField = null) {
                 echo '<p>' . PLEASE_WAIT_FOR_ADMINISTRATOR_TO_ACTIVATE . '</p>';
                 break;
             case Block_Register::ACTIVATION_TYPE_USER:
-                $activationBlocks = Block_Activation::getSet(array(
+                $activationBlocks = Block_Activation::getSet([
                     'where' => "block_type = 'RAAS\\\\CMS\\\\Users\\\\Block_Activation'",
-                    'orderBy' => 'id'
-                ));
-                $activationPages = array();
+                    'orderBy' => "id"
+                ]);
+                $activationPages = [];
                 if ($activationBlocks) {
-                    $activationPages = array();
+                    $activationPages = [];
                     foreach ($activationBlocks as $activationBlock) {
-                        $activationPages = array_merge($activationPages, $activationBlock->pages);
+                        $activationPages = array_merge(
+                            $activationPages,
+                            $activationBlock->pages
+                        );
                     }
                 }
                 $p = $Page->parent;
                 $activationPage = null;
                 while ($p->id) {
-                    $nearestActivationPages = array_filter($activationPages, function ($x) use ($p) {
-                        return $x->pid == $p->id;
-                    });
+                    $nearestActivationPages = array_filter(
+                        $activationPages,
+                        function ($x) use ($p) {
+                            return $x->pid == $p->id;
+                        }
+                    );
                     if ($nearestActivationPages) {
                         $activationPage = array_shift($nearestActivationPages);
                         break;
@@ -167,18 +120,20 @@ $emailField = function ($field, $formField = null) {
                     $activationPage = array_shift($activationPages);
                 }
                 if ($activationPage->id) {
-                    $link = 'http' . ($_SERVER['HTTPS'] == 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $activationPage->url . '?key=' . $User->activationKey;
-                    echo '<p>' . sprintf(ACTIVATION_LINK, $link, $link) . '</p>';
+                    $url = $cf->schemeHost . $activationPage->url
+                        . '?key=' . $User->activationKey;
+                    echo '<p>' . sprintf(ACTIVATION_LINK, $url, $url) . '</p>';
                 }
                 break;
         }
         ?>
         <p>--</p>
         <p>
-          <?php echo WITH_RESPECT?>,<br />
-          <?php echo ADMINISTRATION_OF_SITE?> <a href="http<?php echo ($_SERVER['HTTPS'] == 'on' ? 's' : '')?>://<?php echo htmlspecialchars($_SERVER['HTTP_HOST'])?>"><?php echo htmlspecialchars($_SERVER['HTTP_HOST'])?></a>
+          <?php echo WITH_RESPECT . ',<br />' . ADMINISTRATION_OF_SITE?>
+          <a href="<?php echo htmlspecialchars($cf->schemeHost)?>">
+            <?php echo htmlspecialchars($cf->idnHost)?>
+          </a>
         </p>
         <?php
     }
 }
-?>

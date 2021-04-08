@@ -6,6 +6,8 @@
  */
 namespace RAAS\CMS\Users;
 
+use RAAS\CMS\Page;
+
 $interface = new RegisterInterface(
     $Block,
     $Page,
