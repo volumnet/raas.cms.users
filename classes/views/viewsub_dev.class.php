@@ -151,6 +151,17 @@ class ViewSub_Dev extends RAASAbstractSubView
                 !$this->moduleName
             )
         ];
+        $billingTypes = BillingType::getSet();
+        if (count($billingTypes)) {
+            $submenu[] = [
+                'href' => $this->url . '&action=billing_types',
+                'name' => $this->_('BILLING_TYPES'),
+                'active' => (
+                    in_array($this->action, ['billing_types', 'edit_billing_type']) &&
+                    !$this->moduleName
+                )
+            ];
+        }
         return $submenu;
     }
 
