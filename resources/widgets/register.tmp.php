@@ -26,7 +26,9 @@ if ($_POST['AJAX']) {
     if ($social) {
         $result['socialNetwork'] = trim($socialNetwork);
     }
-    ob_clean();
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
     echo json_encode($result);
     exit;
 } else { ?>

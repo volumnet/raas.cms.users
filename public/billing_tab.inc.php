@@ -44,6 +44,26 @@ $_RAASForm_FormTab = function (FormTab $formTab) use (
               }
               ?>
             </tr>
+            <tr>
+              <td></td>
+              <td>
+                <?php
+                $author = Application::i()->user;
+                echo htmlspecialchars(
+                    $author->full_name ?
+                    $author->full_name . ' (' . $author->login . ')' :
+                    $author->login
+                );
+                ?>
+              </td>
+              <td colspan="2">
+                <input type="number" step="0.01" name="billing_transaction_amount[<?php echo (int)$billingType->id?>]" value="" placeholder="<?php echo ViewSub_Users::i()->_('PAYMENT_AMOUNT')?>" style="margin: 0 auto;" />
+              </td>
+              <td>
+                <input type="text" class="span5" name="billing_transaction_name[<?php echo (int)$billingType->id?>]" style="margin: 0 auto;" />
+                <button type="submit" class="btn btn-primary"><span class="fa fa-plus"></span></button>
+              </td>
+            </tr>
           </thead>
       <?php } ?>
       <?php if ((array)$table->Set) { ?>
@@ -60,27 +80,6 @@ $_RAASForm_FormTab = function (FormTab $formTab) use (
             <?php } ?>
           </tbody>
       <?php } ?>
-      <tfoot>
-        <tr>
-          <td></td>
-          <td>
-            <?php
-            $author = Application::i()->user;
-            echo htmlspecialchars(
-                $author->full_name ?
-                $author->full_name . ' (' . $author->login . ')' :
-                $author->login
-            );
-            ?>
-          </td>
-          <td colspan="2">
-            <input type="number" step="0.01" name="billing_transaction_amount[<?php echo (int)$billingType->id?>]" value="" placeholder="<?php echo ViewSub_Users::i()->_('PAYMENT_AMOUNT')?>" style="margin: 0 auto;" />
-          </td>
-          <td>
-            <input type="text" class="span5" name="billing_transaction_name[<?php echo (int)$billingType->id?>]" />
-          </td>
-        </tr>
-      </tfoot>
     </table>
     <?php
 };

@@ -612,7 +612,7 @@ class RegisterInterface extends FormInterface
             }
         }
 
-        if ($smsPhones = $addresses['smsPhones']) {
+        if (Application::i()->prod && ($smsPhones = $addresses['smsPhones'])) {
             if ($urlTemplate = Package::i()->registryGet('sms_gate')) {
                 $m = new Mustache_Engine();
                 foreach ($smsPhones as $phone) {

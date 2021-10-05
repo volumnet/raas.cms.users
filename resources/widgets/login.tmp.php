@@ -31,7 +31,9 @@ if ($_POST['AJAX']) {
         $result['User']['first_name'] = $User->first_name;
         $result['User']['full_name'] = $User->full_name;
     }
-    ob_clean();
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
     echo json_encode($result);
     exit;
 } else {
