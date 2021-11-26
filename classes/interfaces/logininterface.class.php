@@ -117,7 +117,7 @@ class LogInInterface extends AbstractInterface
             } else {
                 $referer = '/';
             }
-            $result['success'] = $this->checkRedirect(
+            $result['success'][$this->block->id] = $this->checkRedirect(
                 $this->post,
                 $this->server,
                 $referer
@@ -179,13 +179,16 @@ class LogInInterface extends AbstractInterface
         while ($user->checkLoginExists($login)) {
             $login = Application::i()->getNewURN($login);
         }
-        $user->login = $login;
+        if ($this->block->email_as_login) {
+            $user->login = $user->email;
+        }
+        if (!$user->login) {
+            $user->login = $login;
+        }
         $user->commit();
         $userFieldsURNs = ['last_name', 'first_name', 'full_name', 'phone'];
         foreach ($userFieldsURNs as $userFieldsURN) {
-            if (isset($user->fields[$userFieldsURN]) &&
-                ($field = $user->fields[$userFieldsURN])
-            ) {
+            if ($field = $user->fields[$userFieldsURN]) {
                 $field->deleteValues();
                 $field->addValue($socialProfile->$userFieldsURN);
             }

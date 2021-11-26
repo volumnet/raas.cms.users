@@ -15,11 +15,17 @@ $user = RAASControllerFrontend::i()->user;
 $result = [];
 
 if ($user->id) {
-    foreach (['login', 'email', 'lang'] as $key) {
+    foreach (['id', 'login', 'email', 'lang'] as $key) {
         $result[$key] = $user->$key;
     }
 
-    foreach (['phone'] as $key) {
+    foreach ([
+        'phone',
+        'full_name',
+        'last_name',
+        'first_name',
+        'second_name'
+    ] as $key) {
         $field = $user->fields[$key];
         if ($field->id) {
             $result[$key] = $field->getValues();

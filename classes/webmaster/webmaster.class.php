@@ -122,24 +122,41 @@ class Webmaster extends CMSWebmaster
      */
     public function createCab()
     {
+        ini_set('max_execution_time', 3600);
         $interfaces = $this->checkStdInterfaces();
         $widgets = $this->createWidgets();
 
-        $F = new User_Field([
-            'name' => $this->view->_('YOUR_NAME'),
-            'urn' => 'full_name',
+        $lastNameField = new User_Field([
+            'name' => $this->view->_('LAST_NAME'),
+            'urn' => 'last_name',
             'datatype' => 'text',
-            'show_in_table' => 1,
+            'show_in_table' => false,
         ]);
-        $F->commit();
+        $lastNameField->commit();
 
-        $F = new User_Field([
+        $firstNameField = new User_Field([
+            'name' => $this->view->_('FIRST_NAME'),
+            'urn' => 'first_name',
+            'datatype' => 'text',
+            'show_in_table' => true,
+        ]);
+        $firstNameField->commit();
+
+        $secondNameField = new User_Field([
+            'name' => $this->view->_('SECOND_NAME'),
+            'urn' => 'second_name',
+            'datatype' => 'text',
+            'show_in_table' => false,
+        ]);
+        $secondNameField->commit();
+
+        $phoneField = new User_Field([
             'name' => $this->view->_('PHONE'),
             'urn' => 'phone',
             'datatype' => 'text',
-            'show_in_table' => 1,
+            'show_in_table' => true,
         ]);
-        $F->commit();
+        $phoneField->commit();
 
         $ajax = array_shift(Page::getSet([
             'where' => "urn = 'ajax' AND pid = " . (int)$this->Site->id
@@ -152,43 +169,50 @@ class Webmaster extends CMSWebmaster
                 'interface_id' => (int)Snippet::importByURN('__raas_users_register_notify')->id,
                 'fields' => [
                     [
-                        'name' => $this->view->_('LOGIN'),
-                        'urn' => 'login',
-                        'datatype' => 'text',
-                        'required' => 1,
-                        'show_in_table' => 1,
+                        'name' => $this->view->_('EMAIL'),
+                        'urn' => 'email',
+                        'datatype' => 'email',
+                        'required' => true,
+                        'show_in_table' => true,
                     ],
                     [
                         'name' => $this->view->_('PASSWORD'),
                         'urn' => 'password',
                         'datatype' => 'password',
-                        'required' => 1,
-                        'show_in_table' => 1,
+                        'required' => true,
+                        'show_in_table' => true,
                     ],
                     [
-                        'name' => $this->view->_('EMAIL'),
-                        'urn' => 'email',
+                        'name' => $this->view->_('LAST_NAME'),
+                        'urn' => 'last_name',
                         'datatype' => 'text',
-                        'show_in_table' => 1,
+                        'required' => true,
+                        'show_in_table' => false,
                     ],
                     [
-                        'name' => $this->view->_('YOUR_NAME'),
-                        'urn' => 'full_name',
-                        'required' => 1,
+                        'name' => $this->view->_('FIRST_NAME'),
+                        'urn' => 'first_name',
                         'datatype' => 'text',
-                        'show_in_table' => 1,
+                        'required' => true,
+                        'show_in_table' => true,
+                    ],
+                    [
+                        'name' => $this->view->_('SECOND_NAME'),
+                        'urn' => 'second_name',
+                        'datatype' => 'text',
+                        'show_in_table' => false,
                     ],
                     [
                         'name' => $this->view->_('PHONE'),
                         'urn' => 'phone',
-                        'datatype' => 'text',
-                        'show_in_table' => 1,
+                        'datatype' => 'tel',
+                        'show_in_table' => true,
                     ],
                     [
                         'vis' => 1,
                         'name' => View_Web::i()->_('AGREE_PRIVACY_POLICY'),
                         'urn' => 'agree',
-                        'required' => 1,
+                        'required' => true,
                         'datatype' => 'checkbox',
                     ],
                 ],
@@ -199,30 +223,44 @@ class Webmaster extends CMSWebmaster
                 'interface_id' => (int)Snippet::importByURN('__raas_users_register_notify')->id,
                 'fields' => [
                     [
+                        'name' => $this->view->_('EMAIL'),
+                        'urn' => 'email',
+                        'datatype' => 'email',
+                        'required' => true,
+                        'show_in_table' => true,
+                    ],
+                    [
                         'name' => $this->view->_('PASSWORD'),
                         'urn' => 'password',
                         'datatype' => 'password',
-                        'required' => 1,
-                        'show_in_table' => 1,
+                        'required' => true,
+                        'show_in_table' => true,
                     ],
                     [
-                        'name' => $this->view->_('EMAIL'),
-                        'urn' => 'email',
+                        'name' => $this->view->_('LAST_NAME'),
+                        'urn' => 'last_name',
                         'datatype' => 'text',
-                        'show_in_table' => 1,
+                        'required' => true,
+                        'show_in_table' => false,
                     ],
                     [
-                        'name' => $this->view->_('YOUR_NAME'),
-                        'urn' => 'full_name',
-                        'required' => 1,
+                        'name' => $this->view->_('FIRST_NAME'),
+                        'urn' => 'first_name',
                         'datatype' => 'text',
-                        'show_in_table' => 1,
+                        'required' => true,
+                        'show_in_table' => true,
+                    ],
+                    [
+                        'name' => $this->view->_('SECOND_NAME'),
+                        'urn' => 'second_name',
+                        'datatype' => 'text',
+                        'show_in_table' => false,
                     ],
                     [
                         'name' => $this->view->_('PHONE'),
                         'urn' => 'phone',
-                        'datatype' => 'text',
-                        'show_in_table' => 1,
+                        'datatype' => 'tel',
+                        'show_in_table' => true,
                     ],
                 ],
             ],
@@ -292,9 +330,9 @@ class Webmaster extends CMSWebmaster
             $this->createBlock(
                 new Block_Register([
                     'form_id' => Form::importByURN('register')->id,
-                    'email_as_login' => 0,
-                    'notify_about_edit' => 0,
-                    'allow_edit_social' => 0,
+                    'email_as_login' => true,
+                    'notify_about_edit' => false,
+                    'allow_edit_social' => true,
                     'activation_type' => Block_Register::ACTIVATION_TYPE_USER,
                     'allowed_to' => Block_Register::ALLOW_TO_ALL,
                 ]),
@@ -349,9 +387,9 @@ class Webmaster extends CMSWebmaster
                 new Block_Register([
                     'name' => $this->view->_('EDIT_PROFILE'),
                     'form_id' => Form::importByURN('edit_profile')->id,
-                    'email_as_login' => 0,
-                    'notify_about_edit' => 0,
-                    'allow_edit_social' => 0,
+                    'email_as_login' => true,
+                    'notify_about_edit' => false,
+                    'allow_edit_social' => true,
                     'activation_type' => Block_Register::ACTIVATION_TYPE_USER,
                     'allowed_to' => Block_Register::ALLOW_TO_ALL,
                 ]),
@@ -423,8 +461,8 @@ class Webmaster extends CMSWebmaster
             );
             $this->createBlock(
                 new Block_LogIn([
-                    'email_as_login' => 1,
-                    'social_login_type' => Block_Login::SOCIAL_LOGIN_NONE,
+                    'email_as_login' => true,
+                    'social_login_type' => Block_Login::SOCIAL_LOGIN_QUICK_REGISTER,
                     'password_save_type' => Block_Login::SAVE_PASSWORD_SAVE_PASSWORD,
                 ]),
                 'content',

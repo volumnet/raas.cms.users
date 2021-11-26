@@ -8,7 +8,7 @@ export default {
         };
     },
     mounted: function () {
-        $.getJSON(this.url, (result) => {
+        $.getJSON(this.userURL, (result) => {
             this.user = result;
         });
     },

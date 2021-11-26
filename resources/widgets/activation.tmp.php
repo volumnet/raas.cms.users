@@ -8,10 +8,12 @@
  */
 namespace RAAS\CMS\Users;
 
-if ($_POST['AJAX']) {
+use RAAS\CMS\Package;
+
+if ($_POST['AJAX'] == (int)$Block->id) {
     $result = [];
     if ($success) {
-        $result['success'] = 1;
+        $result['success'] = true;
     }
     if ($localError) {
         $result['localError'] = $localError;
@@ -21,19 +23,9 @@ if ($_POST['AJAX']) {
     }
     echo json_encode($result);
     exit;
-} else {
-    ?>
-    <div data-role="notifications">
-      <div class="alert alert-success" <?php echo ($success) ? '' : 'style="display: none"'?>>
-        <?php echo YOUR_ACCOUNT_HAS_BEEN_SUCCESSFULLY_ACTIVATED?>
-      </div>
-      <div class="alert alert-danger" <?php echo ($localError) ? '' : 'style="display: none"'?>>
-        <ul>
-          <?php foreach ((array)$localError as $key => $val) { ?>
-              <li><?php echo htmlspecialchars($val)?></li>
-          <?php } ?>
-        </ul>
-      </div>
-    </div>
+} else { ?>
+    <activation-notification :success="<?php echo $success ? 'true' : 'false'?>" :errors="<?php echo htmlspecialchars(json_encode($localError))?>"></activation-notification>
     <?php
+    Package::i()->requestCSS('/css/activation.css');
+    Package::i()->requestJS('/js/activation.js');
 }
