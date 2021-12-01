@@ -33,6 +33,15 @@ class UsersTable extends Table
         $view = $this->view;
         unset($params['view']);
         $columns = [];
+        $columns['id'] = [
+            'caption' => $this->view->_('ID'),
+            'sortable' => Column::SORTABLE_REVERSABLE,
+            'callback' => function ($row) use ($view) {
+                return '<a href="' . $view->url . '&action=edit&id=' . (int)$row->id . '"' . (!$row->vis ? ' class="muted"' : '') . '>' .
+                          (int)$row->id .
+                       '</a>';
+            }
+        ];
         $columns['post_date'] = [
             'caption' => $this->view->_('REGISTRATION_DATE'),
             'sortable' => Column::SORTABLE_REVERSABLE,
@@ -65,8 +74,8 @@ class UsersTable extends Table
                 'caption' => $col->name,
                 'sortable' => Column::SORTABLE_REVERSABLE,
                 'callback' => function ($row) use ($col) {
-                    if (isset($row->fields[$col->urn])) {
-                        $y = $row->fields[$col->urn]->doRich();
+                    if ($field = $row->fields[$col->urn]) {
+                        $y = $field->doRich();
                     }
                     if ($y) {
                         return '<span' . (!$row->vis ? ' class="muted"' : '') . '>' .

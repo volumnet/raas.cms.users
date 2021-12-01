@@ -290,7 +290,7 @@ class RegisterInterface extends FormInterface
      * @param array $server Данные $_SERVER-полей
      * @param array $files Данные $_FILES-полей
      * @return [
-     *             'Item' =>? Feedback Уведомление обратной связи,
+     *             'User' =>? User Созданный или обновленный пользователь,
      *             'Material' =>? Material Созданный материал
      *         ]
      */
@@ -313,18 +313,18 @@ class RegisterInterface extends FormInterface
             $user->new = 1;
         }
 
-        if (isset($form->fields['email'])) {
+        if ($form->fields['email']) {
             $val = $user->email = trim($post['email']);
             if ($val && $block->email_as_login) {
                 $user->login = $val;
             }
         }
-        if (isset($form->fields['login']) && !$block->email_as_login) {
+        if ($form->fields['login'] && !$block->email_as_login) {
             if ($val = trim($post['login'])) {
                 $user->login = $val;
             }
         }
-        if (isset($form->fields['password']) &&
+        if ($form->fields['password'] &&
             ($val = trim($post['password']))
         ) {
             $user->password = $val;
@@ -335,13 +335,14 @@ class RegisterInterface extends FormInterface
             $user->password_md5 = Application::i()->md5It($val);
         }
 
-        if (isset($form->fields['lang']) && ($val = trim($post['lang']))) {
+        if ($form->fields['lang'] && ($val = trim($post['lang']))) {
             $user->lang = $val;
         } else {
             $user->lang = $page->lang;
         }
         if ($block->allow_edit_social &&
-            isset($post['social'], $session['confirmedSocial'])
+            $post['social'] &&
+            $session['confirmedSocial']
         ) {
             $arr = [];
             foreach ((array)$post['social'] as $val) {

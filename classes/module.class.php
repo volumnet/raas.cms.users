@@ -135,7 +135,7 @@ class Module extends RAASModule
         $sqlQuery .= " GROUP BY tU.id ORDER BY tU.new DESC, ";
         if (isset($columns[$in['sort']])) {
             $sqlQuery .= " tSort.value ";
-        } elseif (in_array($in['sort'], ['post_date', 'login', 'email']) ||
+        } elseif (in_array($in['sort'], ['id', 'post_date', 'login', 'email']) ||
             preg_match('/^balance\\d+$/', $in['sort'])
         ) {
             $sqlQuery .= $in['sort'];

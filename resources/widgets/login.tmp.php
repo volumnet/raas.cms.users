@@ -32,6 +32,9 @@ if ($_POST['AJAX'] == (int)$Block->id) {
         $result['User']['last_name'] = $User->last_name;
         $result['User']['first_name'] = $User->first_name;
         $result['User']['full_name'] = $User->full_name;
+        if (!$localError && $User->id) {
+            $result['success'] = true;
+        }
     }
     while (ob_get_level()) {
         ob_end_clean();
