@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.cms.users",
     "description": "RAAS.CMS.Users",
-    "version": "4.3.4",
+    "version": "4.3.5",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -18,7 +18,8 @@
         "ext-PDO": ">=0",
         "ext-mbstring": ">=0",
         "mustache/mustache": ">=2.5",
-        "volumnet/raas.cms": "^4.2.45"
+        "volumnet/raas.cms": "^4.2.45",
+        "pelago/emogrifier": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "5.*",

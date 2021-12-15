@@ -5,6 +5,7 @@
 namespace RAAS\CMS\Users;
 
 use Mustache_Engine;
+use Pelago\Emogrifier\CssInliner;
 use SOME\Text;
 use RAAS\Application;
 use RAAS\Controller_Frontend as RAASControllerFrontend;
@@ -571,6 +572,13 @@ class RegisterInterface extends FormInterface
         $fromName = $this->getFromName();
         $fromEmail = $this->getFromEmail();
         $debugMessages = [];
+        $attachments = $this->getAttachments($order, $material, $forAdmin);
+
+        $processEmbedded = $this->processEmbedded($message);
+        $message = $processEmbedded['message'];
+        $embedded = (array)$processEmbedded['embedded'];
+
+        $message = CssInliner::fromHtml($message)->inlineCss()->render();
 
         if ($emails = $addresses['emails']) {
             if ($debug) {
@@ -580,6 +588,8 @@ class RegisterInterface extends FormInterface
                     'message' => $message,
                     'from' => $fromName,
                     'fromEmail' => $fromEmail,
+                    'attachments' => $attachments,
+                    'embedded' => $embedded,
                 ];
             } else {
                 Application::i()->sendmail(
@@ -587,7 +597,10 @@ class RegisterInterface extends FormInterface
                     $subject,
                     $message,
                     $fromName,
-                    $fromEmail
+                    $fromEmail,
+                    true,
+                    $attachments,
+                    $embedded
                 );
             }
         }
