@@ -35,4 +35,15 @@ export default {
         };
         return result;
     },
+    computed: {
+        referer: function () {
+            if ((window.location.pathname != '/') && 
+                !/login/.test(window.location.pathname) && 
+                !/register/.test(window.location.pathname)
+            ) {
+                return window.location.pathname;
+            }
+            return '';
+        },
+    }
 };
