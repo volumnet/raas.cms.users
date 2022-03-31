@@ -7,6 +7,8 @@
  * @param array<string[] URN поля => string Текст ошибки> $localError
  */
 namespace RAAS\CMS\Users;
+
+use RAAS\AssetManager;
 use RAAS\CMS\Package;
 
 if ($_POST['AJAX'] == (int)$Block->id) {
@@ -25,6 +27,6 @@ if ($_POST['AJAX'] == (int)$Block->id) {
 } else { ?>
     <recovery-form :block-id="<?php echo (int)$Block->id?>" :initial-errors="<?php echo htmlspecialchars(json_encode((object)$localError))?>" :proceed="<?php echo $proceed ? 'true' : 'false'?>" :key-is-invalid="<?php echo ($proceed && $key_is_invalid) ? 'true' : 'false'?>" :email-as-login="false" :scroll-to-errors="true"></register-form>
     <?php
-    Package::i()->requestCSS('/css/recovery.css');
-    Package::i()->requestJS('/js/recovery.js');
+    AssetManager::requestCSS('/css/recovery.css');
+    AssetManager::requestJS('/js/recovery.js');
 }

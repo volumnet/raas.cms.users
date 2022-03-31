@@ -40,7 +40,9 @@ $_RAASForm_FormTab = function (\RAAS\FormTab $formTab) use (&$_RAASForm_Form_Tab
           <?php } ?>
           <tfoot>
             <tr>
-              <td colspan="2"><?php echo rowContextMenu($Table->meta['allContextMenu'], \RAAS\Application::i()->view->context->_('WITH_SELECTED'), '', 'btn-mini')?></td>
+              <td colspan="2">
+                <all-context-menu :menu="<?php echo htmlspecialchars(json_encode(getMenu($Table->meta['allContextMenu'])))?>"></all-context-menu>
+              </td>
             </tr>
           </tfoot>
         </table>

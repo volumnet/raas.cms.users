@@ -8,6 +8,7 @@
  */
 namespace RAAS\CMS\Users;
 
+use RAAS\AssetManager;
 use RAAS\CMS\Package;
 
 if ($_POST['AJAX'] == (int)$Block->id) {
@@ -26,6 +27,6 @@ if ($_POST['AJAX'] == (int)$Block->id) {
 } else { ?>
     <activation-notification :success="<?php echo $success ? 'true' : 'false'?>" :errors="<?php echo htmlspecialchars(json_encode($localError))?>"></activation-notification>
     <?php
-    Package::i()->requestCSS('/css/activation.css');
-    Package::i()->requestJS('/js/activation.js');
+    AssetManager::requestCSS('/css/activation.css');
+    AssetManager::requestJS('/js/activation.js');
 }

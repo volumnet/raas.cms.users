@@ -572,7 +572,7 @@ class RegisterInterface extends FormInterface
         $fromName = $this->getFromName();
         $fromEmail = $this->getFromEmail();
         $debugMessages = [];
-        $attachments = $this->getAttachments($order, $material, $forAdmin);
+        $attachments = $this->getRegisterAttachments($user, $material, $forAdmin);
 
         $processEmbedded = $this->processEmbedded($message);
         $message = $processEmbedded['message'];
@@ -662,5 +662,26 @@ class RegisterInterface extends FormInterface
         $subject = date(RAASViewWeb::i()->_('DATETIMEFORMAT')) . ' '
                  . sprintf(View_Web::i()->_('REGISTRATION_ON_SITE'), $host);
         return $subject;
+    }
+
+
+    /**
+     * Получает вложения для письма
+     * @param User $user Пользователь
+     * @param Material $material Созданный материал
+     * @param bool $forAdmin Уведомление для администратора
+     *                       (если нет, то для пользователя)
+     * @return array <pre>array<[
+     *     'tmp_name' => string Путь к реальному файлу,
+     *     'type' => string MIME-тип файла,
+     *     'name' => string Имя файла
+     * ]></pre>
+     */
+    public function getRegisterAttachments(
+        User $feedback,
+        Material $material = null,
+        $forAdmin = true
+    ) {
+        return [];
     }
 }

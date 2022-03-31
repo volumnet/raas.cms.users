@@ -8,6 +8,7 @@
  */
 namespace RAAS\CMS\Users;
 
+use RAAS\AssetManager;
 use RAAS\CMS\Feedback;
 use RAAS\CMS\FormArrayFormatter;
 use RAAS\CMS\Package;
@@ -58,6 +59,6 @@ if ($_POST['AJAX'] == (int)$Block->id) {
     } ?>
     <register-form :block-id="<?php echo (int)$Block->id?>" :form="<?php echo htmlspecialchars(json_encode($formArr))?>" :user="user" :activation-type="<?php echo (int)$Block->activation_type?>" :initial-form-data="<?php echo htmlspecialchars(json_encode($formData))?>" :allow-edit-social="<?php echo $Block->allow_edit_social ? 'true' : 'false'?>" :scroll-to-errors="true"></register-form>
     <?php
-    Package::i()->requestCSS('/css/register.css');
-    Package::i()->requestJS('/js/register.js');
+    AssetManager::requestCSS('/css/register.css');
+    AssetManager::requestJS('/js/register.js');
 }

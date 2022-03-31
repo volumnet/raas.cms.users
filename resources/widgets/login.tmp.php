@@ -9,6 +9,7 @@
  */
 namespace RAAS\CMS\Users;
 
+use RAAS\AssetManager;
 use RAAS\CMS\Package;
 use RAAS\CMS\User;
 
@@ -56,6 +57,6 @@ if ($_POST['AJAX'] == (int)$Block->id) {
     ?>
     <login-form :block-id="<?php echo (int)$Block->id?>" :initial-errors="<?php echo htmlspecialchars(json_encode((object)$localError))?>" :email-as-login="<?php echo $Block->email_as_login ? 'true' : 'false'?>" :password-save-type="<?php echo (int)$passwordSaveType?>" :allow-social-login="<?php echo $Block->social_login_type ? 'true' : 'false'?>" :scroll-to-errors="true"></login-form>
     <?php
-    Package::i()->requestCSS('/css/login.css');
-    Package::i()->requestJS('/js/login.js');
+    AssetManager::requestCSS('/css/login.css');
+    AssetManager::requestJS('/js/login.js');
 }
