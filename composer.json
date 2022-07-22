@@ -1,12 +1,12 @@
 {
     "name": "volumnet/raas.cms.users",
     "description": "RAAS.CMS.Users",
-    "version": "4.3.8",
+    "version": "4.3.9",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.0",
         "ext-session": ">=0",
         "ext-iconv": ">=0",
         "ext-pcre": ">=0",
@@ -18,7 +18,7 @@
         "ext-PDO": ">=0",
         "ext-mbstring": ">=0",
         "mustache/mustache": ">=2.5",
-        "volumnet/raas.cms": "^4.2.45",
+        "volumnet/raas.cms": "^4.3.41",
         "pelago/emogrifier": "*"
     },
     "require-dev": {
