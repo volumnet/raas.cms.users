@@ -19,6 +19,8 @@ use RAAS\CMS\User as CMSUser;
  */
 class RecoveryInterface extends FormInterface
 {
+    use CheckRedirectTrait;
+
     /**
      * Конструктор класса
      * @param Block_Recovery|null $block Блок, для которого применяется
@@ -93,7 +95,21 @@ class RecoveryInterface extends FormInterface
                     } else {
                         $user->password_md5 = Application::i()->md5It($this->post['password']);
                         $user->commit();
-                        $result['success'] = true;
+                        $referer = null;
+                        if (isset($this->post['HTTP_REFERER'])) {
+                            $referer = $this->post['HTTP_REFERER'];
+                        } elseif (isset($this->get['HTTP_REFERER'])) {
+                            $referer = $this->get['HTTP_REFERER'];
+                        }
+                        if ($referer) {
+                            $result['success'][$this->block->id] = $this->checkRedirect(
+                                $this->post,
+                                $this->server,
+                                $referer
+                            );
+                        } else {
+                            $result['success'][$this->block->id] = true;
+                        }
                     }
                 }
             }
@@ -156,6 +172,7 @@ class RecoveryInterface extends FormInterface
             'Page' => $page,
             'config' => $config,
             'recoveryInterface' => $this,
+            'referer' => $this->get['HTTP_REFERER']
         ];
 
         $subject = $this->getEmailRecoverySubject();
