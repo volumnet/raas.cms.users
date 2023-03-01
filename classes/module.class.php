@@ -76,7 +76,7 @@ class Module extends RAASModule
         }
         unset($temp);
 
-        $order = strtolower($in['order']) == 'desc' ? 'DESC' : 'ASC';
+        $order = strtolower($in['order'] ?? '') == 'desc' ? 'DESC' : 'ASC';
         $billingTypes = BillingType::getSet();
         $sqlQuery = "SELECT SQL_CALC_FOUND_ROWS tU.* ";
         foreach ($billingTypes as $billingType) {
@@ -85,7 +85,7 @@ class Module extends RAASModule
         $sqlQuery .= " FROM " . User::_tablename()
                   .  "   AS tU ";
         $sqlBind = [];
-        if (isset($columns[$in['sort']]) && ($col = $columns[$in['sort']])) {
+        if (isset($in['sort'], $columns[$in['sort']]) && ($col = $columns[$in['sort']])) {
             $sqlQuery .= " LEFT JOIN " . User_Field::_dbprefix() . User_Field::data_table
                       .  "   AS tSort
                              ON tSort.pid = tU.id
@@ -133,10 +133,10 @@ class Module extends RAASModule
         }
 
         $sqlQuery .= " GROUP BY tU.id ORDER BY tU.new DESC, ";
-        if (isset($columns[$in['sort']])) {
+        if (isset($in['sort'], $columns[$in['sort']])) {
             $sqlQuery .= " tSort.value ";
-        } elseif (in_array($in['sort'], ['id', 'post_date', 'login', 'email']) ||
-            preg_match('/^balance\\d+$/', $in['sort'])
+        } elseif (isset($in['sort']) &&
+            (in_array($in['sort'], ['id', 'post_date', 'login', 'email']) || preg_match('/^balance\\d+$/', $in['sort']))
         ) {
             $sqlQuery .= $in['sort'];
         } else {
@@ -145,7 +145,7 @@ class Module extends RAASModule
         }
         $sqlQuery .= " " . $order;
         $Pages = new Pages(
-            (int)$in['page'] ?: 1,
+            (int)($in['page'] ?? 1) ?: 1,
             Application::i()->registryGet('rowsPerPage')
         );
         $Set = User::getSQLSet([$sqlQuery, $sqlBind], $Pages);

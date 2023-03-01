@@ -180,7 +180,7 @@ class Sub_Users extends RAASAbstractSubController
     protected function showlist()
     {
         $Group = new Group($this->id);
-        foreach (['sort', 'order'] as $var) {
+        foreach (['sort', 'order'] as $key) {
             $OUT[$key] = isset($this->nav[$key]) ? $this->nav[$key] : null;
         }
         $OUT = $this->model->showlist($Group, $this->nav);
@@ -204,7 +204,7 @@ class Sub_Users extends RAASAbstractSubController
         $Item->visit();
         $Form = new EditUserForm(['Item' => $Item, 'view' => $this->view]);
         $activeBillingTypeId = null;
-        if ($_POST['billing_transaction_amount']) {
+        if ($_POST['billing_transaction_amount'] ?? false) {
             foreach ((array)$_POST['billing_transaction_amount'] as $billingTypeId => $billingAmount) {
                 if ((float)$billingAmount &&
                     trim($_POST['billing_transaction_name'][$billingTypeId])

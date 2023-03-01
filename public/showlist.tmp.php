@@ -18,12 +18,12 @@
             <?php } ?>
         <?php } ?>
         <div class="input-append">
-          <input type="search" class="span2 search-query" name="search_string" value="<?php echo htmlspecialchars($VIEW->nav['search_string'])?>" />
+          <input type="search" class="span2 search-query" name="search_string" value="<?php echo htmlspecialchars($VIEW->nav['search_string'] ?? '')?>" />
           <button type="submit" class="btn"><i class="icon-search"></i></button>
         </div> &nbsp;
         <?php if ($Group->id) { ?>
             <label class="checkbox" for="group_only">
-              <input type="checkbox" name="group_only" id="group_only" value="1" <?php echo $VIEW->nav['group_only'] ? 'checked="checked"' : ''?> />
+              <input type="checkbox" name="group_only" id="group_only" value="1" <?php echo ($VIEW->nav['group_only'] ?? false) ? 'checked="checked"' : ''?> />
               <?php echo SEARCH_ONLY_IN_GROUPS?>
             </label>
         <?php } ?>
