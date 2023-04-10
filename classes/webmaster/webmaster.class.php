@@ -97,7 +97,7 @@ class Webmaster extends CMSWebmaster
             $urn = explode('/', $url);
             $urn = $urn[count($urn) - 1];
             $widget = Snippet::importByURN($urn);
-            if (!$widget->id) {
+            if (!($widget && $widget->id)) {
                 $widget = $this->createSnippet(
                     $urn,
                     $name,
@@ -158,9 +158,10 @@ class Webmaster extends CMSWebmaster
         ]);
         $phoneField->commit();
 
-        $ajax = array_shift(Page::getSet([
+        $pagesSet = Page::getSet([
             'where' => "urn = 'ajax' AND pid = " . (int)$this->Site->id
-        ]));
+        ]);
+        $ajax = array_shift($pagesSet);
 
         $this->createForms([
             [

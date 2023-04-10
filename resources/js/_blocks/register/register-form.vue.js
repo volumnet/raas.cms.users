@@ -27,14 +27,6 @@ export default {
             required: true,
         },
         /**
-         * Данные формы
-         * @type {Object}
-         */
-        form: {
-            type: Object,
-            required: true,
-        },
-        /**
          * Разрешить редактирование соц. сетей
          * @type {Object}
          */
@@ -113,18 +105,6 @@ export default {
                         break;
                 }
             }
-            return result;
-        },
-        /**
-         * HTML-код подсказки об обязательных полях
-         * @return {String}
-         */
-        asteriskHintHTML: function () {
-            let result = this.translations.ASTERISK_MARKED_FIELDS_ARE_REQUIRED;
-            result = result.replace(
-                '*', 
-                '<span class="feedback__asterisk">*</span>'
-            );
             return result;
         },
     },
