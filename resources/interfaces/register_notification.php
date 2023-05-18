@@ -29,9 +29,19 @@ if ($SMS) {
     if ($ADMIN) {
         echo sprintf($headerTemplate, $cf->schemeHost, $cf->idnHost) . "\n";
     }
+    $passwordDetected = false;
     foreach ($Form->fields as $field) {
+        if ($field->datatype == 'password') {
+            $passwordDetected = true;
+            if ($ADMIN) {
+                continue;
+            }
+        }
         $renderer = NotificationFieldRenderer::spawn($field, $USER);
         echo $renderer->render(['admin' => $ADMIN, 'sms' => true]);
+    }
+    if (!$passwordDetected && !$ADMIN && $User->password) {
+        echo PASSWORD . ': ' . htmlspecialchars($User->password) . "\n";
     }
 } else { ?>
     <p>
