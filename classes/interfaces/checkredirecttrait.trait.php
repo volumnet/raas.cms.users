@@ -23,7 +23,7 @@ trait CheckRedirectTrait
         $referer = null,
         $debug = false
     ) {
-        if ($post['AJAX']) {
+        if ($post['AJAX'] ?? null) {
             return true;
         } elseif ($referer) {
             $url = $referer;

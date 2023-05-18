@@ -44,9 +44,19 @@ if ($SMS) {
       } else {
           $fields = $Form->fields;
       }
+      $passwordDetected = false;
       foreach ($fields as $field) {
+          if ($field->datatype == 'password') {
+              $passwordDetected = true;
+              if ($ADMIN) {
+                  continue;
+              }
+          }
           $renderer = NotificationFieldRenderer::spawn($field, $User);
           echo $renderer->render(['admin' => $ADMIN, 'sms' => false]);
+      }
+      if (!$passwordDetected && !$ADMIN && $User->password) {
+          echo '<div>' . PASSWORD . ': ' . htmlspecialchars($User->password) . '</div>';
       }
       ?>
     </div>

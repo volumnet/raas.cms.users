@@ -325,12 +325,12 @@ class RegisterInterface extends FormInterface
                 $user->login = $val;
             }
         }
-        if ($form->fields['password'] &&
-            ($val = trim($post['password']))
-        ) {
+        if ($form->fields['password'] && ($val = trim($post['password']))) {
             $user->password = $val;
         } elseif ($new) {
             $val = $user->password = $this->generatePass();
+        } else {
+            $val = null;
         }
         if ($val) {
             $user->password_md5 = Application::i()->md5It($val);
