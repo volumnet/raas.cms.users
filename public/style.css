@@ -1,7 +1,7 @@
-.cms-block-users-register { background-color: #00f; color: white; }
-.cms-block-users-register a { color: white; }
-.cms-block-users-recovery { background-color: #f00; color: white; }
-.cms-block-users-recovery a { color: white; }
-.cms-block-users-login { background-color: #f80; color: white; }
-.cms-block-users-login a { color: white; }
-.cms-block-users-activation { background-color: #0f0; }
+.cms-block.cms-block_users-register { background-color: #00f; color: white; }
+.cms-block_users-register .cms-block__title { color: white; }
+.cms-block.cms-block_users-recovery { background-color: #f00; color: white; }
+.cms-block_users-recovery .cms-block__title { color: white; }
+.cms-block.cms-block_users-login { background-color: #f80; color: white; }
+.cms-block_users-login .cms-block__title { color: white; }
+.cms-block.cms-block_users-activation { background-color: #0f0; }

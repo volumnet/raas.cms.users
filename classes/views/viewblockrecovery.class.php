@@ -6,7 +6,7 @@ use \RAAS\CMS\Location;
 
 class ViewBlockRecovery extends ViewBlock
 {
-    const blockListItemClass = 'cms-block-users-recovery';
+    const BLOCK_LIST_ITEM_CLASS = 'cms-block_users-recovery';
 
     public function renderBlockTypeName()
     {

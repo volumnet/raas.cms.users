@@ -7,7 +7,7 @@ use RAAS\CMS\Location;
 
 class ViewBlockLogIn extends ViewBlock
 {
-    const blockListItemClass = 'cms-block-users-login';
+    const BLOCK_LIST_ITEM_CLASS = 'cms-block_users-login';
 
     public function renderBlockTypeName()
     {

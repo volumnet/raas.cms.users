@@ -6,7 +6,7 @@ use \RAAS\CMS\Location;
 
 class ViewBlockActivation extends ViewBlock
 {
-    const blockListItemClass = 'cms-block-users-activation';
+    const BLOCK_LIST_ITEM_CLASS = 'cms-block_users-activation';
 
     public function renderBlockTypeName()
     {

@@ -6,7 +6,7 @@ use \RAAS\CMS\Location;
 
 class ViewBlockRegister extends ViewBlock
 {
-    const blockListItemClass = 'cms-block-users-register';
+    const BLOCK_LIST_ITEM_CLASS = 'cms-block_users-register';
 
     public function renderBlockTypeName()
     {
