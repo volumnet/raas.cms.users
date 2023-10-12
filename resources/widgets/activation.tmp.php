@@ -4,7 +4,7 @@
  * @param Block_Activation $Block Текущий блок
  * @param Page $Page Текущая страница
  * @param bool $success Успешная активация
- * @param array<string[] URN поля => string Текст ошибки> $localError
+ * @param array $localError <pre><code>array<string[] URN поля => string Текст ошибки></code></pre>
  */
 namespace RAAS\CMS\Users;
 

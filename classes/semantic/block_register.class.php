@@ -1,8 +1,10 @@
 <?php
 namespace RAAS\CMS\Users;
 
+use RAAS\User as RAASUser;
 use RAAS\CMS\Block;
 use RAAS\Controller_Frontend as RAASController_Frontend;
+use RAAS\CMS\Form;
 use RAAS\CMS\Page;
 
 class Block_Register extends Block
@@ -17,12 +19,27 @@ class Block_Register extends Block
 
     protected static $tablename2 = 'cms_users_blocks_register';
 
-    protected static $references = array(
-        'Register_Form' => array('FK' => 'form_id', 'classname' => 'RAAS\\CMS\\Form', 'cascade' => false),
-        'Edit_Form' => array('FK' => 'edit_form_id', 'classname' => 'RAAS\\CMS\\Form', 'cascade' => false),
-        'author' => array('FK' => 'author_id', 'classname' => 'RAAS\\User', 'cascade' => false),
-        'editor' => array('FK' => 'editor_id', 'classname' => 'RAAS\\User', 'cascade' => false),
-    );
+    protected static $references = [
+        'Register_Form' => [
+            'FK' => 'form_id',
+            'classname' => Form::class,
+            'cascade' => false
+        ],
+        'author' => [
+            'FK' => 'author_id',
+            'classname' => RAASUser::class,
+            'cascade' => false
+        ],
+        'editor' => [
+            'FK' => 'editor_id',
+            'classname' => RAASUser::class,
+            'cascade' => false
+        ],
+    ];
+
+    protected static $cognizableVars = [
+        'Edit_Form',
+    ];
 
     public function commit()
     {
@@ -37,7 +54,9 @@ class Block_Register extends Block
     {
         if ($this->allow_to != static::ALLOW_TO_ALL) {
             $r = (bool)RAASController_Frontend::i()->user->id;
-            if (($r && ($this->allow_to == static::ALLOW_TO_UNREGISTERED)) || (!$r && ($this->allow_to == static::ALLOW_TO_REGISTERED))) {
+            if (($r && ($this->allow_to == static::ALLOW_TO_UNREGISTERED)) ||
+                (!$r && ($this->allow_to == static::ALLOW_TO_REGISTERED))
+            ) {
                 if (trim($this->redirect_url)) {
                     header('Location: ' . trim($this->redirect_url));
                     exit;
@@ -52,7 +71,7 @@ class Block_Register extends Block
 
     public function getAddData()
     {
-        return array(
+        return [
             'id' => (int)$this->id,
             'form_id' => (int)$this->form_id,
             'email_as_login' => (int)$this->email_as_login,
@@ -61,6 +80,6 @@ class Block_Register extends Block
             'activation_type' => (int)$this->activation_type,
             'allow_to' => (int)$this->allow_to,
             'redirect_url' => trim($this->redirect_url),
-        );
+        ];
     }
 }

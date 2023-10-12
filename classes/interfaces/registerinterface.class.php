@@ -73,9 +73,8 @@ class RegisterInterface extends FormInterface
         if ($user->id && ($this->page->urn == 'register')) {
             // @deprecated Для совместимости со старыми сайтами, где страница
             // редактирования профиля совпадала со страницей регистрации
-            $form = $this->block->Edit_Form->id
-                  ? $this->block->Edit_Form
-                  : $this->block->Register_Form;
+            // 2023-10-08, AVS: убрал, поскольку уже не существует
+            $form = $this->block->Register_Form;
             $this->page->h1 = $this->page->meta_title
                             = 'Редактирование профиля';
         } else {

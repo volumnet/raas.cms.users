@@ -116,7 +116,8 @@ class Module extends RAASModule
         }
         if (isset($in['search_string']) && $in['search_string']) {
             $sqlQuery .= " AND (
-                                   tU.login LIKE ?
+                                   tU.id = ?
+                                OR tU.login LIKE ?
                                 OR tU.email LIKE ?
                                 OR (
                                         (
@@ -127,6 +128,7 @@ class Module extends RAASModule
                                         ) > 0
                                 )
                             ) ";
+            $sqlBind[] = $in['search_string'];
             for ($i = 0; $i < 3; $i++) {
                 $sqlBind[] = '%' . $in['search_string'] . '%';
             }
