@@ -86,7 +86,7 @@ class Module extends RAASModule
                   .  "   AS tU ";
         $sqlBind = [];
         if (isset($in['sort'], $columns[$in['sort']]) && ($col = $columns[$in['sort']])) {
-            $sqlQuery .= " LEFT JOIN " . User_Field::_dbprefix() . User_Field::data_table
+            $sqlQuery .= " LEFT JOIN " . User_Field::_dbprefix() . User_Field::DATA_TABLE
                       .  "   AS tSort
                              ON tSort.pid = tU.id
                             AND tSort.fid = ?";
@@ -122,7 +122,7 @@ class Module extends RAASModule
                                 OR (
                                         (
                                             SELECT COUNT(*)
-                                              FROM " . User_Field::_dbprefix() . User_Field::data_table
+                                              FROM " . User_Field::_dbprefix() . User_Field::DATA_TABLE
                       .  "                   WHERE pid = tU.id
                                                AND value LIKE ?
                                         ) > 0
@@ -246,7 +246,7 @@ class Module extends RAASModule
         $sqlQuery = "SELECT tU.*
                        FROM " . User::_tablename()
                   . "    AS tU
-                       JOIN " . User_Field::_dbprefix() . User_Field::data_table
+                       JOIN " . User_Field::_dbprefix() . User_Field::DATA_TABLE
                   . "    AS tD
                          ON tD.pid = tU.id
                        JOIN " . User_Field::_tablename()
