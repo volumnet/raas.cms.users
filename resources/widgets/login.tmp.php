@@ -1,6 +1,6 @@
 <?php
 /**
- * Виджет входа в систему
+ * Вход в систему
  * @param Block_LogIn $Block Текущий блок
  * @param Page $Page Текущая страница
  * @param User|null $User Текущий пользователь

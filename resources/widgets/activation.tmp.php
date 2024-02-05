@@ -1,6 +1,6 @@
 <?php
 /**
- * Виджет активации
+ * Активация
  * @param Block_Activation $Block Текущий блок
  * @param Page $Page Текущая страница
  * @param bool $success Успешная активация

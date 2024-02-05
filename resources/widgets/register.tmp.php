@@ -1,6 +1,6 @@
 <?php
 /**
- * Виджет регистрации
+ * Регистрация
  * @param Block_Register $Block Текущий блок
  * @param Page $Page Текущая страница
  * @param bool $success Успешная активация

@@ -254,7 +254,7 @@ class EditUserForm extends RAASForm
                             (int)$field->Form->Item->id
                         ]);
                         $arr = [];
-                        foreach ((array)$_POST[$field->name] as $val) {
+                        foreach ((array)($_POST[$field->name] ?? []) as $val) {
                             if ((int)$val) {
                                 $arr[] = [
                                     'uid' => (int)$field->Form->Item->id,

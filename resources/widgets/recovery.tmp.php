@@ -1,6 +1,6 @@
 <?php
 /**
- * Виджет восстановления пароля
+ * Восстановление пароля
  * @param Block_Recovery $Block Текущий блок
  * @param Page $Page Текущая страница
  * @param bool $success Успешная активация

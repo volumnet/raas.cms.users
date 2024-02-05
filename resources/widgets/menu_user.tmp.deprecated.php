@@ -1,8 +1,9 @@
 <?php
 /**
- * Виджет "Меню пользователя" для AJAX
+ * Меню пользователя для AJAX
  * @param Block_PHP $Block Текущий блок
  * @param Page $Page Текущая страница
+ * @deprecated Сделано через Vue
  */
 namespace RAAS\CMS\Users;
 
