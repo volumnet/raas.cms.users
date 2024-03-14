@@ -273,8 +273,8 @@ class Webmaster extends CMSWebmaster
         $login = $this->createLogIn();
         $recovery = $this->createRecovery();
 
-        if (Snippet::importByURN('my_orders')->id &&
-            Snippet::importByURN('__raas_my_orders_interface')->id
+        if ((Snippet::importByURN('my_orders')->id ?? null) &&
+            (Snippet::importByURN('__raas_my_orders_interface')->id ?? null)
         ) {
             $myOrders = $this->createMyOrders();
         }

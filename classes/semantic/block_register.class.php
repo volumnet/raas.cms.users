@@ -79,7 +79,7 @@ class Block_Register extends Block
             'allow_edit_social' => (int)$this->allow_edit_social,
             'activation_type' => (int)$this->activation_type,
             'allow_to' => (int)$this->allow_to,
-            'redirect_url' => trim($this->redirect_url),
+            'redirect_url' => trim((string)$this->redirect_url),
         ];
     }
 }

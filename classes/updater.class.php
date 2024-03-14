@@ -8,10 +8,7 @@ class Updater extends \RAAS\Updater
 {
     public function preInstall()
     {
-        if (version_compare(
-            $this->Context->registryGet('baseVersion'),
-            '4.2.13'
-        ) < 0) {
+        if (version_compare((string)$this->Context->registryGet('baseVersion'), '4.2.13') < 0) {
             $this->update20151129();
             $this->update20190702();
         }

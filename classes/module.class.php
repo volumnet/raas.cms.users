@@ -305,7 +305,7 @@ class Module extends RAASModule
             !$this->registryGet('baseVersion') ||
             ($this->registryGet('baseVersion') != $this->version)
         ) {
-            if (!trim($this->registryGet('activation_notify'))) {
+            if (!trim((string)$this->registryGet('activation_notify'))) {
                 $this->registrySet('activation_notify', file_get_contents(
                     $this->resourcesDir .
                     '/interfaces/activation_notification.php'

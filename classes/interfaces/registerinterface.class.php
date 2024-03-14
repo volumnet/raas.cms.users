@@ -4,8 +4,6 @@
  */
 namespace RAAS\CMS\Users;
 
-use Mustache_Engine;
-use Pelago\Emogrifier\CssInliner;
 use SOME\Text;
 use RAAS\Application;
 use RAAS\Controller_Frontend as RAASControllerFrontend;
@@ -574,12 +572,8 @@ class RegisterInterface extends FormInterface
         $attachments = $this->getRegisterAttachments($user, $material, $forAdmin);
 
         $processEmbedded = $this->processEmbedded($message);
-        $message = $processEmbedded['message'];
+        $message = Text::inlineCSS($processEmbedded['message']);
         $embedded = (array)$processEmbedded['embedded'];
-
-        if (class_exists('Pelago\Emogrifier\CssInliner')) {
-            $message = CssInliner::fromHtml($message)->inlineCss()->render();
-        }
 
         if ($emails = $addresses['emails']) {
             if ($debug) {
@@ -629,9 +623,8 @@ class RegisterInterface extends FormInterface
 
         if (Application::i()->prod && ($smsPhones = $addresses['smsPhones'])) {
             if ($urlTemplate = Package::i()->registryGet('sms_gate')) {
-                $m = new Mustache_Engine();
                 foreach ($smsPhones as $phone) {
-                    $url = $m->render($urlTemplate, [
+                    $url = Text::renderTemplate($urlTemplate, [
                         'PHONE' => urlencode($phone),
                         'TEXT' => urlencode($smsMessage)
                     ]);
