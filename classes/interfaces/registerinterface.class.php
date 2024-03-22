@@ -95,7 +95,7 @@ class RegisterInterface extends FormInterface
             } elseif ($this->isFormProceed(
                 $this->block,
                 $form,
-                $this->server['REQUEST_METHOD'],
+                $this->server['REQUEST_METHOD'] ?? '',
                 $this->post
             )) {
                 $localError = $this->checkRegisterForm(
@@ -126,7 +126,7 @@ class RegisterInterface extends FormInterface
                 $result['DATA'] = $user->getArrayCopy();
                 unset($result['DATA']['password_md5']);
                 $material = $this->getUserMaterial($form, $user, $new);
-                $materialId = $material->id;
+                $materialId = $material ? $material->id : null;
                 foreach ($form->fields as $fieldURN => $formField) {
                     if ($user->id && isset($user->fields[$fieldURN])) {
                         $userField = $user->fields[$fieldURN];
@@ -183,7 +183,7 @@ class RegisterInterface extends FormInterface
             $this->session['confirmedSocial'] = [];
         }
         if ($profile = $this->getProfile($post['token'])) {
-            if ($post['AJAX']) {
+            if ($post['AJAX'] ?? null) {
                 $_SESSION['confirmedSocial'][] = $profile->profile;
                 $_SESSION['confirmedSocial'] = array_values(
                     array_unique((array)$_SESSION['confirmedSocial'])
@@ -317,12 +317,12 @@ class RegisterInterface extends FormInterface
                 $user->login = $val;
             }
         }
-        if ($form->fields['login'] && !$block->email_as_login) {
+        if (($form->fields['login'] ?? null) && !$block->email_as_login) {
             if ($val = trim($post['login'])) {
                 $user->login = $val;
             }
         }
-        if ($form->fields['password'] && ($val = trim($post['password']))) {
+        if ($form->fields['password'] && ($val = (string)($post['password'] ?? ''))) {
             $user->password = $val;
         } elseif ($new) {
             $val = $user->password = $this->generatePass();
@@ -333,7 +333,7 @@ class RegisterInterface extends FormInterface
             $user->password_md5 = Application::i()->md5It($val);
         }
 
-        if ($form->fields['lang'] && ($val = trim($post['lang']))) {
+        if (($form->fields['lang'] ?? null) && ($val = trim((string)($post['lang'] ?? '')))) {
             $user->lang = $val;
         } else {
             $user->lang = $page->lang;
@@ -569,13 +569,13 @@ class RegisterInterface extends FormInterface
         $fromName = $this->getFromName();
         $fromEmail = $this->getFromEmail();
         $debugMessages = [];
-        $attachments = $this->getRegisterAttachments($user, $material, $forAdmin);
+        $attachments = $this->getRegisterAttachments($user, null, $forAdmin);
 
         $processEmbedded = $this->processEmbedded($message);
         $message = Text::inlineCSS($processEmbedded['message']);
         $embedded = (array)$processEmbedded['embedded'];
 
-        if ($emails = $addresses['emails']) {
+        if ($emails = ($addresses['emails'] ?? null)) {
             if ($debug) {
                 $debugMessages['emails'] = [
                     'emails' => $emails,
@@ -600,7 +600,7 @@ class RegisterInterface extends FormInterface
             }
         }
 
-        if ($smsEmails = $addresses['smsEmails']) {
+        if ($smsEmails = ($addresses['smsEmails'] ?? null)) {
             if ($debug) {
                 $debugMessages['smsEmails'] = [
                     'emails' => $smsEmails,
@@ -621,14 +621,14 @@ class RegisterInterface extends FormInterface
             }
         }
 
-        if (Application::i()->prod && ($smsPhones = $addresses['smsPhones'])) {
+        if ($smsPhones = ($addresses['smsPhones'] ?? null)) {
             if ($urlTemplate = Package::i()->registryGet('sms_gate')) {
                 foreach ($smsPhones as $phone) {
                     $url = Text::renderTemplate($urlTemplate, [
                         'PHONE' => urlencode($phone),
                         'TEXT' => urlencode($smsMessage)
                     ]);
-                    if ($debug) {
+                    if (!Application::i()->prod || $debug) {
                         $debugMessages['smsPhones'][] = $url;
                     } else {
                         $result = file_get_contents($url);
@@ -648,7 +648,7 @@ class RegisterInterface extends FormInterface
      */
     public function getEmailRegisterSubject()
     {
-        $host = $this->server['HTTP_HOST'];
+        $host = $this->server['HTTP_HOST'] ?? '';
         if (function_exists('idn_to_utf8')) {
             $host = idn_to_utf8($host);
         }

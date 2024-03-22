@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit colors="true" bootstrap="./bootstrap.php">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" bootstrap="./bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage includeUncoveredFiles="false">
+    <include>
+      <directory suffix=".php">../classes</directory>
+    </include>
+    <report>
+      <html outputDirectory="coverage"/>
+    </report>
+  </coverage>
   <testsuites>
-    <testsuite>
-      <file>src/interfaces/MaterialInterfaceTest.php</file>
+    <testsuite name="ActivationInterface">
+      <file>src/interfaces/ActivationInterfaceTest.php</file>
+    </testsuite>
+    <testsuite name="CheckRedirectTrait">
+      <file>src/interfaces/CheckRedirectTraitTest.php</file>
+    </testsuite>
+    <testsuite name="EditUserMaterialInterface">
+      <file>src/interfaces/EditUserMaterialInterfaceTest.php</file>
+    </testsuite>
+    <testsuite name="LogInInterface">
+      <file>src/interfaces/LogInInterfaceTest.php</file>
+    </testsuite>
+    <testsuite name="RecoveryInterface">
+      <file>src/interfaces/RecoveryInterfaceTest.php</file>
+    </testsuite>
+    <testsuite name="RegisterInterface">
+      <file>src/interfaces/RegisterInterfaceTest.php</file>
     </testsuite>
   </testsuites>
-  <filter>
-    <whitelist>
-      <directory suffix=".php">../classes</directory>
-    </whitelist>
-  </filter>
-  <logging>
-    <log type="coverage-html" target="coverage" />
-  </logging>
+  <logging/>
 </phpunit>

@@ -4,6 +4,7 @@
  */
 namespace RAAS\CMS\Users;
 
+use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
 use RAAS\CMS\Block;
@@ -13,9 +14,21 @@ use RAAS\CMS\User;
 
 /**
  * Класс теста стандартного интерфейса восстановления пароля
+ * @covers RAAS\CMS\Users\RecoveryInterface
  */
-class RecoveryInterfaceTest extends BaseDBTest
+class RecoveryInterfaceTest extends BaseTest
 {
+    public static $tables = [
+        'cms_blocks',
+        'cms_data',
+        'cms_fields',
+        'cms_pages',
+        'cms_snippets',
+        'cms_users',
+        'cms_users_blocks_recovery',
+        'registry',
+    ];
+
     /**
      * Тест получения заголовка e-mail сообщения
      */
@@ -33,11 +46,8 @@ class RecoveryInterfaceTest extends BaseDBTest
 
         $result = $interface->getEmailRecoverySubject();
 
-        $this->assertContains(date('d.m.Y H:i'), $result);
-        $this->assertContains(
-            'Восстановление пароля на сайте ДОМЕН.РФ',
-            $result
-        );
+        $this->assertStringContainsString(date('d.m.Y H:i'), $result);
+        $this->assertStringContainsString('Восстановление пароля на сайте ДОМЕН.РФ', $result);
     }
 
 
@@ -65,20 +75,14 @@ class RecoveryInterfaceTest extends BaseDBTest
         );
 
         $this->assertEquals(['test@test.org'], $result['emails']['emails']);
-        $this->assertContains(
-            'Восстановление пароля на сайте',
-            $result['emails']['subject']
-        );
-        $this->assertContains(date('d.m.Y H:i'), $result['emails']['message']);
-        $this->assertContains(
-            'Вы запросили восстановление пароля на сайте',
-            $result['emails']['message']
-        );
-        $this->assertContains('/recovery/?key=', $result['emails']['message']);
-        $this->assertContains('Администрация сайта', $result['emails']['from']);
-        $this->assertContains('info@', $result['emails']['fromEmail']);
-        $this->assertNull($result['smsEmails']);
-        $this->assertNull($result['smsPhones']);
+        $this->assertStringContainsString('Восстановление пароля на сайте', $result['emails']['subject']);
+        $this->assertStringContainsString(date('d.m.Y H:i'), $result['emails']['message']);
+        $this->assertStringContainsString('Вы запросили восстановление пароля на сайте', $result['emails']['message']);
+        $this->assertStringContainsString('/recovery/?key=', $result['emails']['message']);
+        $this->assertStringContainsString('Администрация сайта', $result['emails']['from']);
+        $this->assertStringContainsString('info@', $result['emails']['fromEmail']);
+        $this->assertNull($result['smsEmails'] ?? null);
+        $this->assertNull($result['smsPhones'] ?? null);
 
         Package::i()->registrySet('sms_gate', '');
     }
@@ -480,7 +484,7 @@ class RecoveryInterfaceTest extends BaseDBTest
         $this->assertEquals(1, $result['User']->id);
         $this->assertEquals(1, Controller_Frontend::i()->user->id);
         $this->assertEmpty($result['localError']);
-        $this->assertTrue($result['success']);
+        $this->assertNotEmpty($result['success']);
 
         $user = new User(1);
         $this->assertEquals(Application::i()->md5It('aaa'), $user->password_md5);

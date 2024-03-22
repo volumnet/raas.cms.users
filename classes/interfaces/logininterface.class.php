@@ -62,11 +62,11 @@ class LogInInterface extends AbstractInterface
         $auth = new Auth($user);
         $localError = [];
         $noredirect = false;
-        if ($this->get['logout']) {
+        if ($this->get['logout'] ?? null) {
             $auth->logout();
         } elseif ($user->id) {
             // Ничего не делаем
-        } elseif (mb_strtolower($this->server['REQUEST_METHOD']) == 'post') {
+        } elseif (mb_strtolower($this->server['REQUEST_METHOD'] ?? '') == 'post') {
             if (isset($this->post['token']) && $this->block->social_login_type) {
                 if ($socialProfile = $this->getProfile($this->post['token'])) {
                     if ($auth->loginBySocialNetwork($socialProfile->profile)) {
@@ -179,7 +179,7 @@ class LogInInterface extends AbstractInterface
         while ($user->checkLoginExists($login)) {
             $login = Application::i()->getNewURN($login);
         }
-        if ($this->block->email_as_login) {
+        if ($this->block && $this->block->email_as_login) {
             $user->login = $user->email;
         }
         if (!$user->login) {
@@ -188,7 +188,7 @@ class LogInInterface extends AbstractInterface
         $user->commit();
         $userFieldsURNs = ['last_name', 'first_name', 'full_name', 'phone'];
         foreach ($userFieldsURNs as $userFieldsURN) {
-            if ($field = $user->fields[$userFieldsURN]) {
+            if ($field = ($user->fields[$userFieldsURN] ?? null)) {
                 $field->deleteValues();
                 $field->addValue($socialProfile->$userFieldsURN);
             }

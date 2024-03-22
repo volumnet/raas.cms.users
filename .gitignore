@@ -3,3 +3,5 @@ vendor
 components
 composer.lock
 config.php
+.phpunit.result.cache
+.phpintel

@@ -37,7 +37,7 @@ if ($SMS) {
                 continue;
             }
         }
-        $renderer = NotificationFieldRenderer::spawn($field, $USER);
+        $renderer = NotificationFieldRenderer::spawn($field, $User);
         echo $renderer->render(['admin' => $ADMIN, 'sms' => true]);
     }
     if (!$passwordDetected && !$ADMIN && $User->password) {

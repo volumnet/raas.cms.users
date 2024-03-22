@@ -5,6 +5,7 @@
 namespace RAAS\CMS\Users;
 
 use ReflectionClass;
+use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
 use RAAS\CMS\Block;
@@ -12,8 +13,8 @@ use RAAS\CMS\Form;
 use RAAS\CMS\Form_Field;
 use RAAS\CMS\Material;
 use RAAS\CMS\Material_Type;
-use RAAS\CMS\Page;
 use RAAS\CMS\Package;
+use RAAS\CMS\Page;
 use RAAS\CMS\SocialProfile;
 use RAAS\CMS\ULogin;
 use RAAS\CMS\User;
@@ -21,9 +22,37 @@ use RAAS\CMS\User_Field;
 
 /**
  * Класс теста стандартного интерфейса регистрации
+ * @covers RAAS\CMS\Users\RegisterInterface
  */
-class RegisterInterfaceTest extends BaseDBTest
+class RegisterInterfaceTest extends BaseTest
 {
+    public static $tables = [
+        'attachments',
+        'cms_access',
+        'cms_access_blocks_cache',
+        'cms_access_materials_cache',
+        'cms_access_pages_cache',
+        'cms_blocks',
+        'cms_blocks_material',
+        'cms_blocks_pages_assoc',
+        'cms_data',
+        'cms_fields',
+        'cms_forms',
+        'cms_material_types',
+        'cms_material_types_affected_pages_for_materials_cache',
+        'cms_material_types_affected_pages_for_self_cache',
+        'cms_materials',
+        'cms_materials_affected_pages_cache',
+        'cms_materials_pages_assoc',
+        'cms_pages',
+        'cms_snippets',
+        'cms_users',
+        'cms_users_blocks_register',
+        'cms_users_groups_assoc',
+        'cms_users_social',
+        'registry',
+    ];
+
     /**
      * Тест регистрации по токену соц. сети
      * (случай с неверным токеном)
@@ -164,7 +193,7 @@ class RegisterInterfaceTest extends BaseDBTest
 
         $result = $interface->generatePass(10);
 
-        $this->assertRegExp('/[A-Za-z0-9]{10}/umi', $result);
+        $this->assertMatchesRegularExpression('/[A-Za-z0-9]{10}/umi', $result);
     }
 
 
@@ -186,8 +215,8 @@ class RegisterInterfaceTest extends BaseDBTest
 
         $result = $interface->getEmailRegisterSubject();
 
-        $this->assertContains(date('d.m.Y H:i'), $result);
-        $this->assertContains('Регистрация на сайте ДОМЕН.РФ', $result);
+        $this->assertStringContainsString(date('d.m.Y H:i'), $result);
+        $this->assertStringContainsString('Регистрация на сайте ДОМЕН.РФ', $result);
     }
 
 
@@ -260,7 +289,7 @@ class RegisterInterfaceTest extends BaseDBTest
                 'image' => 'Необходимо заполнить поле «Изображение»',
                 'login' => 'Пользователь с таким логином уже существует',
                 'email' => 'Пользователь с таким адресом электронной почты уже существует',
-                '_name' => 'Код с картинки указан неверно',
+                '_name' => 'Антиспам-система не пройдена',
             ],
             $result
         );
@@ -335,44 +364,20 @@ class RegisterInterfaceTest extends BaseDBTest
         );
 
         $this->assertEquals(['test@test.org'], $result['emails']['emails']);
-        $this->assertContains(
-            'Регистрация на сайте',
-            $result['emails']['subject']
-        );
-        $this->assertContains('<div>', $result['emails']['message']);
-        $this->assertContains(
-            'Телефон: +7 999 000-00-00',
-            $result['emails']['message']
-        );
-        $this->assertContains('/admin/', $result['emails']['message']);
-        $this->assertContains('Администрация сайта', $result['emails']['from']);
-        $this->assertContains('info@', $result['emails']['fromEmail']);
-        $this->assertEquals(
-            ['79990000000@sms.test.org'],
-            $result['smsEmails']['emails']
-        );
-        $this->assertContains(
-            'Регистрация на сайте',
-            $result['smsEmails']['subject']
-        );
-        $this->assertNotContains('<div>', $result['smsEmails']['message']);
-        $this->assertContains(
-            'Администрация сайта',
-            $result['smsEmails']['from']
-        );
-        $this->assertContains('info@', $result['smsEmails']['fromEmail']);
-        $this->assertContains(
-            'Телефон: +7 999 000-00-00',
-            $result['smsEmails']['message']
-        );
-        $this->assertContains(
-            'smsgate/%2B79990000000/',
-            $result['smsPhones'][0]
-        );
-        $this->assertContains(
-            urlencode('Телефон: +7 999 000-00-00'),
-            $result['smsPhones'][0]
-        );
+        $this->assertStringContainsString('Регистрация на сайте', $result['emails']['subject']);
+        $this->assertStringContainsString('<div>', $result['emails']['message']);
+        $this->assertStringContainsString('Телефон: +7 999 000-00-00', $result['emails']['message']);
+        $this->assertStringContainsString('/admin/', $result['emails']['message']);
+        $this->assertStringContainsString('Администрация сайта', $result['emails']['from']);
+        $this->assertStringContainsString('info@', $result['emails']['fromEmail']);
+        $this->assertEquals(['79990000000@sms.test.org'], $result['smsEmails']['emails']);
+        $this->assertStringContainsString('Регистрация на сайте', $result['smsEmails']['subject']);
+        $this->assertStringNotContainsString('<div>', $result['smsEmails']['message']);
+        $this->assertStringContainsString('Администрация сайта', $result['smsEmails']['from']);
+        $this->assertStringContainsString('info@', $result['smsEmails']['fromEmail']);
+        $this->assertStringContainsString('Телефон: +7 999 000-00-00', $result['smsEmails']['message']);
+        $this->assertStringContainsString('smsgate/%2B79990000000/', $result['smsPhones'][0]);
+        $this->assertStringContainsString(urlencode('Телефон: +7 999 000-00-00'), $result['smsPhones'][0]);
 
         $form->email = '';
         $form->commit();
@@ -409,27 +414,16 @@ class RegisterInterfaceTest extends BaseDBTest
         );
 
         $this->assertEquals(['test@test.org'], $result['emails']['emails']);
-        $this->assertContains(
-            'Регистрация на сайте',
-            $result['emails']['subject']
-        );
-        $this->assertContains('<div>', $result['emails']['message']);
-        $this->assertContains(
-            'Телефон: +7 999 000-00-00',
-            $result['emails']['message']
-        );
-        $this->assertContains('/activate/', $result['emails']['message']);
-        $this->assertContains('Администрация сайта', $result['emails']['from']);
-        $this->assertContains('info@', $result['emails']['fromEmail']);
-        $this->assertEmpty($result['smsEmails']);
-        $this->assertContains(
-            'smsgate/%2B79990000000/',
-            $result['smsPhones'][0]
-        );
-        $this->assertContains(
-            urlencode('Телефон: +7 999 000-00-00'),
-            $result['smsPhones'][0]
-        );
+        $this->assertStringContainsString('Регистрация на сайте', $result['emails']['subject']);
+        $this->assertStringContainsString('<div>', $result['emails']['message']);
+        $this->assertStringContainsString('Телефон: +7 999 000-00-00', $result['emails']['message']);
+        $this->assertStringContainsString('/activate/', $result['emails']['message']);
+        $this->assertStringContainsString('Администрация сайта', $result['emails']['from']);
+        $this->assertStringContainsString('info@', $result['emails']['fromEmail']);
+        $this->assertEmpty($result['smsEmails'] ?? null);
+        $this->assertNotEmpty($result['smsPhones'] ?? null);
+        $this->assertStringContainsString('smsgate/%2B79990000000/', $result['smsPhones'][0]);
+        $this->assertStringContainsString(urlencode('Телефон: +7 999 000-00-00'), $result['smsPhones'][0]);
 
         Package::i()->registrySet('sms_gate', '');
     }
@@ -696,7 +690,7 @@ class RegisterInterfaceTest extends BaseDBTest
         $this->assertEquals('test123@test.org', $user->email);
         $this->assertEquals('en', $user->lang);
         $this->assertContains('https://vk.com/user123', $user->social);
-        $this->assertEmpty($interface->session['confirmedSocial']);
+        $this->assertEmpty($interface->session['confirmedSocial'] ?? null);
         $this->assertEquals('127.0.0.1', $user->ip);
         $this->assertEquals(date('Y-m-d'), $user->date);
         $this->assertEquals(30, $user->page_id);
@@ -912,17 +906,17 @@ class RegisterInterfaceTest extends BaseDBTest
         $result = $interface->process();
 
         $this->assertEquals([], $result['localError']);
-        $this->assertNull($result['success']);
-        $this->assertEmpty($result['DATA']['login']);
-        $this->assertEmpty($result['DATA']['email']);
-        $this->assertEmpty($result['DATA']['password']);
-        $this->assertEmpty($result['DATA']['password_md5']);
-        $this->assertEmpty($result['DATA']['password@confirm']);
+        $this->assertNull($result['success'] ?? null);
+        $this->assertEmpty($result['DATA']['login'] ?? null);
+        $this->assertEmpty($result['DATA']['email'] ?? null);
+        $this->assertEmpty($result['DATA']['password'] ?? null);
+        $this->assertEmpty($result['DATA']['password_md5'] ?? null);
+        $this->assertEmpty($result['DATA']['password@confirm'] ?? null);
         $this->assertInstanceof(Form::class, $result['Form']);
         $this->assertEquals(4, $result['Form']->id);
         $this->assertEquals($user, $result['User']);
         $this->assertEquals('Регистрация', $page->getH1());
-        $this->assertEmpty($result['social']);
+        $this->assertEmpty($result['social'] ?? null);
     }
 
 
@@ -981,12 +975,12 @@ class RegisterInterfaceTest extends BaseDBTest
         $result = $interface->process();
 
         $this->assertEquals([], $result['localError']);
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
         $this->assertEquals('test', $result['DATA']['login']);
         $this->assertEquals('test@test.org', $result['DATA']['email']);
-        $this->assertEmpty($result['DATA']['password']);
-        $this->assertEmpty($result['DATA']['password_md5']);
-        $this->assertEmpty($result['DATA']['password@confirm']);
+        $this->assertEmpty($result['DATA']['password'] ?? null);
+        $this->assertEmpty($result['DATA']['password_md5'] ?? null);
+        $this->assertEmpty($result['DATA']['password@confirm'] ?? null);
         $this->assertEquals('Товар 1', $result['DATA']['_name_']);
         $this->assertEquals('83620', $result['DATA']['price']);
         $this->assertInstanceof(Form::class, $result['Form']);

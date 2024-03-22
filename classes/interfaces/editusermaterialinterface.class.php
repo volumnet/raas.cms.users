@@ -69,7 +69,7 @@ class EditUserMaterialInterface extends RegisterInterface
             if ($this->isFormProceed(
                 $this->block,
                 $form,
-                $this->server['REQUEST_METHOD'],
+                $this->server['REQUEST_METHOD'] ?? '',
                 $this->post
             )) {
                 $localError = $this->check(
@@ -97,7 +97,7 @@ class EditUserMaterialInterface extends RegisterInterface
                 $result['localError'] = $localError;
             } else {
                 $result['DATA'] = [];
-                $material = $this->getUserMaterial($form, $user, $new);
+                $material = $this->getUserMaterial($form, $user);
                 $materialId = $material->id;
                 foreach ($form->fields as $fieldURN => $formField) {
                     if ($materialId && isset($material->fields[$fieldURN])) {
@@ -114,11 +114,9 @@ class EditUserMaterialInterface extends RegisterInterface
                         } else {
                             $result['DATA'][$fieldURN] = array_shift($values);
                         }
-                    } elseif ($materialId &&
-                        in_array($fieldURN, ['_name_', '_description_'])
-                    ) {
+                    } elseif ($materialId && in_array($fieldURN, ['_name_', '_description_'])) {
                         $result['DATA'][$fieldURN] = $material->{trim($fieldURN, '_')};
-                    } elseif (!$materialId->id) {
+                    } elseif (!$materialId) {
                         $result['DATA'][$fieldURN] = $formField->defval;
                     }
                 }

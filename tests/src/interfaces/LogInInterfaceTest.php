@@ -4,27 +4,44 @@
  */
 namespace RAAS\CMS\Users;
 
-use RAAS\CMS\Auth;
-use RAAS\CMS\User;
-
+use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
+use RAAS\CMS\Auth;
 use RAAS\CMS\Block;
 use RAAS\CMS\Form;
 use RAAS\CMS\Form_Field;
 use RAAS\CMS\Material;
 use RAAS\CMS\Material_Type;
-use RAAS\CMS\Page;
 use RAAS\CMS\Package;
+use RAAS\CMS\Page;
 use RAAS\CMS\SocialProfile;
 use RAAS\CMS\ULogin;
+use RAAS\CMS\User;
 use RAAS\CMS\User_Field;
 
 /**
  * Класс теста стандартного интерфейса входа в систему
+ * @covers RAAS\CMS\Users\LogInInterface
  */
-class LogInInterfaceTest extends BaseDBTest
+class LogInInterfaceTest extends BaseTest
 {
+    public static $tables = [
+        'cms_access',
+        'cms_access_blocks_cache',
+        'cms_access_materials_cache',
+        'cms_access_pages_cache',
+        'cms_blocks',
+        'cms_data',
+        'cms_fields',
+        'cms_pages',
+        'cms_users',
+        'cms_users_blocks_login',
+        'cms_users_groups_assoc',
+        'cms_users_social',
+        'registry',
+    ];
+
     /**
      * Тест проверки, нужно ли сохранять пароль
      * Случай с проверкой на флажок "Сохранять пароль" и установленным флажком
@@ -188,7 +205,7 @@ class LogInInterfaceTest extends BaseDBTest
         $this->assertInstanceOf(User::class, $result['User']);
         $this->assertEmpty($result['User']->id);
         $this->assertEquals([], $result['localError']);
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
     }
 
 
@@ -217,7 +234,7 @@ class LogInInterfaceTest extends BaseDBTest
         $this->assertEmpty($result['User']->id);
         $this->assertEmpty(Controller_Frontend::i()->user->id);
         $this->assertEquals([], $result['localError']);
-        $this->assertTrue($result['success']);
+        $this->assertNotEmpty($result['success']);
     }
 
 
@@ -246,7 +263,7 @@ class LogInInterfaceTest extends BaseDBTest
         $this->assertEquals(1, $result['User']->id);
         $this->assertEquals(1, Controller_Frontend::i()->user->id);
         $this->assertEquals([], $result['localError']);
-        $this->assertTrue($result['success']);
+        $this->assertNotEmpty($result['success']);
     }
 
 
@@ -276,7 +293,7 @@ class LogInInterfaceTest extends BaseDBTest
         $this->assertEquals(1, $result['User']->id);
         $this->assertEquals(1, Controller_Frontend::i()->user->id);
         $this->assertEquals([], $result['localError']);
-        $this->assertTrue($result['success']);
+        $this->assertTrue($result['success'][46]);
     }
 
 
@@ -307,7 +324,7 @@ class LogInInterfaceTest extends BaseDBTest
         $this->assertEquals(1, Controller_Frontend::i()->user->id);
         $this->assertContains('https://vk.com/test1', $result['User']->social);
         $this->assertEquals([], $result['localError']);
-        $this->assertTrue($result['success']);
+        $this->assertTrue($result['success'][46]);
 
         $user = $result['User'];
         $user->meta_social = ['https://facebook.com/test', 'https://vk.com/test'];
@@ -317,13 +334,14 @@ class LogInInterfaceTest extends BaseDBTest
 
     /**
      * Тест обработки интерфейса
-     * Случай с быстрой регистрацией по соц. сети
+     * Случай с быстрой регистрацией по соц. сети и без использования e-mail как логина
      */
-    public function testProcessWithLoginBySocialQuickRegistration()
+    public function testProcessWithLoginBySocialQuickRegistrationAndNoEmailAsLogin()
     {
         Controller_Frontend::i()->user = new User();
         $block = Block::spawn(46); // Блок входа в систему
         $block->social_login_type = Block_LogIn::SOCIAL_LOGIN_QUICK_REGISTER;
+        $block->email_as_login = false;
         $interface = new LogInInterfaceWithSocialMock(
             $block,
             new Page(32), // Страница входа в систему
@@ -349,7 +367,7 @@ class LogInInterfaceTest extends BaseDBTest
         $this->assertEquals('User', $result['User']->first_name);
         $this->assertEquals(['https://test-social.com/test3-profile'], $result['User']->social);
         $this->assertEquals([], $result['localError']);
-        $this->assertTrue($result['success']);
+        $this->assertTrue($result['success'][46]);
 
         User::delete($result['User']);
     }
@@ -388,7 +406,7 @@ class LogInInterfaceTest extends BaseDBTest
             ['Пользователь с такой социальной сетью не найден'],
             $result['localError']
         );
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
 
         User::delete($result['User']);
     }
@@ -423,7 +441,7 @@ class LogInInterfaceTest extends BaseDBTest
             ['Не могу получить профиль социальной сети'],
             $result['localError']
         );
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
     }
 
 
@@ -454,7 +472,7 @@ class LogInInterfaceTest extends BaseDBTest
             ['login' => 'Необходимо указать логин'],
             $result['localError']
         );
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
     }
 
 
@@ -485,7 +503,7 @@ class LogInInterfaceTest extends BaseDBTest
             ['password' => 'Необходимо указать пароль'],
             $result['localError']
         );
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
     }
 
 
@@ -516,7 +534,7 @@ class LogInInterfaceTest extends BaseDBTest
             ['Неверные имя пользователя и/или пароль'],
             $result['localError']
         );
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
     }
 
 
@@ -551,7 +569,7 @@ class LogInInterfaceTest extends BaseDBTest
             ['Ваша учетная запись заблокирована'],
             $result['localError']
         );
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
 
         $user = new User(2);
         $user->vis = 1;
@@ -583,6 +601,6 @@ class LogInInterfaceTest extends BaseDBTest
         $this->assertEquals(1, $result['User']->id);
         $this->assertEquals(1, Controller_Frontend::i()->user->id);
         $this->assertEquals([], $result['localError']);
-        $this->assertTrue($result['success']);
+        $this->assertTrue($result['success'][46]);
     }
 }

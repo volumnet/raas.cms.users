@@ -5,6 +5,7 @@
 namespace RAAS\CMS\Users;
 
 use ReflectionClass;
+use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
 use RAAS\CMS\Block;
@@ -12,8 +13,8 @@ use RAAS\CMS\Form;
 use RAAS\CMS\Form_Field;
 use RAAS\CMS\Material;
 use RAAS\CMS\Material_Type;
-use RAAS\CMS\Page;
 use RAAS\CMS\Package;
+use RAAS\CMS\Page;
 use RAAS\CMS\SocialProfile;
 use RAAS\CMS\ULogin;
 use RAAS\CMS\User;
@@ -21,10 +22,11 @@ use RAAS\CMS\User_Field;
 
 /**
  * Класс теста стандартного интерфейса регистрации
+ * @covers RAAS\CMS\Users\EditUserMaterialInterface
  */
-class EditUserMaterialInterfaceTest extends BaseDBTest
+class EditUserMaterialInterfaceTest extends BaseTest
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
@@ -77,7 +79,7 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
     }
 
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         $block = Block::spawn(27);
         $block->form = 1;
@@ -131,7 +133,7 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
 
         $result = $interface->process();
 
-        $this->assertEmpty($result['localError']);
+        $this->assertEmpty($result['localError'] ?? []);
         $this->assertInstanceof(Material::class, $result['Material']);
         $material = $result['Material'];
         $this->assertNotNull($material->id);
@@ -172,7 +174,7 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
 
         $result = $interface->process();
 
-        $this->assertEmpty($result['localError']);
+        $this->assertEmpty($result['localError'] ?? []);
         $this->assertInstanceof(Material::class, $result['Material']);
         $material = $result['Material'];
         $this->assertEquals(0, $material->vis);
@@ -214,8 +216,8 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
 
         $result = $interface->process();
 
-        $this->assertEmpty($result['localError']);
-        $this->assertNull($result['success']);
+        $this->assertEmpty($result['localError'] ?? []);
+        $this->assertNull($result['success'] ?? null);
         $this->assertInstanceof(Form::class, $result['Form']);
         $this->assertEquals(4, $result['Form']->id);
         $this->assertEquals($user, $result['User']);
@@ -252,7 +254,7 @@ class EditUserMaterialInterfaceTest extends BaseDBTest
         $result = $interface->process();
 
         $this->assertEquals([], $result['localError']);
-        $this->assertNull($result['success']);
+        $this->assertNull($result['success'] ?? null);
         $this->assertEquals('Товар 1', $result['DATA']['_name_']);
         $this->assertEquals('83620', $result['DATA']['price']);
         $this->assertCount(3, $result['DATA']['related']);

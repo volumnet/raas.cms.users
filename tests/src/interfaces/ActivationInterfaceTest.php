@@ -4,6 +4,7 @@
  */
 namespace RAAS\CMS\Users;
 
+use SOME\BaseTest;
 use RAAS\Controller_Frontend;
 use RAAS\CMS\Block;
 use RAAS\CMS\Page;
@@ -11,9 +12,17 @@ use RAAS\CMS\User;
 
 /**
  * Класс теста стандартного интерфейса активации учетной записи
+ * @covers RAAS\CMS\Users\ActivationInterface
  */
-class ActivationInterfaceTest extends BaseDBTest
+class ActivationInterfaceTest extends BaseTest
 {
+    public static $tables = [
+        'cms_blocks',
+        'cms_fields',
+        'cms_pages',
+        'cms_users',
+    ];
+
     /**
      * Тест отработки интерфейса
      * Случай с входом на страницу без данных

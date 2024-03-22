@@ -4,12 +4,14 @@
  */
 namespace RAAS\CMS\Users;
 
+use SOME\BaseTest;
 use RAAS\CMS\Page;
 
 /**
  * Класс теста трейта проверки редиректа
+ * @covers RAAS\CMS\Users\CheckRedirectTrait
  */
-class CheckRedirectTraitTest extends BaseDBTest
+class CheckRedirectTraitTest extends BaseTest
 {
     /**
      * Тест применения редиректа

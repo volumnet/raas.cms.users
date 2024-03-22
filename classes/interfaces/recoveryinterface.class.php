@@ -61,13 +61,13 @@ class RecoveryInterface extends FormInterface
         $result = [];
         $user = RAASController_Frontend::i()->user;
         $localError = [];
-        if ($this->get['key'] || $user->id) {
+        if (($this->get['key'] ?? '') || $user->id) {
             $result['proceed'] = true;
             $invalidKey = false;
             $tmpUser = null;
             if ($this->get['key']) {
                 $tmpUser = CMSUser::importByRecoveryKey($this->get['key']);
-                if ($tmpUser->id) {
+                if ($tmpUser && $tmpUser->id) {
                     $user = $tmpUser;
                 } else {
                     $invalidKey = true;
@@ -85,7 +85,7 @@ class RecoveryInterface extends FormInterface
                     $auth = new Auth($user);
                     $auth->setSession();
                 }
-                if (mb_strtolower($this->server['REQUEST_METHOD']) == 'post') {
+                if (mb_strtolower($this->server['REQUEST_METHOD'] ?? '') == 'post') {
                     if (!isset($this->post['password']) ||
                         !trim($this->post['password'])
                     ) {
@@ -172,7 +172,7 @@ class RecoveryInterface extends FormInterface
             'Page' => $page,
             'config' => $config,
             'recoveryInterface' => $this,
-            'referer' => $this->get['HTTP_REFERER']
+            'referer' => ($this->get['HTTP_REFERER'] ?? '')
         ];
 
         $subject = $this->getEmailRecoverySubject();
@@ -216,7 +216,7 @@ class RecoveryInterface extends FormInterface
      */
     public function getEmailRecoverySubject()
     {
-        $host = $this->server['HTTP_HOST'];
+        $host = $this->server['HTTP_HOST'] ?? '';
         if (function_exists('idn_to_utf8')) {
             $host = idn_to_utf8($host);
         }
