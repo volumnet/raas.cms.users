@@ -1,6 +1,12 @@
 <?php
+/**
+ * Блок входа в систему
+ */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\Block;
+
+use RAAS\CMS\Block;
 
 class Block_LogIn extends Block
 {
@@ -23,7 +29,7 @@ class Block_LogIn extends Block
     }
 
 
-    public function getAddData()
+    public function getAddData(): array
     {
         return array(
             'id' => (int)$this->id,

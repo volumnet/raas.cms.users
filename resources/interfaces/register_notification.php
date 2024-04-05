@@ -9,9 +9,10 @@
  * @param array $config Конфигурация блока
  * @param Page $Page Текущая страница
  */
-namespace RAAS\CMS;
+namespace RAAS\CMS\Users;
 
 use RAAS\Controller_Frontend as ControllerFrontend;
+use RAAS\CMS\NotificationFieldRenderer;
 use RAAS\CMS\Users\Block_Register;
 use RAAS\CMS\Users\Block_Activation;
 
@@ -82,9 +83,9 @@ if ($SMS) {
           <small>
             <?php
             echo IP_ADDRESS . ': ' .
-                htmlspecialchars($User->ip) . '<br />' .
+                htmlspecialchars((string)$User->ip) . '<br />' .
                 USER_AGENT . ': ' .
-                htmlspecialchars($User->user_agent) . '<br />' .
+                htmlspecialchars((string)$User->user_agent) . '<br />' .
                 PAGE . ': ';
             if ($page->parents) {
                 foreach ($page->parents as $row) { ?>

@@ -285,7 +285,8 @@ class RegisterInterfaceTest extends BaseTest
         $this->assertEquals(
             [
                 'password' => 'Необходимо заполнить поле «Пароль»',
-                'full_name' => 'Необходимо заполнить поле «Ваше имя»',
+                'last_name' => 'Необходимо заполнить поле «Фамилия»',
+                'first_name' => 'Необходимо заполнить поле «Имя»',
                 'image' => 'Необходимо заполнить поле «Изображение»',
                 'login' => 'Пользователь с таким логином уже существует',
                 'email' => 'Пользователь с таким адресом электронной почты уже существует',
@@ -314,7 +315,8 @@ class RegisterInterfaceTest extends BaseTest
             new User(),
             new Form(4),
             [
-                'full_name' => 'aaa',
+                'last_name' => 'Тестовый',
+                'first_name' => 'Пользователь',
                 'email' => 'test',
                 'password' => 'pass',
                 'password@confirm' => 'pass'
@@ -625,8 +627,10 @@ class RegisterInterfaceTest extends BaseTest
         $ipField->commit();
         $dateField = new User_Field(['urn' => 'date', 'datatype' => 'date']);
         $dateField->commit();
-        $fullNameField = new User_Field(['urn' => 'full_name', 'datatype' => 'text']);
-        $fullNameField->commit();
+        $lastNameField = new User_Field(['urn' => 'last_name', 'datatype' => 'text']);
+        $lastNameField->commit();
+        $firstNameField = new User_Field(['urn' => 'first_name', 'datatype' => 'text']);
+        $firstNameField->commit();
 
         $nameField = new Form_Field([
             'pid' => 4,
@@ -652,12 +656,14 @@ class RegisterInterfaceTest extends BaseTest
         $form->email = 'test@test.org';
         $block = Block::spawn(45);
         $block->allow_edit_social = 1;
+        $block->email_as_login = 0;
         $page = new Page(30); // Главная
         $user = new User();
         $post = [
             'login' => 'testuser',
             'password' => 'pass',
-            'full_name' => 'Test User 123',
+            'last_name' => 'Тестовый',
+            'first_name' => 'Пользователь',
             'phone' => '+7 999 111-11-11',
             'email' => 'test123@test.org',
             'lang' => 'en',
@@ -686,7 +692,8 @@ class RegisterInterfaceTest extends BaseTest
         $user->reload();
         $this->assertEquals('testuser', $user->login);
         $this->assertEquals('pass', $user->password);
-        $this->assertEquals('Test User 123', $user->full_name);
+        $this->assertEquals('Тестовый', $user->last_name);
+        $this->assertEquals('Пользователь', $user->first_name);
         $this->assertEquals('test123@test.org', $user->email);
         $this->assertEquals('en', $user->lang);
         $this->assertContains('https://vk.com/user123', $user->social);
@@ -709,7 +716,8 @@ class RegisterInterfaceTest extends BaseTest
         User_Field::delete($langField);
         User_Field::delete($ipField);
         User_Field::delete($dateField);
-        User_Field::delete($fullNameField);
+        User_Field::delete($lastNameField);
+        User_Field::delete($firstNameField);
         User_Field::delete($catalogField);
         Form_Field::delete($nameField);
         Form_Field::delete($priceField);
@@ -734,7 +742,8 @@ class RegisterInterfaceTest extends BaseTest
         $loginField->required = 0;
         $loginField->commit();
         $post = [
-            'full_name' => 'Test User 123',
+            'last_name' => 'Тестовый',
+            'first_name' => 'Пользователь',
             'phone' => '+7 999 111-11-11',
             'email' => 'test123@test.org',
         ];
@@ -775,7 +784,8 @@ class RegisterInterfaceTest extends BaseTest
             'login' => 'testuser',
             'password' => 'pass',
             'password@confirm' => 'pass',
-            'full_name' => 'Test User 123',
+            'last_name' => 'Тестовый',
+            'first_name' => 'Пользователь',
             'phone' => '+7 999 111-11-11',
             'email' => 'test123@test.org',
             'form_signature' => md5('form445')
@@ -819,7 +829,8 @@ class RegisterInterfaceTest extends BaseTest
         $user = Controller_Frontend::i()->user = new User(1);
         $post = [
             'login' => 'test',
-            'full_name' => 'Test User',
+            'last_name' => 'Тестовый',
+            'first_name' => 'Пользователь',
             'phone' => '+7 999 000-00-00',
             'email' => 'test@test.org',
             'form_signature' => md5('form445'),
@@ -976,7 +987,7 @@ class RegisterInterfaceTest extends BaseTest
 
         $this->assertEquals([], $result['localError']);
         $this->assertNull($result['success'] ?? null);
-        $this->assertEquals('test', $result['DATA']['login']);
+        $this->assertEquals('test@test.org', $result['DATA']['login']);
         $this->assertEquals('test@test.org', $result['DATA']['email']);
         $this->assertEmpty($result['DATA']['password'] ?? null);
         $this->assertEmpty($result['DATA']['password_md5'] ?? null);

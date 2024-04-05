@@ -1,6 +1,10 @@
 <?php
+/**
+ * Блок восстановления пароля
+ */
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\Block;
+
+use RAAS\CMS\Block;
 
 class Block_Recovery extends Block
 {
@@ -21,7 +25,7 @@ class Block_Recovery extends Block
     }
 
 
-    public function getAddData()
+    public function getAddData(): array
     {
         return array(
             'id' => (int)$this->id,

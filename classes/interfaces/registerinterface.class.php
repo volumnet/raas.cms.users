@@ -318,7 +318,7 @@ class RegisterInterface extends FormInterface
             }
         }
         if (($form->fields['login'] ?? null) && !$block->email_as_login) {
-            if ($val = trim($post['login'])) {
+            if ($val = trim((string)($post['login'] ?? ''))) {
                 $user->login = $val;
             }
         }

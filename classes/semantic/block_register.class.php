@@ -1,4 +1,9 @@
 <?php
+/**
+ * Блок регистрации
+ */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\User as RAASUser;
@@ -50,7 +55,7 @@ class Block_Register extends Block
     }
 
 
-    public function process(Page $Page, $nocache = false)
+    public function process(Page $Page, bool $nocache = false)
     {
         if ($this->allow_to != static::ALLOW_TO_ALL) {
             $r = (bool)RAASController_Frontend::i()->user->id;
@@ -65,11 +70,11 @@ class Block_Register extends Block
                 }
             }
         }
-        parent::process($Page);
+        return parent::process($Page, $nocache);
     }
 
 
-    public function getAddData()
+    public function getAddData(): array
     {
         return [
             'id' => (int)$this->id,

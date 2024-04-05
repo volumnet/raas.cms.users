@@ -1,6 +1,12 @@
 <?php
+/**
+ * Блок активации
+ */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
-use \RAAS\CMS\Block;
+
+use RAAS\CMS\Block;
 
 class Block_Activation extends Block
 {

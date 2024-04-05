@@ -73,9 +73,13 @@ class EditUserMaterialInterfaceTest extends BaseTest
         $passwordField->required = 0;
         $passwordField->commit();
 
-        $fullNameField = $form->fields['full_name'];
-        $fullNameField->required = 0;
-        $fullNameField->commit();
+        $lastNameField = $form->fields['last_name'];
+        $lastNameField->required = 0;
+        $lastNameField->commit();
+
+        $firstNameField = $form->fields['first_name'];
+        $firstNameField->required = 0;
+        $firstNameField->commit();
     }
 
 
@@ -108,9 +112,13 @@ class EditUserMaterialInterfaceTest extends BaseTest
         $passwordField->required = 1;
         $passwordField->commit();
 
-        $fullNameField = $form->fields['full_name'];
-        $fullNameField->required = 1;
-        $fullNameField->commit();
+        $lastNameField = $form->fields['last_name'];
+        $lastNameField->required = 1;
+        $lastNameField->commit();
+
+        $firstNameField = $form->fields['first_name'];
+        $firstNameField->required = 1;
+        $firstNameField->commit();
     }
 
 
