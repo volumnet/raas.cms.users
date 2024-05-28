@@ -2,6 +2,8 @@
 /**
  * Файл стандартного интерфейса регистрации
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use SOME\Text;
@@ -198,8 +200,10 @@ class RegisterInterface extends FormInterface
                 if ($debug) {
                     $result['redirect'] = $url;
                 } else {
+                    // @codeCoverageIgnoreStart
                     header('Location: ' . $url);
                     exit;
+                    // @codeCoverageIgnoreEnd
                 }
             }
         }
@@ -214,7 +218,9 @@ class RegisterInterface extends FormInterface
      */
     public function getProfile($token)
     {
+        // @codeCoverageIgnoreStart
         return ULogin::getProfile($token);
+        // @codeCoverageIgnoreEnd
     }
 
 
@@ -431,10 +437,8 @@ class RegisterInterface extends FormInterface
      * @param User $user Пользователь
      * @return User_Field|null
      */
-    public function getMaterialTypeField(
-        Material_Type $materialType,
-        User $user
-    ) {
+    public function getMaterialTypeField(Material_Type $materialType, User $user)
+    {
         $mTypeId = $materialType->id;
         $materialFields = array_filter(
             $user->fields,
@@ -609,6 +613,7 @@ class RegisterInterface extends FormInterface
                     'from' => $fromName,
                     'fromEmail' => $fromEmail,
                 ];
+            // @codeCoverageIgnoreStart
             } else {
                 Application::i()->sendmail(
                     $smsEmails,
@@ -619,6 +624,7 @@ class RegisterInterface extends FormInterface
                     false
                 );
             }
+            // @codeCoverageIgnoreEnd
         }
 
         if ($smsPhones = ($addresses['smsPhones'] ?? null)) {
@@ -630,9 +636,11 @@ class RegisterInterface extends FormInterface
                     ]);
                     if (!Application::i()->prod || $debug) {
                         $debugMessages['smsPhones'][] = $url;
+                    // @codeCoverageIgnoreStart
                     } else {
                         $result = file_get_contents($url);
                     }
+                    // @codeCoverageIgnoreEnd
                 }
             }
         }
@@ -652,7 +660,7 @@ class RegisterInterface extends FormInterface
         if (function_exists('idn_to_utf8')) {
             $host = idn_to_utf8($host);
         }
-        $host = mb_strtoupper($host);
+        $host = mb_strtoupper((string)$host);
         $subject = date(RAASViewWeb::i()->_('DATETIMEFORMAT')) . ' '
                  . sprintf(View_Web::i()->_('REGISTRATION_ON_SITE'), $host);
         return $subject;

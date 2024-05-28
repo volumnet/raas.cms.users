@@ -2,6 +2,8 @@
 /**
  * Файл стандартного интерфейса восстановления пароля
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\Application;
@@ -56,7 +58,11 @@ class RecoveryInterface extends FormInterface
     }
 
 
-    public function process()
+    /**
+     * Обрабатывает интерфейс
+     * @param bool $debug Режим отладки
+     */
+    public function process(bool $debug = false)
     {
         $result = [];
         $user = RAASController_Frontend::i()->user;
@@ -105,7 +111,8 @@ class RecoveryInterface extends FormInterface
                             $result['success'][$this->block->id] = $this->checkRedirect(
                                 $this->post,
                                 $this->server,
-                                $referer
+                                $referer,
+                                $debug
                             );
                         } else {
                             $result['success'][$this->block->id] = true;
@@ -220,7 +227,7 @@ class RecoveryInterface extends FormInterface
         if (function_exists('idn_to_utf8')) {
             $host = idn_to_utf8($host);
         }
-        $host = mb_strtoupper($host);
+        $host = mb_strtoupper((string)$host);
         $subject = date(RAASViewWeb::i()->_('DATETIMEFORMAT')) . ' '
                  . sprintf(View_Web::i()->_('PASSWORD_RECOVERY_ON_SITE'), $host);
         return $subject;

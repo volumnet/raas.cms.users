@@ -1,14 +1,21 @@
 <?php
+/**
+ * Форма редактирования блока восстановления пароля
+ */
 namespace RAAS\CMS\Users;
 
 use RAAS\Field as RAASField;
+use RAAS\FormTab;
+use RAAS\Option;
+use RAAS\OptionCollection;
 use RAAS\CMS\Form as CMSForm;
 use RAAS\CMS\EditBlockForm;
 use RAAS\CMS\Snippet;
 use RAAS\CMS\Snippet_Folder;
-use RAAS\Option;
-use RAAS\OptionCollection;
 
+/**
+ * Форма редактирования блока восстановления пароля
+ */
 class EditBlockRecoveryForm extends EditBlockForm
 {
     public function __get($var)
@@ -31,7 +38,7 @@ class EditBlockRecoveryForm extends EditBlockForm
     }
 
 
-    protected function getInterfaceField()
+    protected function getInterfaceField(): RAASField
     {
         $field = parent::getInterfaceField();
         $snippet = Snippet::importByURN('__raas_users_recovery_interface');
@@ -42,11 +49,11 @@ class EditBlockRecoveryForm extends EditBlockForm
     }
 
 
-    protected function getCommonTab()
+    protected function getCommonTab(): FormTab
     {
         $tab = parent::getCommonTab();
         $snippet = Snippet::importByURN('__raas_users_recovery_notify');
-        $wf = function(Snippet_Folder $x) use (&$wf) {
+        $wf = function (Snippet_Folder $x) use (&$wf) {
             $temp = array();
             foreach ($x->children as $row) {
                 if ($row->urn != '__raas_views') {
@@ -75,7 +82,7 @@ class EditBlockRecoveryForm extends EditBlockForm
     }
 
 
-    protected function getServiceTab()
+    protected function getServiceTab(): FormTab
     {
         $tab = parent::getServiceTab();
         $tab->children[] = $this->getInterfaceField();

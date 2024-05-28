@@ -61,7 +61,7 @@ class EditUserMaterialInterfaceTest extends BaseTest
         ]);
         $catalogField->commit();
 
-        $form = new Form(4); // Обратная связь
+        $form = new Form(4); // Форма для регистрации
         $form->material_type = 4; // Каталог продукции
         $form->commit();
 
@@ -89,7 +89,7 @@ class EditUserMaterialInterfaceTest extends BaseTest
         $block->form = 1;
         $block->commit();
 
-        $form = new Form(4); // Обратная связь
+        $form = new Form(4); // Форма для регистрации
         $form->material_type = 0; // Новости
         $form->commit();
 
@@ -275,5 +275,49 @@ class EditUserMaterialInterfaceTest extends BaseTest
 
         $user->fields['catalog']->deleteValues();
         $material->fields['related']->deleteValues();
+    }
+
+
+
+
+
+    /**
+     * Тест обработки
+     * (случай без отправки формы и без материала)
+     */
+    public function testProcessWithNoMaterialAndFormData()
+    {
+        $block = Block::spawn(27);
+        $page = new Page(30); // Главная
+        $form = new Form(4); // Форма для регистрации
+        $priceFormField = $form->fields['price'];
+        $priceFormField->defval = '12345';
+        $priceFormField->commit();
+        $user = Controller_Frontend::i()->user = new User(1);
+        $post = [];
+
+        $interface = new EditUserMaterialInterface(
+            $block,
+            $page,
+            [],
+            $post,
+            [],
+            [],
+            [],
+            []
+        );
+
+        $result = $interface->process();
+
+        $this->assertEquals([], $result['localError']);
+        $this->assertNull($result['success'] ?? null);
+        $this->assertEmpty($result['DATA']['_name_'] ?? null);
+        $this->assertEquals('12345', $result['DATA']['price']);
+        $this->assertInstanceof(Form::class, $result['Form']);
+        $this->assertEquals(4, $result['Form']->id);
+        $this->assertEquals($user, $result['User']);
+
+        $priceFormField->defval = '';
+        $priceFormField->commit();
     }
 }

@@ -2,6 +2,8 @@
 /**
  * Файл стандартного интерфейса редактирования пользовательского материала
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\Controller_Frontend as RAASControllerFrontend;

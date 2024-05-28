@@ -2,6 +2,8 @@
 /**
  * Файл трейта проверки редиректа
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 /**
@@ -32,9 +34,11 @@ trait CheckRedirectTrait
         }
         if ($debug) {
             return $url;
+        // @codeCoverageIgnoreStart
         } else {
             header('Location: ' . $url);
             exit;
         }
+        // @codeCoverageIgnoreEnd
     }
 }

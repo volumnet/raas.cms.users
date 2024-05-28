@@ -484,7 +484,87 @@ class RecoveryInterfaceTest extends BaseTest
         $this->assertEquals(1, $result['User']->id);
         $this->assertEquals(1, Controller_Frontend::i()->user->id);
         $this->assertEmpty($result['localError']);
-        $this->assertNotEmpty($result['success']);
+        $this->assertTrue($result['success'][47] ?? null);
+
+        $user = new User(1);
+        $this->assertEquals(Application::i()->md5It('aaa'), $user->password_md5);
+
+        $user->password_md5 = $oldPasswordMD5;
+        $user->commit();
+        Controller_Frontend::i()->user = new User();
+    }
+
+
+    /**
+     * Тест отработки интерфейса
+     * Случай с редиректом в POST-переменной
+     */
+    public function testProcessWithPostReferer()
+    {
+        $user = new User(1);
+        $oldPasswordMD5 = $user->password_md5;
+        Controller_Frontend::i()->user = new User();
+        $interface = new RecoveryInterface(
+            Block::spawn(47),
+            new Page(33),
+            ['key' => $user->recoveryKey],
+            ['password' => 'aaa', 'password@confirm' => 'aaa', 'HTTP_REFERER' => 'https://test.org/'],
+            [],
+            [],
+            ['REQUEST_METHOD' => 'POST']
+        );
+
+        $result = $interface->process(true);
+
+        $this->assertEquals(
+            ['proceed', 'success', 'localError', 'User'],
+            array_keys($result)
+        );
+        $this->assertTrue($result['proceed']);
+        $this->assertEquals(1, $result['User']->id);
+        $this->assertEquals(1, Controller_Frontend::i()->user->id);
+        $this->assertEmpty($result['localError']);
+        $this->assertEquals('https://test.org/', $result['success'][47] ?? null);
+
+        $user = new User(1);
+        $this->assertEquals(Application::i()->md5It('aaa'), $user->password_md5);
+
+        $user->password_md5 = $oldPasswordMD5;
+        $user->commit();
+        Controller_Frontend::i()->user = new User();
+    }
+
+
+    /**
+     * Тест отработки интерфейса
+     * Случай с редиректом в GET-переменной
+     */
+    public function testProcessWithGetReferer()
+    {
+        $user = new User(1);
+        $oldPasswordMD5 = $user->password_md5;
+        Controller_Frontend::i()->user = new User();
+        $interface = new RecoveryInterface(
+            Block::spawn(47),
+            new Page(33),
+            ['key' => $user->recoveryKey, 'HTTP_REFERER' => 'https://test.org/'],
+            ['password' => 'aaa', 'password@confirm' => 'aaa'],
+            [],
+            [],
+            ['REQUEST_METHOD' => 'POST']
+        );
+
+        $result = $interface->process(true);
+
+        $this->assertEquals(
+            ['proceed', 'success', 'localError', 'User'],
+            array_keys($result)
+        );
+        $this->assertTrue($result['proceed']);
+        $this->assertEquals(1, $result['User']->id);
+        $this->assertEquals(1, Controller_Frontend::i()->user->id);
+        $this->assertEmpty($result['localError']);
+        $this->assertEquals('https://test.org/', $result['success'][47] ?? null);
 
         $user = new User(1);
         $this->assertEquals(Application::i()->md5It('aaa'), $user->password_md5);

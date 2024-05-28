@@ -2,6 +2,8 @@
 /**
  * Файл стандартного интерфейса активации учетной записи
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\Controller_Frontend as RAASController_Frontend;

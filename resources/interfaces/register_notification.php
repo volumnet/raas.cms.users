@@ -13,6 +13,7 @@ namespace RAAS\CMS\Users;
 
 use RAAS\Controller_Frontend as ControllerFrontend;
 use RAAS\CMS\NotificationFieldRenderer;
+use RAAS\CMS\Page;
 use RAAS\CMS\Users\Block_Register;
 use RAAS\CMS\Users\Block_Activation;
 
@@ -122,7 +123,7 @@ if ($SMS) {
                         );
                     }
                 }
-                $p = $Page->parent;
+                $p = isset($Page) ? $Page->parent : new Page();
                 $activationPage = null;
                 while ($p->id) {
                     $nearestActivationPages = array_filter(
@@ -137,7 +138,7 @@ if ($SMS) {
                     }
                     $p = $p->parent;
                 }
-                if (!$activationPage->id && $activationPages) {
+                if (!($activationPage && $activationPage->id) && $activationPages) {
                     $activationPage = array_shift($activationPages);
                 }
                 if ($activationPage->id) {

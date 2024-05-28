@@ -183,6 +183,30 @@ class LogInInterfaceTest extends BaseTest
 
 
     /**
+     * Тест быстрой регистрации пользователя по профилю в соц. сети
+     * Случай без никнейма
+     */
+    public function testProcessSocialLoginQuickRegisterWithEmailAsLogin()
+    {
+        $interface = new LogInInterfaceWithSocialMock(new Block_LogIn(['email_as_login' => true]));
+        $profile = $interface->getProfile('testProcessSocialLoginQuickRegister');
+
+        $result = $interface->processSocialLoginQuickRegister($profile);
+
+        $this->isInstanceOf(Auth::class, $result);
+        $this->isInstanceOf(User::class, $result->user);
+        $user = $result->user;
+        $this->assertEquals('test3@test.org', $user->login);
+        $this->assertEquals('test3@test.org', $user->email);
+        $this->assertEquals('Test', $user->last_name);
+        $this->assertEquals('User', $user->first_name);
+        $this->assertEquals(['https://test-social.com/test3-profile'], $user->social);
+
+        User::delete($user);
+    }
+
+
+    /**
      * Тест обработки интерфейса
      * Случай без данных
      */

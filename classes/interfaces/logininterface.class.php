@@ -2,6 +2,8 @@
 /**
  * Файл стандартного интерфейса входа в систему
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\Application;
@@ -228,6 +230,8 @@ class LogInInterface extends AbstractInterface
      */
     public function getProfile($token)
     {
+        // @codeCoverageIgnoreStart
         return ULogin::getProfile($token);
+        // @codeCoverageIgnoreEnd
     }
 }
