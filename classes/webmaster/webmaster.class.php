@@ -38,22 +38,6 @@ class Webmaster extends CMSWebmaster
     {
         $interfaces = [];
         $interfacesData = [
-            '__raas_users_register_interface' => [
-                'name' => 'REGISTRATION_STANDARD_INTERFACE',
-                'filename' => 'register_interface',
-            ],
-            '__raas_users_activation_interface' => [
-                'name' => 'ACTIVATION_STANDARD_INTERFACE',
-                'filename' => 'activation_interface',
-            ],
-            '__raas_users_login_interface' => [
-                'name' => 'LOG_IN_INTO_THE_SYSTEM_STANDARD_INTERFACE',
-                'filename' => 'login_interface',
-            ],
-            '__raas_users_recovery_interface' => [
-                'name' => 'PASSWORD_RECOVERY_STANDARD_INTERFACE',
-                'filename' => 'recovery_interface',
-            ],
             '__raas_users_register_notify' => [
                 'name' => 'REGISTRATION_STANDARD_NOTIFICATION',
                 'filename' => 'register_notification',
@@ -273,9 +257,7 @@ class Webmaster extends CMSWebmaster
         $login = $this->createLogIn();
         $recovery = $this->createRecovery();
 
-        if ((Snippet::importByURN('my_orders')->id ?? null) &&
-            (Snippet::importByURN('__raas_my_orders_interface')->id ?? null)
-        ) {
+        if ((Snippet::importByURN('my_orders')->id ?? null) && class_exists('RAAS\\CMS\\Shop\\MyOrdersInterface')) {
             $myOrders = $this->createMyOrders();
         }
 
@@ -338,7 +320,7 @@ class Webmaster extends CMSWebmaster
                     'allowed_to' => Block_Register::ALLOW_TO_ALL,
                 ]),
                 'content',
-                '__raas_users_register_interface',
+                RegisterInterface::class,
                 'register',
                 $register
             );
@@ -395,7 +377,7 @@ class Webmaster extends CMSWebmaster
                     'allowed_to' => Block_Register::ALLOW_TO_ALL,
                 ]),
                 'content',
-                '__raas_users_register_interface',
+                RegisterInterface::class,
                 'register',
                 $profile
             );
@@ -429,7 +411,7 @@ class Webmaster extends CMSWebmaster
             $this->createBlock(
                 new Block_Activation(),
                 'content',
-                '__raas_users_activation_interface',
+                ActivationInterface::class,
                 'activation',
                 $activation
             );
@@ -467,7 +449,7 @@ class Webmaster extends CMSWebmaster
                     'password_save_type' => Block_Login::SAVE_PASSWORD_SAVE_PASSWORD,
                 ]),
                 'content',
-                '__raas_users_login_interface',
+                LogInInterface::class,
                 'login',
                 $login
             );
@@ -503,7 +485,7 @@ class Webmaster extends CMSWebmaster
                     'notification_id' => Snippet::importByURN('__raas_users_recovery_notify')->id,
                 ]),
                 'content',
-                '__raas_users_recovery_interface',
+                RecoveryInterface::class,
                 'recovery',
                 $recovery
             );
@@ -589,7 +571,7 @@ class Webmaster extends CMSWebmaster
             $this->createBlock(
                 new Block_PHP(),
                 'content',
-                '__raas_my_orders_interface',
+                'RAAS\\CMS\\Shop\\MyOrdersInterface',
                 'my_orders',
                 $myOrders
             );

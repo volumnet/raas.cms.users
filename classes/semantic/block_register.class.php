@@ -14,6 +14,8 @@ use RAAS\CMS\Page;
 
 class Block_Register extends Block
 {
+    const ALLOWED_INTERFACE_CLASSNAME = RegisterInterface::class;
+
     const ACTIVATION_TYPE_ADMINISTRATOR = 0;
     const ACTIVATION_TYPE_USER = 1;
     const ACTIVATION_TYPE_ALREADY_ACTIVATED = 2;
@@ -42,10 +44,6 @@ class Block_Register extends Block
         ],
     ];
 
-    protected static $cognizableVars = [
-        'Edit_Form',
-    ];
-
     public function commit()
     {
         if (!$this->name) {
@@ -62,10 +60,13 @@ class Block_Register extends Block
             if (($r && ($this->allow_to == static::ALLOW_TO_UNREGISTERED)) ||
                 (!$r && ($this->allow_to == static::ALLOW_TO_REGISTERED))
             ) {
+                // @codeCoverageIgnoreStart
+                // Не можем проверить редирект
                 if (trim($this->redirect_url)) {
                     header('Location: ' . trim($this->redirect_url));
                     exit;
                 } else {
+                // @codeCoverageIgnoreEnd
                     return;
                 }
             }

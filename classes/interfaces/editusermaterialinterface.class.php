@@ -53,7 +53,7 @@ class EditUserMaterialInterface extends RegisterInterface
     }
 
 
-    public function process()
+    public function process(): array
     {
         $result = [];
         // 2019-08-21, AVS: пока не помню, для чего создается новый пользователь,

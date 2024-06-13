@@ -2,12 +2,15 @@
 /**
  * Форма редактирования блока регистрации
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\Field as RAASField;
 use RAAS\FormTab;
 use RAAS\CMS\EditBlockForm;
 use RAAS\CMS\Form as CMSForm;
+use RAAS\CMS\InterfaceField;
 use RAAS\CMS\Snippet;
 
 /**
@@ -15,6 +18,8 @@ use RAAS\CMS\Snippet;
  */
 class EditBlockRegisterForm extends EditBlockForm
 {
+    const DEFAULT_BLOCK_CLASSNAME = Block_Register::class;
+
     public function __get($var)
     {
         switch ($var) {
@@ -28,50 +33,39 @@ class EditBlockRegisterForm extends EditBlockForm
     }
 
 
-    public function __construct(array $params)
+    public function __construct(array $params = [])
     {
         $params['view'] = Module::i()->view;
         parent::__construct($params);
     }
 
 
-    protected function getInterfaceField(): RAASField
-    {
-        $field = parent::getInterfaceField();
-        $snippet = Snippet::importByURN('__RAAS_users_register_interface');
-        if ($snippet) {
-            $field->default = (int)$snippet->id;
-        }
-        return $field;
-    }
-
-
     protected function getCommonTab(): FormTab
     {
         $tab = parent::getCommonTab();
-        $tab->children[] = new RAASField([
+        $tab->children['form_id'] = new RAASField([
             'type' => 'select',
             'name' => 'form_id',
             'caption' => $this->view->_('REGISTRATION_FORM'),
             'children' => ['Set' => CMSForm::getSet()],
             'required' => true,
         ]);
-        $tab->children[] = new RAASField([
+        $tab->children['email_as_login'] = new RAASField([
             'type' => 'checkbox',
             'name' => 'email_as_login',
             'caption' => $this->view->_('USE_EMAIL_AS_LOGIN'),
         ]);
-        $tab->children[] = new RAASField([
+        $tab->children['notify_about_edit'] = new RAASField([
             'type' => 'checkbox',
             'name' => 'notify_about_edit',
             'caption' => $this->view->_('NOTIFY_ADMIN_ABOUT_EDIT'),
         ]);
-        $tab->children[] = new RAASField([
+        $tab->children['allow_edit_social'] = new RAASField([
             'type' => 'checkbox',
             'name' => 'allow_edit_social',
             'caption' => $this->view->_('ALLOW_EDIT_SOCIAL'),
         ]);
-        $tab->children[] = new RAASField([
+        $tab->children['activation_type'] = new RAASField([
             'type' => 'select',
             'name' => 'activation_type',
             'caption' => $this->view->_('ACTIVATION_TYPE'),
@@ -90,7 +84,7 @@ class EditBlockRegisterForm extends EditBlockForm
                 ],
             ],
         ]);
-        $tab->children[] = new RAASField([
+        $tab->children['allow_to'] = new RAASField([
             'type' => 'select',
             'name' => 'allow_to',
             'caption' => $this->view->_('ALLOW_TO'),
@@ -109,11 +103,11 @@ class EditBlockRegisterForm extends EditBlockForm
                 ],
             ],
         ]);
-        $tab->children[] = new RAASField([
+        $tab->children['redirect_url'] = new RAASField([
             'name' => 'redirect_url',
             'caption' => $this->view->_('REDIRECT_URL'),
         ]);
-        $tab->children[] = $this->getWidgetField();
+        $tab->children['widget_id'] = $this->getWidgetField();
         return $tab;
     }
 
@@ -121,7 +115,7 @@ class EditBlockRegisterForm extends EditBlockForm
     protected function getServiceTab(): FormTab
     {
         $tab = parent::getServiceTab();
-        $tab->children[] = $this->getInterfaceField();
+        $tab->children['interface_id'] = $this->getInterfaceField();
         return $tab;
     }
 }

@@ -9,7 +9,7 @@ namespace RAAS\CMS\Users;
 use RAAS\Application;
 use RAAS\Controller_Frontend as RAASController_Frontend;
 use RAAS\View_Web as RAASViewWeb;
-use RAAS\CMS\AbstractInterface;
+use RAAS\CMS\BlockInterface;
 use RAAS\CMS\Auth;
 use RAAS\CMS\Page;
 use RAAS\CMS\SocialProfile;
@@ -19,7 +19,7 @@ use RAAS\CMS\User as CMSUser;
 /**
  * Класс стандартного интерфейса входа в систему
  */
-class LogInInterface extends AbstractInterface
+class LogInInterface extends BlockInterface
 {
     use CheckRedirectTrait;
 
@@ -58,7 +58,7 @@ class LogInInterface extends AbstractInterface
     }
 
 
-    public function process()
+    public function process(): array
     {
         $user = RAASController_Frontend::i()->user;
         $auth = new Auth($user);

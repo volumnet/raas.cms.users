@@ -2,12 +2,16 @@
 /**
  * Блок восстановления пароля
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\CMS\Block;
 
 class Block_Recovery extends Block
 {
+    const ALLOWED_INTERFACE_CLASSNAME = RecoveryInterface::class;
+
     protected static $tablename2 = 'cms_users_blocks_recovery';
 
     protected static $references = array(

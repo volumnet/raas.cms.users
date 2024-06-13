@@ -9,7 +9,7 @@ namespace RAAS\CMS\Users;
 use RAAS\Application;
 use RAAS\Controller_Frontend as RAASController_Frontend;
 use RAAS\View_Web as RAASViewWeb;
-use RAAS\CMS\AbstractInterface;
+use RAAS\CMS\BlockInterface;
 use RAAS\CMS\Auth;
 use RAAS\CMS\FormInterface;
 use RAAS\CMS\Snippet;
@@ -45,7 +45,7 @@ class RecoveryInterface extends FormInterface
         array $server = [],
         array $files = []
     ) {
-        AbstractInterface::__construct(
+        BlockInterface::__construct(
             $block,
             $page,
             $get,
@@ -62,7 +62,7 @@ class RecoveryInterface extends FormInterface
      * Обрабатывает интерфейс
      * @param bool $debug Режим отладки
      */
-    public function process(bool $debug = false)
+    public function process(bool $debug = false): array
     {
         $result = [];
         $user = RAASController_Frontend::i()->user;

@@ -10,6 +10,8 @@ use RAAS\CMS\Block;
 
 class Block_LogIn extends Block
 {
+    const ALLOWED_INTERFACE_CLASSNAME = LogInInterface::class;
+
     const SOCIAL_LOGIN_NONE = 0;
     const SOCIAL_LOGIN_ONLY_REGISTERED = 1;
     const SOCIAL_LOGIN_QUICK_REGISTER = 2;

@@ -10,6 +10,8 @@ use RAAS\CMS\Block;
 
 class Block_Activation extends Block
 {
+    const ALLOWED_INTERFACE_CLASSNAME = ActivationInterface::class;
+
     public function commit()
     {
         if (!$this->name) {

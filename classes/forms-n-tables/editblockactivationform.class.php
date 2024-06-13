@@ -2,12 +2,15 @@
 /**
  * Форма редактирования блока активации
  */
+declare(strict_types=1);
+
 namespace RAAS\CMS\Users;
 
 use RAAS\Field as RAASField;
 use RAAS\FormTab;
 use RAAS\CMS\Form as CMSForm;
 use RAAS\CMS\EditBlockForm;
+use RAAS\CMS\InterfaceField;
 use RAAS\CMS\Snippet;
 
 /**
@@ -15,6 +18,8 @@ use RAAS\CMS\Snippet;
  */
 class EditBlockActivationForm extends EditBlockForm
 {
+    const DEFAULT_BLOCK_CLASSNAME = Block_Activation::class;
+
     public function __get($var)
     {
         switch ($var) {
@@ -28,28 +33,17 @@ class EditBlockActivationForm extends EditBlockForm
     }
 
 
-    public function __construct(array $params)
+    public function __construct(array $params = [])
     {
         $params['view'] = Module::i()->view;
         parent::__construct($params);
     }
 
 
-    protected function getInterfaceField(): RAASField
-    {
-        $field = parent::getInterfaceField();
-        $snippet = Snippet::importByURN('__RAAS_users_activation_interface');
-        if ($snippet) {
-            $field->default = (int)$snippet->id;
-        }
-        return $field;
-    }
-
-
     protected function getCommonTab(): FormTab
     {
         $tab = parent::getCommonTab();
-        $tab->children[] = $this->getWidgetField();
+        $tab->children['widget_id'] = $this->getWidgetField();
         return $tab;
     }
 
@@ -57,7 +51,7 @@ class EditBlockActivationForm extends EditBlockForm
     protected function getServiceTab(): FormTab
     {
         $tab = parent::getServiceTab();
-        $tab->children[] = $this->getInterfaceField();
+        $tab->children['interface_id'] = $this->getInterfaceField();
         return $tab;
     }
 }

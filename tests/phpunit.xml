@@ -9,6 +9,18 @@
     </report>
   </coverage>
   <testsuites>
+    <testsuite name="EditBlockActivationForm">
+      <file>src/forms-n-tables/EditBlockActivationFormTest.php</file>
+    </testsuite>
+    <testsuite name="EditBlockLogInForm">
+      <file>src/forms-n-tables/EditBlockLogInFormTest.php</file>
+    </testsuite>
+    <testsuite name="EditBlockRecoveryForm">
+      <file>src/forms-n-tables/EditBlockRecoveryFormTest.php</file>
+    </testsuite>
+    <testsuite name="EditBlockRegisterForm">
+      <file>src/forms-n-tables/EditBlockRegisterFormTest.php</file>
+    </testsuite>
     <testsuite name="ActivationInterface">
       <file>src/interfaces/ActivationInterfaceTest.php</file>
     </testsuite>
@@ -26,6 +38,21 @@
     </testsuite>
     <testsuite name="RegisterInterface">
       <file>src/interfaces/RegisterInterfaceTest.php</file>
+    </testsuite>
+    <testsuite name="Block_Activation">
+      <file>src/semantic/BlockActivationTest.php</file>
+    </testsuite>
+    <testsuite name="Block_Login">
+      <file>src/semantic/BlockLoginTest.php</file>
+    </testsuite>
+    <testsuite name="Block_Recovery">
+      <file>src/semantic/BlockRecoveryTest.php</file>
+    </testsuite>
+    <testsuite name="Block_Register">
+      <file>src/semantic/BlockRegisterTest.php</file>
+    </testsuite>
+    <testsuite name="Updater">
+      <file>src/UpdaterTest.php</file>
     </testsuite>
   </testsuites>
   <logging/>

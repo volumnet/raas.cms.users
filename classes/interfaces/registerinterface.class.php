@@ -10,7 +10,7 @@ use SOME\Text;
 use RAAS\Application;
 use RAAS\Controller_Frontend as RAASControllerFrontend;
 use RAAS\View_Web as RAASViewWeb;
-use RAAS\CMS\AbstractInterface;
+use RAAS\CMS\BlockInterface;
 use RAAS\CMS\Form;
 use RAAS\CMS\FormInterface;
 use RAAS\CMS\Material;
@@ -49,7 +49,7 @@ class RegisterInterface extends FormInterface
         array $server = [],
         array $files = []
     ) {
-        AbstractInterface::__construct(
+        BlockInterface::__construct(
             $block,
             $page,
             $get,
@@ -62,7 +62,7 @@ class RegisterInterface extends FormInterface
     }
 
 
-    public function process()
+    public function process(): array
     {
         $result = [];
         // 2019-08-21, AVS: пока не помню, для чего создается новый пользователь,
