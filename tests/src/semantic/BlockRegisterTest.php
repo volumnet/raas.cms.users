@@ -9,6 +9,7 @@ use RAAS\Application;
 use RAAS\Controller_Frontend as ControllerFrontend;
 use RAAS\CMS\Package;
 use RAAS\CMS\Page;
+use RAAS\CMS\Snippet;
 use RAAS\CMS\User;
 
 /**
@@ -81,6 +82,10 @@ class BlockRegisterTest extends BaseTest
      */
     public function testProcess()
     {
+        $snippet = new Snippet(51); // Регистрация
+        $snippet->description = file_get_contents(Module::i()->resourcesDir . '/widgets/register.tmp.php');
+        $snippet->commit();
+
         $block = new Block_Register(45); // Блок регистрации на странице регистрации
 
         ob_start();

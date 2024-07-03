@@ -37,27 +37,16 @@ class Webmaster extends CMSWebmaster
     public function checkStdInterfaces()
     {
         $interfaces = [];
-        $interfacesData = [
-            '__raas_users_register_notify' => [
-                'name' => 'REGISTRATION_STANDARD_NOTIFICATION',
-                'filename' => 'register_notification',
-            ],
-            '__raas_users_recovery_notify' => [
-                'name' => 'PASSWORD_RECOVERY_STANDARD_NOTIFICATION',
-                'filename' => 'recovery_notification',
-            ],
-        ];
-        foreach ($interfacesData as $interfaceURN => $interfaceData) {
-            $interfaces[$interfaceURN] = $this->checkSnippet(
-                $this->interfacesFolder,
-                $interfaceURN,
-                $interfaceData['name'],
-                file_get_contents(
-                    Module::i()->resourcesDir .
-                    '/interfaces/' . $interfaceData['filename'] . '.php'
-                )
-            );
-        }
+        $interfaces['__raas_users_register_notify'] = $this->checkSnippet(
+            $this->interfacesFolder,
+            '__raas_users_register_notify',
+            'users/register_notification.php',
+        );
+        $interfaces['__raas_users_recovery_notify'] = $this->checkSnippet(
+            $this->interfacesFolder,
+            '__raas_users_recovery_notify',
+            'users/recovery_notification.php',
+        );
         return $interfaces;
     }
 
