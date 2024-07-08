@@ -57,7 +57,15 @@ if ($_POST['AJAX'] == (int)$Block->id) {
             }
         }
     } ?>
-    <register-form :block-id="<?php echo (int)$Block->id?>" :form="<?php echo htmlspecialchars(json_encode($formArr))?>" :user="user" :activation-type="<?php echo (int)$Block->activation_type?>" :initial-form-data="<?php echo htmlspecialchars(json_encode($formData))?>" :allow-edit-social="<?php echo $Block->allow_edit_social ? 'true' : 'false'?>" :scroll-to-errors="true"></register-form>
+    <register-form
+      :block-id="<?php echo (int)$Block->id?>"
+      :form="<?php echo htmlspecialchars(json_encode($formArr))?>"
+      :user="user"
+      :activation-type="<?php echo (int)$Block->activation_type?>"
+      :initial-form-data="<?php echo htmlspecialchars(json_encode($formData))?>"
+      :allow-edit-social="<?php echo $Block->allow_edit_social ? 'true' : 'false'?>"
+      :scroll-to-errors="true"
+    ></register-form>
     <?php
     AssetManager::requestCSS('/css/register.css');
     AssetManager::requestJS('/js/register.js');

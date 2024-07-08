@@ -25,7 +25,10 @@ if ($_POST['AJAX'] == (int)$Block->id) {
     echo json_encode($result);
     exit;
 } else { ?>
-    <activation-notification :success="<?php echo $success ? 'true' : 'false'?>" :errors="<?php echo htmlspecialchars(json_encode($localError))?>"></activation-notification>
+    <activation-notification
+      :success="<?php echo $success ? 'true' : 'false'?>"
+      :errors="<?php echo htmlspecialchars(json_encode($localError))?>"
+    ></activation-notification>
     <?php
     AssetManager::requestCSS('/css/activation.css');
     AssetManager::requestJS('/js/activation.js');

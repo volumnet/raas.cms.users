@@ -55,7 +55,14 @@ if ($_POST['AJAX'] == (int)$Block->id) {
             break;
     }
     ?>
-    <login-form :block-id="<?php echo (int)$Block->id?>" :initial-errors="<?php echo htmlspecialchars(json_encode((object)$localError))?>" :email-as-login="<?php echo $Block->email_as_login ? 'true' : 'false'?>" :password-save-type="<?php echo (int)$passwordSaveType?>" :allow-social-login="<?php echo $Block->social_login_type ? 'true' : 'false'?>" :scroll-to-errors="true"></login-form>
+    <login-form
+      :block-id="<?php echo (int)$Block->id?>"
+      :initial-errors="<?php echo htmlspecialchars(json_encode((object)$localError))?>"
+      :email-as-login="<?php echo $Block->email_as_login ? 'true' : 'false'?>"
+      :password-save-type="<?php echo (int)$passwordSaveType?>"
+      :allow-social-login="<?php echo $Block->social_login_type ? 'true' : 'false'?>"
+      :scroll-to-errors="true"
+    ></login-form>
     <?php
     AssetManager::requestCSS('/css/login.css');
     AssetManager::requestJS('/js/login.js');

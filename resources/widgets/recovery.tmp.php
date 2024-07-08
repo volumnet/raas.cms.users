@@ -25,7 +25,14 @@ if ($_POST['AJAX'] == (int)$Block->id) {
     echo json_encode($result);
     exit;
 } else { ?>
-    <recovery-form :block-id="<?php echo (int)$Block->id?>" :initial-errors="<?php echo htmlspecialchars(json_encode((object)$localError))?>" :proceed="<?php echo $proceed ? 'true' : 'false'?>" :key-is-invalid="<?php echo ($proceed && $key_is_invalid) ? 'true' : 'false'?>" :email-as-login="false" :scroll-to-errors="true"></register-form>
+    <recovery-form
+      :block-id="<?php echo (int)$Block->id?>"
+      :initial-errors="<?php echo htmlspecialchars(json_encode((object)$localError))?>"
+      :proceed="<?php echo $proceed ? 'true' : 'false'?>"
+      :key-is-invalid="<?php echo ($proceed && $key_is_invalid) ? 'true' : 'false'?>"
+      :email-as-login="false"
+      :scroll-to-errors="true"
+    ></register-form>
     <?php
     AssetManager::requestCSS('/css/recovery.css');
     AssetManager::requestJS('/js/recovery.js');
