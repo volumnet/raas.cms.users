@@ -80,9 +80,9 @@ export default {
                 ],
                 providers: [
                     'vkontakte',
-                    'facebook',
-                    'twitter',
-                    'google',
+                    // 'facebook',
+                    // 'twitter',
+                    // 'google',
                     'yandex',
                     'odnoklassniki',
                     'mailru'
