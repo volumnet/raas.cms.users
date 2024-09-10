@@ -40,12 +40,12 @@ class Webmaster extends CMSWebmaster
         $interfaces['__raas_users_register_notify'] = $this->checkSnippet(
             $this->interfacesFolder,
             '__raas_users_register_notify',
-            'users/register_notification.php',
+            'users/register_notification.php'
         );
         $interfaces['__raas_users_recovery_notify'] = $this->checkSnippet(
             $this->interfacesFolder,
             '__raas_users_recovery_notify',
-            'users/recovery_notification.php',
+            'users/recovery_notification.php'
         );
         return $interfaces;
     }
