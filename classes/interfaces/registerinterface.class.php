@@ -29,9 +29,9 @@ class RegisterInterface extends FormInterface
 
     /**
      * Конструктор класса
-     * @param Block_Register|null $block Блок, для которого применяется
+     * @param ?Block_Register $block Блок, для которого применяется
      *                               интерфейс
-     * @param Page|null $page Страница, для которой применяется интерфейс
+     * @param ?Page $page Страница, для которой применяется интерфейс
      * @param array $get Поля $_GET параметров
      * @param array $post Поля $_POST параметров
      * @param array $cookie Поля $_COOKIE параметров
@@ -40,8 +40,8 @@ class RegisterInterface extends FormInterface
      * @param array $files Поля $_FILES параметров
      */
     public function __construct(
-        Block_Register $block = null,
-        Page $page = null,
+        ?Block_Register $block = null,
+        ?Page $page = null,
         array $get = [],
         array $post = [],
         array $cookie = [],
@@ -670,7 +670,7 @@ class RegisterInterface extends FormInterface
     /**
      * Получает вложения для письма
      * @param User $user Пользователь
-     * @param Material $material Созданный материал
+     * @param ?Material $material Созданный материал
      * @param bool $forAdmin Уведомление для администратора
      *                       (если нет, то для пользователя)
      * @return array <pre>array<[
@@ -681,7 +681,7 @@ class RegisterInterface extends FormInterface
      */
     public function getRegisterAttachments(
         User $feedback,
-        Material $material = null,
+        ?Material $material = null,
         $forAdmin = true
     ) {
         return [];

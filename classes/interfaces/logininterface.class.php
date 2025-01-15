@@ -25,9 +25,9 @@ class LogInInterface extends BlockInterface
 
     /**
      * Конструктор класса
-     * @param Block_LogIn|null $block Блок, для которого применяется
+     * @param ?Block_LogIn $block Блок, для которого применяется
      *                                интерфейс
-     * @param Page|null $page Страница, для которой применяется интерфейс
+     * @param ?Page $page Страница, для которой применяется интерфейс
      * @param array $get Поля $_GET параметров
      * @param array $post Поля $_POST параметров
      * @param array $cookie Поля $_COOKIE параметров
@@ -36,8 +36,8 @@ class LogInInterface extends BlockInterface
      * @param array $files Поля $_FILES параметров
      */
     public function __construct(
-        Block_LogIn $block = null,
-        Page $page = null,
+        ?Block_LogIn $block = null,
+        ?Page $page = null,
         array $get = [],
         array $post = [],
         array $cookie = [],

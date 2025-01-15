@@ -19,9 +19,9 @@ class ActivationInterface extends BlockInterface
 {
     /**
      * Конструктор класса
-     * @param Block_Activation|null $block Блок, для которого применяется
+     * @param ?Block_Activation $block Блок, для которого применяется
      *                                     интерфейс
-     * @param Page|null $page Страница, для которой применяется интерфейс
+     * @param ?Page $page Страница, для которой применяется интерфейс
      * @param array $get Поля $_GET параметров
      * @param array $post Поля $_POST параметров
      * @param array $cookie Поля $_COOKIE параметров
@@ -30,8 +30,8 @@ class ActivationInterface extends BlockInterface
      * @param array $files Поля $_FILES параметров
      */
     public function __construct(
-        Block_Activation $block = null,
-        Page $page = null,
+        ?Block_Activation $block = null,
+        ?Page $page = null,
         array $get = [],
         array $post = [],
         array $cookie = [],
