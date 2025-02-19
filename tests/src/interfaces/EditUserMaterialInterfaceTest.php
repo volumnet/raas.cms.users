@@ -5,6 +5,9 @@
 namespace RAAS\CMS\Users;
 
 use ReflectionClass;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
@@ -22,8 +25,8 @@ use RAAS\CMS\User_Field;
 
 /**
  * Класс теста стандартного интерфейса регистрации
- * @covers RAAS\CMS\Users\EditUserMaterialInterface
  */
+#[CoversClass(EditUserMaterialInterface::class)]
 class EditUserMaterialInterfaceTest extends BaseTest
 {
     public static function setUpBeforeClass(): void

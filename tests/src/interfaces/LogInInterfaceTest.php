@@ -4,6 +4,9 @@
  */
 namespace RAAS\CMS\Users;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
@@ -22,8 +25,8 @@ use RAAS\CMS\User_Field;
 
 /**
  * Класс теста стандартного интерфейса входа в систему
- * @covers RAAS\CMS\Users\LogInInterface
  */
+#[CoversClass(LogInInterface::class)]
 class LogInInterfaceTest extends BaseTest
 {
     public static $tables = [

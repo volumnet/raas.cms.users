@@ -657,7 +657,7 @@ class RegisterInterface extends FormInterface
     public function getEmailRegisterSubject()
     {
         $host = $this->server['HTTP_HOST'] ?? '';
-        if (function_exists('idn_to_utf8')) {
+        if ($host && function_exists('idn_to_utf8')) {
             $host = idn_to_utf8($host);
         }
         $host = mb_strtoupper((string)$host);

@@ -5,6 +5,9 @@
 namespace RAAS\CMS\Users;
 
 use ReflectionClass;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
@@ -22,8 +25,8 @@ use RAAS\CMS\User_Field;
 
 /**
  * Класс теста стандартного интерфейса регистрации
- * @covers RAAS\CMS\Users\RegisterInterface
  */
+#[CoversClass(RegisterInterface::class)]
 class RegisterInterfaceTest extends BaseTest
 {
     public static $tables = [
@@ -116,7 +119,7 @@ class RegisterInterfaceTest extends BaseTest
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($uLogin, 'https://vk.com/test');
         $interface = $this->getMockBuilder(RegisterInterface::class)
-            ->setMethods(['getProfile'])
+            ->onlyMethods(['getProfile'])
             ->getMock();
         $interface->expects($this->once())
             ->method('getProfile')

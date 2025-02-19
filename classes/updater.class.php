@@ -9,14 +9,16 @@ class Updater extends \RAAS\Updater
 {
     public function preInstall()
     {
+        // 2025 год - 8
+        // 2024 год - 7/8
+        // 2023 год - 7
+        // 2022 год - 5/7
+        // 2021 год - 5 -- убираем его и ранее
         $v = (string)($this->Context->registryGet('baseVersion') ?? '');
-        if (version_compare($v, '4.2.13') < 0) {
-            $this->update20151129();
-            $this->update20190702();
-        }
         if (version_compare($v, '4.3.23') < 0) {
             $this->update20240613();
         }
+        // ПО ВОЗМОЖНОСТИ НЕ ПИШЕМ СЮДА, А ПИШЕМ В postInstall
     }
 
 
@@ -30,35 +32,7 @@ class Updater extends \RAAS\Updater
         }
     }
 
-    public function update20151129()
-    {
-        if (in_array(SOME::_dbprefix() . "cms_forms", $this->tables) &&
-            in_array('urn', $this->columns(SOME::_dbprefix() . "cms_forms"))) {
-            $sqlQuery = "UPDATE " . SOME::_dbprefix() . "cms_forms
-                             SET urn = 'register'
-                           WHERE (urn = '')
-                             AND (
-                                    name = 'Форма для регистрации'
-                                 OR name = 'Registration form'
-                             )";
-            $this->SQL->query($sqlQuery);
-        }
-    }
 
-
-    /**
-     * Добавление поле "Автор" в транзакции
-     */
-    public function update20190702()
-    {
-        if (in_array(SOME::_dbprefix() . "cms_users_billing_transactions", $this->tables) &&
-            !in_array('author_id', $this->columns(SOME::_dbprefix() . "cms_users_billing_transactions"))) {
-            $sqlQuery = "ALTER TABLE " . SOME::_dbprefix() . "cms_users_billing_transactions
-                           ADD author_id INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Author ID#' AFTER id,
-                           ADD KEY (author_id)";
-            $this->SQL->query($sqlQuery);
-        }
-    }
     /**
      * Обновления по версии 4.3.23
      * Исправление значения по умолчанию в cms_shop_orders.user_agent

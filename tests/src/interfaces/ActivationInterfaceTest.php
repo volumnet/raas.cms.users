@@ -4,6 +4,9 @@
  */
 namespace RAAS\CMS\Users;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\Controller_Frontend;
 use RAAS\CMS\Block;
@@ -12,8 +15,8 @@ use RAAS\CMS\User;
 
 /**
  * Класс теста стандартного интерфейса активации учетной записи
- * @covers RAAS\CMS\Users\ActivationInterface
  */
+#[CoversClass(ActivationInterface::class)]
 class ActivationInterfaceTest extends BaseTest
 {
     public static $tables = [

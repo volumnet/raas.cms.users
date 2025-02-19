@@ -4,6 +4,9 @@
  */
 namespace RAAS\CMS\Users;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Field as RAASField;
@@ -15,8 +18,8 @@ use RAAS\CMS\WidgetField;
 
 /**
  * Тест класса EditBlockRecoveryForm
- * @covers RAAS\CMS\Users\EditBlockRecoveryForm
  */
+#[CoversClass(EditBlockRecoveryForm::class)]
 class EditBlockRecoveryFormTest extends BaseTest
 {
     public static $tables = [

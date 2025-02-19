@@ -4,12 +4,14 @@
  */
 namespace RAAS\CMS\Users;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\CMS\Page;
 
 /**
  * Класс теста трейта проверки редиректа
- * @covers RAAS\CMS\Users\CheckRedirectTrait
  */
 class CheckRedirectTraitTest extends BaseTest
 {
@@ -19,7 +21,9 @@ class CheckRedirectTraitTest extends BaseTest
      */
     public function testCheckRedirectWithAJAX()
     {
-        $trait = $this->getMockForTrait(CheckRedirectTrait::class);
+        $trait = new class {
+            use CheckRedirectTrait;
+        };
 
         $result = $trait->checkRedirect(['AJAX' => true], [], null, true);
 
@@ -33,7 +37,9 @@ class CheckRedirectTraitTest extends BaseTest
      */
     public function testCheckRedirectWithReferer()
     {
-        $trait = $this->getMockForTrait(CheckRedirectTrait::class);
+        $trait = new class {
+            use CheckRedirectTrait;
+        };
 
         $result = $trait->checkRedirect([], [], '/referer/', true);
 
@@ -47,7 +53,9 @@ class CheckRedirectTraitTest extends BaseTest
      */
     public function testCheckRedirectWithHTTPReferer()
     {
-        $trait = $this->getMockForTrait(CheckRedirectTrait::class);
+        $trait = new class {
+            use CheckRedirectTrait;
+        };
 
         $result = $trait->checkRedirect(
             [],

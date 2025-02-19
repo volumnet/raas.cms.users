@@ -1,7 +1,7 @@
 {
     "name": "volumnet/raas.cms.users",
     "description": "RAAS.CMS.Users",
-    "version": "4.5.1",
+    "version": "4.5.2",
     "license": "GPL-3.0-or-later",
     "minimum-stability": "dev",
     "prefer-stable": true,

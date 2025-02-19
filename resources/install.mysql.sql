@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_reg
 
   PRIMARY KEY (id),
   KEY (form_id)
-) COMMENT='Register blocks';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Register blocks';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_login (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_log
   password_save_type TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Password save type: 0 - none, 1 - checkbox "save password", 2 - checkbox "foreign computer"',
   
   PRIMARY KEY (id)
-) COMMENT='Log in blocks';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Log in blocks';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_recovery (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_blocks_rec
   
   PRIMARY KEY (id),
   KEY (notification_id)
-) COMMENT='Recovery blocks';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Recovery blocks';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_types (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_ty
     description TEXT NULL DEFAULT NULL COMMENT 'Description',
 
     PRIMARY KEY (id)
-) COMMENT 'Billing types';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Billing types';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_accounts (
     uid INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'User ID#',
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_ac
     KEY (uid),
     KEY (billing_type_id),
     INDEX (balance)
-) COMMENT 'Billing accounts';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Billing accounts';
 
 CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_transactions (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID#',
@@ -64,4 +64,4 @@ CREATE TABLE IF NOT EXISTS {$DBPREFIX$}{$PACKAGENAME$}_{$MODULENAME$}_billing_tr
     KEY (billing_type_id),
     INDEX (post_date),
     INDEX (amount)
-) COMMENT 'Billing transactions';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Billing transactions';

@@ -4,6 +4,9 @@
  */
 namespace RAAS\CMS\Users;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend as ControllerFrontend;
@@ -12,8 +15,8 @@ use RAAS\CMS\Page;
 
 /**
  * Тест класса Block_Login
- * @covers RAAS\CMS\Users\Block_Login
  */
+#[CoversClass(Block_Login::class)]
 class BlockLoginTest extends BaseTest
 {
     public static $tables = [

@@ -4,6 +4,9 @@
  */
 namespace RAAS\CMS\Users;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use SOME\BaseTest;
 use RAAS\Application;
 use RAAS\Controller_Frontend;
@@ -14,8 +17,8 @@ use RAAS\CMS\User;
 
 /**
  * Класс теста стандартного интерфейса восстановления пароля
- * @covers RAAS\CMS\Users\RecoveryInterface
  */
+#[CoversClass(RecoveryInterface::class)]
 class RecoveryInterfaceTest extends BaseTest
 {
     public static $tables = [
