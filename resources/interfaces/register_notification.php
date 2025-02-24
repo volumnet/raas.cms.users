@@ -88,15 +88,15 @@ if ($SMS) {
                 USER_AGENT . ': ' .
                 htmlspecialchars((string)$User->user_agent) . '<br />' .
                 PAGE . ': ';
-            if ($page->parents) {
+            if ($page?->parents) {
                 foreach ($page->parents as $row) { ?>
                     <a href="<?php echo htmlspecialchars($adminUrl . '&id=' . (int)$row->id)?>">
                       <?php echo htmlspecialchars($row->name)?>
                     </a> /
                 <?php }
             } ?>
-            <a href="<?php echo htmlspecialchars($adminUrl . '&id=' . (int)$page->id)?>">
-              <?php echo htmlspecialchars($page->name)?>
+            <a href="<?php echo htmlspecialchars($adminUrl . '&id=' . (int)$page?->id)?>">
+              <?php echo htmlspecialchars($page?->name)?>
             </a>
           </small>
         </p>
