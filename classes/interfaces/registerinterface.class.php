@@ -317,7 +317,7 @@ class RegisterInterface extends FormInterface
             $user->new = 1;
         }
 
-        if ($form->fields['email']) {
+        if ($form->fields['email'] ?? null) {
             $val = $user->email = trim($post['email']);
             if ($val && $block->email_as_login) {
                 $user->login = $val;
@@ -328,7 +328,7 @@ class RegisterInterface extends FormInterface
                 $user->login = $val;
             }
         }
-        if ($form->fields['password'] && ($val = (string)($post['password'] ?? ''))) {
+        if (($form->fields['password'] ?? null) && ($val = (string)($post['password'] ?? ''))) {
             $user->password = $val;
         } elseif ($new) {
             $val = $user->password = $this->generatePass();
