@@ -28,19 +28,10 @@
             </label>
         <?php } ?>
       </form>
-      <?php
-      if ($Table->Set) {
-          include \RAAS\CMS\Package::i()->view->tmp('multitable.tmp.php');
-       }
-       ?>
+      <?php echo $Table->renderFull()?>
     </div>
     <div class="tab-pane" id="groups">
-      <?php
-      if ($GroupsTable->Set) {
-          $Table = $GroupsTable;
-          include \RAAS\CMS\Package::i()->view->tmp('multitable.tmp.php');
-      }
-      ?>
+      <?php echo $GroupsTable->renderFull()?>
     </div>
   </div>
 </div>

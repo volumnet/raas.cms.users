@@ -1,53 +1,15 @@
 <?php
+/**
+ * Отображение заказов пользователя
+ */
 namespace RAAS\CMS\Users;
 
-$_RAASForm_FormTab = function (\RAAS\FormTab $formTab) use (&$_RAASForm_Form_Tabbed, &$_RAASForm_Form_Plain, &$_RAASForm_Attrs) {
-    $Table = $formTab->meta['Table'];
-    include \RAAS\CMS\ViewSub_Main::i()->tmp('/table.inc.php');
-    if ((array)$Table->Set || ($Table->emptyHeader && $Table->header)) {
-        ?>
-        <table<?php echo $_RAASTable_Attrs($Table)?>>
-          <?php if ($Table->header) { ?>
-              <thead>
-                <tr>
-                  <th>
-                  </th>
-                  <?php
-                  foreach ($Table->columns as $key => $col) {
-                      include \RAAS\Application::i()->view->context->tmp('/column.inc.php');
-                      if ($col->template) {
-                          include \RAAS\Application::i()->view->context->tmp($col->template);
-                      }
-                      $_RAASTable_Header($col, $key);
-                  }
-                  ?>
-                </tr>
-              </thead>
-          <?php } ?>
-          <?php if ((array)$Table->Set) { ?>
-              <tbody>
-                <?php
-                for ($i = 0; $i < count($Table->rows); $i++) {
-                    $row = $Table->rows[$i];
-                    include \RAAS\CMS\View_Web::i()->tmp('multirow.inc.php');
-                    if ($row->template) {
-                        include \RAAS\Application::i()->view->context->tmp($row->template);
-                    }
-                    $_RAASTable_Row($row, $i);
-                    ?>
-                <?php } ?>
-              </tbody>
-          <?php } ?>
-          <tfoot>
-            <tr>
-              <td colspan="2">
-                <all-context-menu :menu="<?php echo htmlspecialchars(json_encode(getMenu($Table->meta['allContextMenu'])))?>"></all-context-menu>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-    <?php } ?>
-    <?php if (!(array)$Table->Set && $Table->emptyString) { ?>
-      <p><?php echo htmlspecialchars($Table->emptyString)?></p>
-    <?php }
+use RAAS\FormTab;
+
+/**
+ * Отображает вкладку
+ * @param FormTab $formTab Вкладка для отображения
+ */
+$_RAASForm_FormTab = function (FormTab $formTab) {
+    echo $formTab->meta['Table']->render();
 };

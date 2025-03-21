@@ -184,7 +184,7 @@ class EditUserForm extends RAASForm
             'type' => 'checkbox',
             'name' => 'vis',
             'caption' => $this->view->_('ACTIVATED'),
-            'template' => 'edit.vis.tmp.php'
+            'template' => 'edit.vis.inc.php'
         ]);
         $tabChildren['vis'] = $field;
 

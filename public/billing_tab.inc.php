@@ -13,16 +13,11 @@ use RAAS\CMS\ViewSub_Main as CMSViewSubMain;
  * Отображает вкладку
  * @param FormTab $formTab Вкладка
  */
-$_RAASForm_FormTab = function (FormTab $formTab) use (
-    &$_RAASForm_Form_Tabbed,
-    &$_RAASForm_Form_Plain,
-    &$_RAASForm_Attrs
-) {
+$_RAASForm_FormTab = function (FormTab $formTab) {
     $table = $formTab->meta['table'];
     $billingType = $formTab->meta['billingType'];
     $user = $formTab->meta['user'];
     $balance = (float)$billingType->getBalance($user);
-    include CMSViewSubMain::i()->tmp('/table.inc.php');
     ?>
     <h2>
       Баланс
@@ -30,20 +25,10 @@ $_RAASForm_FormTab = function (FormTab $formTab) use (
         <?php echo number_format($balance, 2, '.', ' ')?>
       </span>
     </h2>
-    <table<?php echo $_RAASTable_Attrs($table)?>>
+    <table<?php echo $table->getAttrsString()?>>
       <?php if ($table->header) { ?>
           <thead>
-            <tr>
-              <?php
-              foreach ($table->columns as $key => $col) {
-                  include Application::i()->view->context->tmp('/column.inc.php');
-                  if ($col->template) {
-                      include Application::i()->view->context->tmp($col->template);
-                  }
-                  $_RAASTable_Header($col, $key);
-              }
-              ?>
-            </tr>
+            <?php echo $table->renderHeaderRow()?>
             <tr>
               <td></td>
               <td>
@@ -66,20 +51,7 @@ $_RAASForm_FormTab = function (FormTab $formTab) use (
             </tr>
           </thead>
       <?php } ?>
-      <?php if ((array)$table->Set) { ?>
-          <tbody>
-            <?php
-            for ($i = 0; $i < count($table->rows); $i++) {
-                $row = $table->rows[$i];
-                include CMSViewWeb::i()->tmp('/row.inc.php');
-                if ($row->template) {
-                    include Application::i()->view->context->tmp($row->template);
-                }
-                $_RAASTable_Row($row, $i);
-                ?>
-            <?php } ?>
-          </tbody>
-      <?php } ?>
+      <?php echo $table->renderBody()?>
     </table>
     <?php
 };

@@ -53,34 +53,49 @@ class Controller_Ajax extends Abstract_Controller
     protected function get_users()
     {
         $Set = $this->model->getUsersBySearch(isset($_GET['search_string']) ? $_GET['search_string'] : '');
-        $OUT['Set'] = array_map(
-            function ($x) {
-                $name = $x->login;
-                if ($x->full_name) {
-                    $name = $x->full_name . ' (' . $x->login . ')';
-                } elseif ($x->name) {
-                    $name = $x->name . ' (' . $x->login . ')';
-                } elseif ($x->last_name || $x->first_name || $x->second_name) {
-                    $name = trim($x->last_name . ' ' . $x->first_name . ' ' . $x->second_name . ' (' . $x->login . ')');
-                }
-                $description = '';
-                if ($x->email) {
-                    $description = $x->email;
-                }
-                $y = array('id' => (int)$x->id, 'name' => $name, 'description' => htmlspecialchars($description));
-                foreach ($x->fields as $row) {
-                    if ($row->datatype == 'image') {
-                        if ($val = $row->getValue()) {
-                            if ($val->id) {
-                                $y['img'] = '/' . $val->fileURL;
-                            }
-                        }
+        $OUT['Set'] = array_map([$this, 'formatUser'], $Set);
+        $this->view->get_users($OUT);
+    }
+
+
+    /**
+     * Форматирует пользователя для вывода подсказок
+     * @param User $user
+     * @return array <pre><code>[
+     *     'id' => int ID# материала,
+     *     'name' => string Наименование материала,
+     *     'description' => string Описание материала,
+     *     'img' =>? string URL картинки
+     * ]</code></pre>
+     */
+    public function formatUser(User $user): array
+    {
+        $name = $user->login;
+        if ($user->full_name) {
+            $name = $user->full_name . ' (' . $user->login . ')';
+        } elseif ($user->name) {
+            $name = $user->name . ' (' . $user->login . ')';
+        } elseif ($user->last_name || $user->first_name || $user->second_name) {
+            $name = trim($user->last_name . ' ' . $user->first_name . ' ' . $user->second_name . ' (' . $user->login . ')');
+        }
+        $description = '';
+        if ($user->email) {
+            $description = $user->email;
+        }
+        $result = [
+            'id' => (int)$user->id,
+            'name' => $name,
+            'description' => htmlspecialchars($description),
+        ];
+        foreach ($user->fields as $row) {
+            if ($row->datatype == 'image') {
+                if ($val = $row->getValue()) {
+                    if ($val->id) {
+                        $result['img'] = '/' . $val->fileURL;
                     }
                 }
-                return $y;
-            },
-            $Set
-        );
-        $this->view->get_users($OUT);
+            }
+        }
+        return $result;
     }
 }
