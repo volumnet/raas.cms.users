@@ -305,7 +305,7 @@ class EditUserForm extends RAASForm
             'name' => 'orders',
             'caption' => ShopViewWeb::i()->_('ORDERS'),
             'meta' => ['Table' => $ordersTable],
-            'template' => 'user_orders.inc.php'
+            'template' => fn($formTab) => $formTab->meta['Table']->render(),
         ]);
         return $tab;
     }
