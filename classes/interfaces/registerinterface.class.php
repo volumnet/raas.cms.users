@@ -344,17 +344,11 @@ class RegisterInterface extends FormInterface
         } else {
             $user->lang = $page->lang;
         }
-        if ($block->allow_edit_social &&
-            $post['social'] &&
-            $session['confirmedSocial']
-        ) {
+        if ($block->allow_edit_social && ($post['social'] ?? null) && ($session['confirmedSocial'] ?? null)) {
             $arr = [];
             foreach ((array)$post['social'] as $val) {
                 $val = trim($val);
-                if ($val && in_array($val, array_merge(
-                    (array)$session['confirmedSocial'],
-                    (array)$user->social
-                ))) {
+                if ($val && in_array($val, array_merge((array)$session['confirmedSocial'], (array)$user->social))) {
                     $arr[] = $val;
                 }
             }
