@@ -71,7 +71,7 @@ class RecoveryInterface extends FormInterface
             $result['proceed'] = true;
             $invalidKey = false;
             $tmpUser = null;
-            if ($this->get['key']) {
+            if ($this->get['key'] ?? null) {
                 $tmpUser = CMSUser::importByRecoveryKey($this->get['key']);
                 if ($tmpUser && $tmpUser->id) {
                     $user = $tmpUser;
