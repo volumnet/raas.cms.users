@@ -4,8 +4,12 @@
  */
 namespace RAAS\CMS\Users;
 
+use SOME\HTTP;
 use RAAS\Abstract_Sub_View as RAASAbstractSubView;
+use RAAS\CMS\User;
 use RAAS\CMS\User_Field;
+use RAAS\CMS\UserFieldGroup;
+use RAAS\CMS\ViewSub_Dev as CMSViewSubDev;
 
 /**
  * Класс представления раздела "Разработка"
@@ -22,10 +26,33 @@ class ViewSub_Dev extends RAASAbstractSubView
      */
     public function fields(array $in = [])
     {
+        $Set = [];
+        $fieldGroups = UserFieldGroup::getSet();
+        $grouped = (count($fieldGroups) > 1);
+        if ($grouped) {
+            foreach ($fieldGroups as $fieldGroup) {
+                $groupFields = $fieldGroup->getFields(new User());
+                if (!$fieldGroup->id) {
+                    $fieldGroup->name = $this->_('GENERAL');
+                }
+                $Set[] = $fieldGroup;
+                foreach ($groupFields as $row) {
+                    $Set[] = $row;
+                }
+            }
+        } else {
+            foreach (User_Field::getSet() as $row) {
+                $Set[] = $row;
+            }
+        }
         $in['Table'] = new FieldsTable(array_merge($in, [
             'view' => $this,
             'editAction' => 'edit_field',
-            'ctxMenu' => 'getFieldContextMenu'
+            'editGroupAction' => 'edit_fieldgroup',
+            'ctxMenu' => 'getFieldContextMenu',
+            'groupCtxMenu' => 'getFieldGroupContextMenu',
+            'Set' => $Set,
+            'grouped' => $grouped
         ]));
         $this->assignVars($in);
         $this->title = $this->_('USERS_FIELDS');
@@ -33,11 +60,18 @@ class ViewSub_Dev extends RAASAbstractSubView
             'name' => $this->_('DEVELOPMENT'),
             'href' => $this->url
         ];
-        $this->contextmenu = [[
-            'name' => $this->_('CREATE_FIELD'),
-            'href' => $this->url . '&action=edit_field',
-            'icon' => 'plus'
-        ]];
+        $this->contextmenu = [
+            [
+                'name' => $this->_('CREATE_FIELD'),
+                'href' => $this->url . '&action=edit_field',
+                'icon' => 'plus'
+            ],
+            [
+                'href' => $this->url . '&action=edit_fieldgroup',
+                'name' => $this->_('CREATE_FIELDGROUP'),
+                'icon' => 'plus'
+            ],
+        ];
         $this->template = $in['Table']->template;
     }
 
@@ -70,6 +104,75 @@ class ViewSub_Dev extends RAASAbstractSubView
             'href' => $this->url . '&action=fields'
         ];
         $this->stdView->stdEdit($in, 'getFieldContextMenu');
+    }
+
+
+    /**
+     * Редактирование группы полей пользователей
+     * @param [
+     *            'Item' => UserFieldGroup Группа полей для редактирования,
+     *            'meta' => [
+     *                'parentUrl' => string URL родительской страницы
+     *            ],
+     *            'localError' =>? array<[
+     *                'name' => string Тип ошибки,
+     *                'value' => string URN поля, к которому относится ошибка,
+     *                'description' => string Описание ошибки,
+     *            ]> Ошибки,
+     *            'Form' => EditFieldGroupForm Форма редактирования,
+     *        ] $in Входные данные
+     */
+    public function editFieldGroup(array $in = [])
+    {
+        $this->path[] = [
+            'name' => $this->_('DEVELOPMENT'),
+            'href' => $this->url
+        ];
+        $this->path[] = [
+            'name' => $this->_('USERS_FIELDS'),
+            'href' => $this->url . '&action=fields'
+        ];
+        $this->stdView->stdEdit($in, 'getFieldGroupContextMenu');
+        $this->subtitle = CMSViewSubDev::i()->getFieldGroupSubtitle($in['Item']);
+    }
+
+
+    /**
+     * Перемещение поля в группу
+     * @param [
+     *            'Item' =>? User_Field Текущее поле,
+     *            'items' =>? array<User_Field> Список текущих полей
+     *        ] $in Входные данные
+     */
+    public function moveFieldToGroup(array $in = [])
+    {
+        $gids = array_map(function ($x) {
+            return (int)$x->gid;
+        }, $in['items']);
+        $in['menu'] = array_map(function ($fieldGroup) use ($gids) {
+            return [
+                'name' => $fieldGroup->name ?: $this->_('GENERAL'),
+                'href' => HTTP::queryString('gid=' . (int)$fieldGroup->id),
+                'active' => in_array($fieldGroup->id, $gids),
+            ];
+        }, UserFieldGroup::getSet());
+        $in['hint'] = $this->_('CHOOSE_FIELDGROUP');
+
+        $this->assignVars($in);
+        $this->path[] = [
+            'name' => $this->_('DEVELOPMENT'),
+            'href' => $this->url
+        ];
+        $this->path[] = [
+            'name' => $this->_('USERS_FIELDS'),
+            'href' => $this->url . '&action=fields'
+        ];
+        if (count($in['items']) == 1) {
+            $this->contextmenu = $this->getFieldContextMenu($in['Item']);
+            $this->subtitle = CMSViewSubDev::i()->getFieldSubtitle($in['Item']);
+        }
+        $this->title = $this->_('MOVING_FIELDS_TO_GROUP');
+        $this->template = '/move';
     }
 
 
@@ -147,8 +250,13 @@ class ViewSub_Dev extends RAASAbstractSubView
             'href' => $this->url . '&action=fields',
             'name' => $this->_('USERS_FIELDS'),
             'active' => (
-                in_array($this->action, ['fields', 'edit_field']) &&
-                !$this->moduleName
+                in_array($this->action, [
+                    'fields',
+                    'edit_field',
+                    'edit_fieldgroup',
+                    'move_field_to_group',
+                ]) &&
+                ($this->moduleName == 'users')
             )
         ];
         $billingTypes = BillingType::getSet();
@@ -256,6 +364,11 @@ class ViewSub_Dev extends RAASAbstractSubView
             'icon' => 'asterisk',
         ];
         $arr[] = [
+            'name' => $this->_('MOVE_TO_FIELDGROUP'),
+            'href' => $this->url . '&action=move_field_to_group',
+            'icon' => 'share-alt'
+        ];
+        $arr[] = [
             'name' => $this->_('DELETE'),
             'href' => $this->url . '&action=delete_field&back=1',
             'icon' => 'remove',
@@ -263,6 +376,34 @@ class ViewSub_Dev extends RAASAbstractSubView
                       .     $this->_('DELETE_MULTIPLE_TEXT')
                       .  '\')'
         ];
+        return $arr;
+    }
+
+
+    /**
+     * Возвращает контекстное меню для группы полей
+     * @param UserFieldGroup $fieldGroup Группа полей для получения контекстного меню
+     * @param int $i Порядок поля в списке
+     * @param int $c Количество полей в списке
+     * @return array<[
+     *             'href' ?=> string Ссылка,
+     *             'name' => string Заголовок пункта
+     *             'icon' ?=> string Наименование иконки,
+     *             'title' ?=> string Всплывающая подсказка
+     *             'onclick' ?=> string JavaScript-команда при клике,
+     *         ]>
+     */
+    public function getFieldGroupContextMenu(UserFieldGroup $fieldGroup, $i = 0, $c = 0)
+    {
+        $arr = [];
+        $arr = array_merge($arr, $this->stdView->stdContextMenu(
+            $fieldGroup,
+            $i,
+            $c,
+            'edit_fieldgroup',
+            'fields',
+            'delete_fieldgroup'
+        ));
         return $arr;
     }
 

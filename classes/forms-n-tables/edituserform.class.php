@@ -11,9 +11,11 @@ use RAAS\Form as RAASForm;
 use RAAS\FormTab;
 use RAAS\Option;
 use RAAS\CMS\CMSAccess;
+use RAAS\CMS\FieldGroup;
 use RAAS\CMS\Group;
 use RAAS\CMS\Package;
 use RAAS\CMS\User;
+use RAAS\CMS\UserFieldGroup;
 use RAAS\CMS\Shop\Order;
 use RAAS\CMS\Shop\View_Web as ShopViewWeb;
 
@@ -41,9 +43,31 @@ class EditUserForm extends RAASForm
     public function __construct(array $params = [])
     {
         $view = $this->view;
-        $t = $this;
         unset($params['view']);
         $item = isset($params['Item']) ? $params['Item'] : null;
+
+
+        $tabs = [];
+        foreach (UserFieldGroup::getSet() as $fieldGroupURN => $fieldGroup) {
+            if ($fieldGroupURN == '') {
+                $tabs['common'] = $this->getCommonTab($item);
+            } else {
+                if ($tab = $this->getGroupTab($fieldGroup, $item)) {
+                    $tabs[$tab->name] = $tab;
+                }
+            }
+        }
+        // $tabs['common'] = $this->getCommonTab($item);
+        $tabs['groups'] = $this->getGroupsTab();
+        if ($item->id) {
+            if (class_exists('RAAS\CMS\Shop\Order')) {
+                $tabs['orders'] = $this->getOrdersTab($item);
+            }
+            $billingTypes = BillingType::getSet();
+            foreach ($billingTypes as $billingType) {
+                $tabs['billing' . (int)$billingType->id] = $this->getBillingTab($item, $billingType);
+            }
+        }
 
         $defaultParams = [
             'Item' => $item,
@@ -51,9 +75,9 @@ class EditUserForm extends RAASForm
             'caption' => $item->id
                       ?  ($item->full_name ? ($item->full_name . ' (' . $item->login . ')') : $item->login)
                       :  $this->view->_('CREATING_USER'),
-            'children' => [],
+            'children' => $tabs,
             'template' => 'edit',
-            'export' => function ($Form) use ($t) {
+            'export' => function ($Form) {
                 $oldVis = (int)$Form->Item->vis;
                 $Form->exportDefault();
                 $Form->Item->new = 0;
@@ -85,32 +109,20 @@ class EditUserForm extends RAASForm
 
         $arr = array_merge($defaultParams, $params);
         parent::__construct($arr);
-        $this->children['common'] = $this->getCommonTab();
-        $this->children['groups'] = $this->getGroupsTab();
-        if ($item->id) {
-            if (class_exists('RAAS\CMS\Shop\Order')) {
-                $this->children['orders'] = $this->getOrdersTab($this->Item);
-            }
-            $billingTypes = BillingType::getSet();
-            foreach ($billingTypes as $billingType) {
-                $this->children['billing' . (int)$billingType->id] = $this->getBillingTab(
-                    $this->Item,
-                    $billingType
-                );
-            }
-        }
     }
 
 
     /**
      * Получает основную вкладку редактирования пользователя
+     * @param User $item Пользователь для редактирования
      * @return FormTab
      */
-    protected function getCommonTab()
+    protected function getCommonTab(User $item): FormTab
     {
+        $groupTabs = UserFieldGroup::getSet();
+        $groupTab = $this->getGroupTab($groupTabs[''], $item);
+
         $tabChildren = [];
-        $t = $this;
-        $item = $this->Item;
         $CONTENT = [];
         $CONTENT['languages'] = [];
         foreach ($this->view->availableLanguages as $key => $val) {
@@ -124,14 +136,14 @@ class EditUserForm extends RAASForm
             'required' => 'required'
         ]);
         $field->required = 'required';
-        $field->check = function ($field) use ($t) {
+        $field->check = function ($field) {
             $localError = $field->getErrors();
             if (!$localError) {
                 if ($field->Form->Item->checkLoginExists($_POST[$field->name])) {
                     $localError[] = [
                         'name' => 'INVALID',
                         'value' => $field->name,
-                        'description' => $t->view->_('ERR_LOGIN_EXISTS')
+                        'description' => $this->view->_('ERR_LOGIN_EXISTS')
                     ];
                 }
             }
@@ -145,7 +157,7 @@ class EditUserForm extends RAASForm
             'name' => 'password',
             'caption' => $this->view->_('PASSWORD'),
             'confirm' => true,
-            'export' => function ($field) use ($t) {
+            'export' => function ($field) {
                 if ($_POST[$field->name]) {
                     $field->Form->Item->password_md5 = Application::i()->md5It(
                         trim($_POST[$field->name])
@@ -164,14 +176,14 @@ class EditUserForm extends RAASForm
             'name' => 'email',
             'caption' => $this->view->_('EMAIL')
         ]);
-        $field->check = function ($field) use ($t) {
+        $field->check = function ($field) {
             $localError = $field->getErrors();
             if (!$localError) {
                 if ($field->Form->Item->checkEmailExists($_POST[$field->name])) {
                     $localError[] = [
                         'name' => 'INVALID',
                         'value' => $field->name,
-                        'description' => $t->view->_('ERR_EMAIL_EXISTS')
+                        'description' => $this->view->_('ERR_EMAIL_EXISTS')
                     ];
                 }
             }
@@ -200,8 +212,8 @@ class EditUserForm extends RAASForm
 
 
         // Кастомные поля
-        foreach ($item->fields as $row) {
-            $tabChildren[$row->urn] = $row->Field;
+        foreach ($groupTab->children as $fieldURN => $field) {
+            $tabChildren[$fieldURN] = $field;
         }
 
         // Социальные сети
@@ -210,10 +222,8 @@ class EditUserForm extends RAASForm
             'name' => 'social',
             'multiple' => true,
             'caption' => $this->view->_('SOCIAL_NETWORKS'),
-            'export' => function ($field) use ($t) {
-                $field->Form->Item->meta_social = isset($_POST[$field->name])
-                                                ? (array)$_POST[$field->name]
-                                                : [];
+            'export' => function ($field) {
+                $field->Form->Item->meta_social = (array)($_POST[$field->name] ?? []);
             }
         ]);
 
@@ -227,12 +237,36 @@ class EditUserForm extends RAASForm
 
 
     /**
+     * Получает вкладку по группе полей
+     * @param FieldGroup $fieldGroup Группа полей
+     * @param User $item Пользователь для редактирования
+     * @return FormTab|null null, если нет полей и группа не общая
+     */
+    protected function getGroupTab(FieldGroup $fieldGroup, User $item): ?FormTab
+    {
+        $tab = new FormTab([
+            'name' => 'group_' . $fieldGroup->urn,
+            'caption' => $fieldGroup->name
+        ]);
+        $formFields = $fieldGroup->getFields($item);
+        if (!$formFields && $fieldGroup->id) {
+            return null;
+        }
+        foreach ($formFields as $field) {
+            $field = $field->deepClone();
+            $field->Owner = $item;
+            $tab->children[$field->urn] = $field->Field;
+        }
+        return $tab;
+    }
+
+
+    /**
      * Получает вкладку "Группы"
      * @return FormTab
      */
-    public function getGroupsTab()
+    public function getGroupsTab(): FormTab
     {
-        $t = $this;
         $g = new Group();
         $tab = new FormTab([
             'name' => 'groups',
@@ -243,27 +277,22 @@ class EditUserForm extends RAASForm
                     'name' => 'groups',
                     'multiple' => 'multiple',
                     'children' => ['Set' => $g->children],
-                    'import' => function ($field) use ($t) {
+                    'import' => function ($field) {
                         return $field->Form->Item->groups_ids;
                     },
-                    'oncommit' => function ($field) use ($t) {
+                    'oncommit' => function ($field) {
+                        $item = $field->Form->Item;
                         $sqlQuery = "DELETE FROM cms_users_groups_assoc
                                       WHERE uid = ?";
-                        $t->Item->_SQL()->query([
-                            $sqlQuery,
-                            (int)$field->Form->Item->id
-                        ]);
+                        $item->_SQL()->query([$sqlQuery, (int)$field->Form->Item->id]);
                         $arr = [];
                         foreach ((array)($_POST[$field->name] ?? []) as $val) {
                             if ((int)$val) {
-                                $arr[] = [
-                                    'uid' => (int)$field->Form->Item->id,
-                                    'gid' => (int)$val
-                                ];
+                                $arr[] = ['uid' => (int)$field->Form->Item->id, 'gid' => (int)$val];
                             }
                         }
-                        $t->Item->_SQL()->add("cms_users_groups_assoc", $arr);
-                        CMSAccess::refreshMaterialsAccessCache($t->Item);
+                        $item->_SQL()->add("cms_users_groups_assoc", $arr);
+                        CMSAccess::refreshMaterialsAccessCache($item);
                     }
                 ]
             ],
@@ -277,7 +306,7 @@ class EditUserForm extends RAASForm
      * @param User $user Пользователь
      * @return FormTab
      */
-    private function getOrdersTab(User $user)
+    private function getOrdersTab(User $user): FormTab
     {
         $ordersTable = new UserOrdersTable([
             'Item' => $user,
@@ -317,7 +346,7 @@ class EditUserForm extends RAASForm
      * @param BillingType $billingType Тип биллинга
      * @return FormTab
      */
-    protected function getBillingTab(User $user, BillingType $billingType)
+    protected function getBillingTab(User $user, BillingType $billingType): FormTab
     {
         $billingTable = new BillingTransactionsTable([
             'Set' => BillingTransaction::getSet([
@@ -340,5 +369,4 @@ class EditUserForm extends RAASForm
         ]);
         return $tab;
     }
-
 }
