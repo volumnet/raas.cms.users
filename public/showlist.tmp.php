@@ -19,7 +19,7 @@
         <?php } ?>
         <div class="input-append">
           <input type="search" class="span2 search-query" name="search_string" value="<?php echo htmlspecialchars($VIEW->nav['search_string'] ?? '')?>" />
-          <button type="submit" class="btn"><i class="icon-search"></i></button>
+          <button type="submit" class="btn"><raas-icon icon="search"></raas-icon></button>
         </div> &nbsp;
         <?php if ($Group->id) { ?>
             <label class="checkbox" for="group_only">

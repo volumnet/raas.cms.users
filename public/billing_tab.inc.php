@@ -46,7 +46,7 @@ $_RAASForm_FormTab = function (FormTab $formTab) {
               </td>
               <td>
                 <input type="text" class="span5" name="billing_transaction_name[<?php echo (int)$billingType->id?>]" style="margin: 0 auto;" />
-                <button type="submit" class="btn btn-primary"><span class="fa fa-plus"></span></button>
+                <button type="submit" class="btn btn-primary"><raas-icon icon="plus"></raas-icon></button>
               </td>
             </tr>
           </thead>
